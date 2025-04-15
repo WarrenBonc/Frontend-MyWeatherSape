@@ -1,5 +1,5 @@
-import { useDispatch } from 'react-redux';
-import { setToken, setUser, setLoading, setError } from '../reducers/user'; 
+import { useDispatch } from "react-redux";
+import { setToken, setUser, setLoading, setError } from "../reducers/user";
 
 import React, { useState } from "react";
 import {
@@ -14,56 +14,50 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
-
 const SigninPage = ({ navigation }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const dispatch = useDispatch(); 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
-// Fonction de soumission de formulaire
-const handleSignin = () => {
-  if (!email || !password) {
-    setError('Veuillez entrer votre email et mot de passe.');
-    return;
-  }
-
-  setLoading(true);
-  setError(''); // Réinitialise l'erreur avant de commencer la requête
-  fetch('http://192.168.0.32:3000/api/users/signin', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email, password }),
-  })
-  .then(response => response.json())  // Gère la réponse de l'API
-  .then(data => {
-    console.log("Réponse API :", data);
-    if (data.result===true) {
-      // Si la connexion réussit, on enregistre le token et l'utilisateur
-      dispatch(setToken(data.token));  // Enregistre le token dans Redux
-      dispatch(setUser(data.userId));  // Optionnel, pour garder des informations utilisateur
-      navigation.navigate('Preference');  // Redirige vers la page de préférence
-    } else {
-      setError(data.error);  // Affiche l'erreur si la connexion échoue
+  // Fonction de soumission de formulaire
+  const handleSignin = () => {
+    if (!email || !password) {
+      setError("Veuillez entrer votre email et mot de passe.");
+      return;
     }
-  })
-  .catch(err => {
-    console.error(err);
-    setError('Une erreur est survenue, veuillez réessayer.');
-  })
-  .finally(() => {
-    setLoading(false);  // Réinitialise l'état de chargement
-  });
-};
 
-
-
-
-
+    setLoading(true);
+    setError(""); // Réinitialise l'erreur avant de commencer la requête
+    fetch("http://192.168.0.44:3000/api/users/signin", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    })
+      .then((response) => response.json()) // Gère la réponse de l'API
+      .then((data) => {
+        console.log("Réponse API :", data);
+        if (data.result === true) {
+          // Si la connexion réussit, on enregistre le token et l'utilisateur
+          dispatch(setToken(data.token)); // Enregistre le token dans Redux
+          dispatch(setUser(data.userId)); // Optionnel, pour garder des informations utilisateur
+          navigation.navigate("MainTabs"); // Redirige vers la page de préférence
+        } else {
+          setError(data.error); // Affiche l'erreur si la connexion échoue
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        setError("Une erreur est survenue, veuillez réessayer.");
+      })
+      .finally(() => {
+        setLoading(false); // Réinitialise l'état de chargement
+      });
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -91,7 +85,7 @@ const handleSignin = () => {
             placeholderTextColor="#aaa"
             keyboardType="email-address"
             value={email}
-            onChangeText={text => setEmail(text)}
+            onChangeText={(text) => setEmail(text)}
           />
           <View style={styles.passwordContainer}>
             <TextInput
@@ -100,8 +94,9 @@ const handleSignin = () => {
               placeholderTextColor="#aaa"
               secureTextEntry={!passwordVisible}
               value={password}
-              onChangeText={text => setPassword(text)}
+              onChangeText={(text) => setPassword(text)}
             />
+
             <TouchableOpacity
               onPress={() => setPasswordVisible(!passwordVisible)}
               style={styles.iconContainer}
@@ -116,7 +111,7 @@ const handleSignin = () => {
               />
             </TouchableOpacity>
           </View>
-
+          {error && <Text style={{ color: "red" }}>{error}</Text>}
           {/* Forgot Password */}
           <TouchableOpacity style={styles.forgotPasswordButton}>
             <Text style={styles.forgotPasswordText}>Mot de passe oublié ?</Text>
@@ -131,11 +126,8 @@ const handleSignin = () => {
           >
             <TouchableOpacity
               style={styles.buttonContent}
-<<<<<<< HEAD
-              onPress={() => navigation.navigate("MainTabs")}
-=======
-              onPress={handleSignin}
->>>>>>> 0dd044c336c88519d9d3c7a5c23e6e77d6aecafc
+              disabled={loading} // Disable button when loading
+              onPress={() => handleSignin()}
             >
               <Text style={styles.buttonText}>Se connecter</Text>
             </TouchableOpacity>

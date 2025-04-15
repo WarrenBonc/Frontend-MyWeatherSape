@@ -1,5 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View, Image } from "react-native";
+import Questionaire from "../components/Questionnaire";
 
 const PreferencePage = () => {
   return (
@@ -13,6 +14,7 @@ const PreferencePage = () => {
         source={require("../assets/Ellipse.png")}
         style={[styles.ellipse, styles.topRight]}
       />
+      <Questionaire />
     </View>
   );
 };

@@ -34,6 +34,7 @@ function BottomTabs() {
   return (
     <Tab.Navigator screenOptions={{ headerShown: false }}>
       <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Dressing" component={DressingScreen} />
       <Tab.Screen name="Settings" component={SettingsScreen} />
     </Tab.Navigator>
   );
@@ -54,7 +55,6 @@ export default function App() {
           <Stack.Screen name="SignIn" component={SigninScreen} />
           <Stack.Screen name="Signup" component={SignupScreen} />
           <Stack.Screen name="Preference" component={PreferenceScreen} />
-          <Stack.Screen name="Dressing" component={DressingScreen} />
           <Stack.Screen name="MainTabs" component={BottomTabs} />
         </Stack.Navigator>
       </NavigationContainer>
