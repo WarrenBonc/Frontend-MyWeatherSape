@@ -173,10 +173,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
-    marginBottom: 0,
+    marginTop: 35,
   },
   title: {
-    fontSize: 34,
+    fontSize: 29,
     fontWeight: "bold",
     marginBottom: 20,
     color: "#333",

@@ -145,13 +145,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
-    marginBottom: 20,
+    marginBottom: 10,
   },
   title: {
-    fontSize: 34,
+    fontSize: 29,
     fontWeight: "bold",
     marginBottom: 20,
     color: "#333",
+    textAlign: "center",
   },
   text: {
     fontSize: 14,
