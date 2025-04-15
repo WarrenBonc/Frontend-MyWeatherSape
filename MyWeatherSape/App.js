@@ -3,6 +3,20 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
+
+import { Provider } from "react-redux";
+import { configureStore } from "@reduxjs/toolkit";
+
+import user from './reducers/user';
+
+//creation du store
+const store = configureStore({
+  reducer: {
+    user: userReducer,
+  },
+});
+
+
 // Import Screens
 import WelcomeScreen from "./screens/WelcomeScreen";
 import SigninScreen from "./screens/SigninScreen";
@@ -32,6 +46,7 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
+    <Provider store={store}>
     <NavigationContainer>
       <Stack.Navigator
         screenOptions={{ headerShown: false }}
@@ -45,5 +60,6 @@ export default function App() {
         <Stack.Screen name="MainTabs" component={BottomTabs} />
       </Stack.Navigator>
     </NavigationContainer>
+    </Provider>
   );
 }
