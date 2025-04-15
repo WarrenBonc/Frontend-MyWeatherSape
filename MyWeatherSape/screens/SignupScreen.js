@@ -109,7 +109,7 @@ const SignupPage = ({ navigation }) => {
               <Text style={styles.buttonText}>Créer un compte</Text>
             </TouchableOpacity>
           </LinearGradient>
-          <Text style={styles.orText}>Ou connectez-vous avec</Text>
+          <Text style={styles.orText}>Ou inscrivez-vous avec</Text>
           <View style={styles.socialButtonsContainer}>
             <TouchableOpacity
               style={[styles.socialButton, styles.googleButton]}
