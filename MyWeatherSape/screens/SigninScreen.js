@@ -1,5 +1,5 @@
-import { useDispatch } from 'react-redux';
-import { setToken, setUser, setLoading, setError } from '../reducers/user'; 
+import { useDispatch } from "react-redux";
+import { setToken, setUser, setLoading, setError } from "../reducers/user";
 
 import React, { useState } from "react";
 import {
@@ -14,21 +14,20 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
-
 const SigninPage = ({ navigation }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const dispatch = useDispatch(); 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
-// Fonction de soumission de formulaire
-const handleSignin = () => {
-  if (!email || !password) {
-    setError('Veuillez entrer votre email et mot de passe.');
-    return;
-  }
+  // Fonction de soumission de formulaire
+  const handleSignin = () => {
+    if (!email || !password) {
+      setError("Veuillez entrer votre email et mot de passe.");
+      return;
+    }
 
   setLoading(true);
   setError(''); // Réinitialise l'erreur avant de commencer la requête
@@ -91,7 +90,7 @@ const handleSignin = () => {
             placeholderTextColor="#aaa"
             keyboardType="email-address"
             value={email}
-            onChangeText={text => setEmail(text)}
+            onChangeText={(text) => setEmail(text)}
           />
           <View style={styles.passwordContainer}>
             <TextInput
@@ -100,8 +99,9 @@ const handleSignin = () => {
               placeholderTextColor="#aaa"
               secureTextEntry={!passwordVisible}
               value={password}
-              onChangeText={text => setPassword(text)}
+              onChangeText={(text) => setPassword(text)}
             />
+
             <TouchableOpacity
               onPress={() => setPasswordVisible(!passwordVisible)}
               style={styles.iconContainer}
@@ -116,7 +116,7 @@ const handleSignin = () => {
               />
             </TouchableOpacity>
           </View>
-
+          {error && <Text style={{ color: "red" }}>{error}</Text>}
           {/* Forgot Password */}
           <TouchableOpacity style={styles.forgotPasswordButton}>
             <Text style={styles.forgotPasswordText}>Mot de passe oublié ?</Text>
@@ -131,7 +131,11 @@ const handleSignin = () => {
           >
             <TouchableOpacity
               style={styles.buttonContent}
+<<<<<<< HEAD
               onPress={() => navigation.navigate("MainTabs")}
+=======
+              onPress={handleSignin}
+>>>>>>> 0dd044c336c88519d9d3c7a5c23e6e77d6aecafc
             >
               <Text style={styles.buttonText}>Se connecter</Text>
             </TouchableOpacity>
