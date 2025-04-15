@@ -41,9 +41,9 @@ console.log("🧥 Recommandation IA :", recommendation);
 
     try {
       const [currentRes, forecastRes, aiRes] = await Promise.all([
-        fetch(`http://localhost:3000/api/weather?city=${city}`),
-        fetch(`http://localhost:3000/api/weather/forecast?city=${city}&days=5`),
-        fetch(`http://localhost:3000/api/weather/recommendation`, {
+        fetch(`http://192.168.1.45:3000/api/weather?city=${city}`),
+        fetch(`http://192.168.1.45:3000/api/weather/forecast?city=${city}&days=5`),
+        fetch(`http://192.168.1.45:3000/api/weather/recommendation`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userId, city }),

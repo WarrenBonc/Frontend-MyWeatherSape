@@ -32,7 +32,7 @@ const handleSignin = () => {
 
   setLoading(true);
   setError(''); // Réinitialise l'erreur avant de commencer la requête
-  fetch('http://192.168.0.32:3000/api/users/signin', {
+  fetch('http://192.168.1.45:3000/api/users/signin', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -131,11 +131,7 @@ const handleSignin = () => {
           >
             <TouchableOpacity
               style={styles.buttonContent}
-<<<<<<< HEAD
               onPress={() => navigation.navigate("MainTabs")}
-=======
-              onPress={handleSignin}
->>>>>>> 0dd044c336c88519d9d3c7a5c23e6e77d6aecafc
             >
               <Text style={styles.buttonText}>Se connecter</Text>
             </TouchableOpacity>
