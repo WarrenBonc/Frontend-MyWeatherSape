@@ -15,6 +15,36 @@ const SignupPage = ({ navigation }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [dateOfBirth, setDateOfBirth] = useState("");
 
+const [firstName, setFirstName] = useState("");
+const [email, setEmail] = useState("");
+const [password, setPassword] = useState("");
+
+const handleSignup = () => {
+  fetch("http://192.168.0.32:3000/api/users/signup", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      firstName,
+      email,
+      password,
+      birthdate: dateOfBirth.split("/").reverse().join("-"), // Format yyyy-mm-dd
+    }),
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.result) {
+        navigation.navigate("Preference");
+      } else {
+        alert(data.error);
+      }
+    })
+    .catch(error => {
+      alert("Une erreur est survenue lors de l'inscription.");
+      console.error(error);
+    });
+};
+
+
   const handleDateInput = (text) => {
     // Supprime tout caractère non numérique
     const cleaned = text.replace(/[^0-9]/g, "");
@@ -55,12 +85,16 @@ const SignupPage = ({ navigation }) => {
             style={styles.input}
             placeholder="Prénom"
             placeholderTextColor="#aaa"
+            value={firstName}
+            onChangeText={setFirstName}
           />
           <TextInput
             style={styles.input}
             placeholder="Email"
             placeholderTextColor="#aaa"
             keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
           />
           <View style={styles.passwordContainer}>
             <TextInput
@@ -68,6 +102,8 @@ const SignupPage = ({ navigation }) => {
               placeholder="Mot de passe"
               placeholderTextColor="#aaa"
               secureTextEntry={!passwordVisible}
+              value={password}
+              onChangeText={setPassword}
             />
             <TouchableOpacity
               onPress={() => setPasswordVisible(!passwordVisible)}
@@ -104,7 +140,7 @@ const SignupPage = ({ navigation }) => {
           >
             <TouchableOpacity
               style={styles.buttonContent}
-              onPress={() => navigation.navigate("Preference")}
+              onPress={handleSignup}
             >
               <Text style={styles.buttonText}>Créer un compte</Text>
             </TouchableOpacity>
