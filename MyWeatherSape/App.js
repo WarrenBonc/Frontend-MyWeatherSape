@@ -3,19 +3,17 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 
-import user from './reducers/user';
+import User from "./reducers/user";
 
 //creation du store
 const store = configureStore({
   reducer: {
-    user: userReducer,
+    user: User,
   },
 });
-
 
 // Import Screens
 import WelcomeScreen from "./screens/WelcomeScreen";
@@ -47,19 +45,19 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <Provider store={store}>
-    <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{ headerShown: false }}
-        initialRouteName={!token ? "Welcome" : "MainTabs"}
-      >
-        <Stack.Screen name="Welcome" component={WelcomeScreen} />
-        <Stack.Screen name="SignIn" component={SigninScreen} />
-        <Stack.Screen name="Signup" component={SignupScreen} />
-        <Stack.Screen name="Preference" component={PreferenceScreen} />
-        <Stack.Screen name="Dressing" component={DressingScreen} />
-        <Stack.Screen name="MainTabs" component={BottomTabs} />
-      </Stack.Navigator>
-    </NavigationContainer>
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{ headerShown: false }}
+          initialRouteName={!token ? "Welcome" : "MainTabs"}
+        >
+          <Stack.Screen name="Welcome" component={WelcomeScreen} />
+          <Stack.Screen name="SignIn" component={SigninScreen} />
+          <Stack.Screen name="Signup" component={SignupScreen} />
+          <Stack.Screen name="Preference" component={PreferenceScreen} />
+          <Stack.Screen name="Dressing" component={DressingScreen} />
+          <Stack.Screen name="MainTabs" component={BottomTabs} />
+        </Stack.Navigator>
+      </NavigationContainer>
     </Provider>
   );
 }

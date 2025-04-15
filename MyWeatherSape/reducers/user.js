@@ -3,8 +3,8 @@ import { createSlice } from "@reduxjs/toolkit";
 const userSlice = createSlice({
   name: "user",
   initialState: {
-    value: "", // Stocke le nom de l'utilisateur
-    token: "", // Stocke le token d'authentification
+    value: null, // Stocke le nom de l'utilisateur
+    token: null, // Stocke le token d'authentification
     isAuthenticated: false, // Indique si l'utilisateur est authentifié
     loading: false, // Indique si une requête est en cours
     error: null, // Stocke l'erreur (si existante)
@@ -24,12 +24,13 @@ const userSlice = createSlice({
       state.error = action.payload; // Met à jour l'erreur
     },
     logout: (state) => {
-      state.token = ""; // Efface le token
-      state.value = ""; // Efface le nom de l'utilisateur
+      state.token = null; // Efface le token
+      state.value = null; // Efface le nom de l'utilisateur
       state.isAuthenticated = false; // L'utilisateur n'est plus authentifié
     },
   },
 });
 
-export const { setUser, setToken, setLoading, setError, logout } = userSlice.actions;
+export const { setUser, setToken, setLoading, setError, logout } =
+  userSlice.actions;
 export default userSlice.reducer;
