@@ -1,3 +1,6 @@
+import { useDispatch } from 'react-redux';
+import { setToken, setUser, setLoading, setError } from '../reducers/user'; 
+
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -11,8 +14,56 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
+
 const SigninPage = ({ navigation }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const dispatch = useDispatch(); 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+// Fonction de soumission de formulaire
+const handleSignin = () => {
+  if (!email || !password) {
+    setError('Veuillez entrer votre email et mot de passe.');
+    return;
+  }
+
+  setLoading(true);
+  setError(''); // Réinitialise l'erreur avant de commencer la requête
+  fetch('http://192.168.0.32:3000/api/users/signin', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, password }),
+  })
+  .then(response => response.json())  // Gère la réponse de l'API
+  .then(data => {
+    console.log("Réponse API :", data);
+    if (data.result===true) {
+      // Si la connexion réussit, on enregistre le token et l'utilisateur
+      dispatch(setToken(data.token));  // Enregistre le token dans Redux
+      dispatch(setUser(data.userId));  // Optionnel, pour garder des informations utilisateur
+      navigation.navigate('Preference');  // Redirige vers la page de préférence
+    } else {
+      setError(data.error);  // Affiche l'erreur si la connexion échoue
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    setError('Une erreur est survenue, veuillez réessayer.');
+  })
+  .finally(() => {
+    setLoading(false);  // Réinitialise l'état de chargement
+  });
+};
+
+
+
+
+
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -39,6 +90,8 @@ const SigninPage = ({ navigation }) => {
             placeholder="Email"
             placeholderTextColor="#aaa"
             keyboardType="email-address"
+            value={email}
+            onChangeText={text => setEmail(text)}
           />
           <View style={styles.passwordContainer}>
             <TextInput
@@ -46,6 +99,8 @@ const SigninPage = ({ navigation }) => {
               placeholder="Mot de passe"
               placeholderTextColor="#aaa"
               secureTextEntry={!passwordVisible}
+              value={password}
+              onChangeText={text => setPassword(text)}
             />
             <TouchableOpacity
               onPress={() => setPasswordVisible(!passwordVisible)}
@@ -76,7 +131,7 @@ const SigninPage = ({ navigation }) => {
           >
             <TouchableOpacity
               style={styles.buttonContent}
-              onPress={() => navigation.navigate("Preference")}
+              onPress={handleSignin}
             >
               <Text style={styles.buttonText}>Se connecter</Text>
             </TouchableOpacity>
