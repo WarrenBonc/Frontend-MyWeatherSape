@@ -131,11 +131,7 @@ const handleSignin = () => {
           >
             <TouchableOpacity
               style={styles.buttonContent}
-<<<<<<< HEAD
-              onPress={() => navigation.navigate("MainTabs")}
-=======
-              onPress={handleSignin}
->>>>>>> 0dd044c336c88519d9d3c7a5c23e6e77d6aecafc
+              onPress={() => handleSignin}
             >
               <Text style={styles.buttonText}>Se connecter</Text>
             </TouchableOpacity>
