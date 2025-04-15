@@ -76,7 +76,7 @@ const SigninPage = ({ navigation }) => {
           >
             <TouchableOpacity
               style={styles.buttonContent}
-              onPress={() => navigation.navigate("Preference")}
+              onPress={() => navigation.navigate("MainTabs")}
             >
               <Text style={styles.buttonText}>Se connecter</Text>
             </TouchableOpacity>

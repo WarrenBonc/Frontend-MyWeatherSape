@@ -1,10 +1,18 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Image } from "react-native";
 
 const PreferencePage = () => {
   return (
     <View style={styles.container}>
-      <Text>PreferencePage</Text>
+      <Image
+        source={require("../assets/Ellipse.png")}
+        style={[styles.ellipse, styles.bottomLeft]}
+      />
+      {/* Ellipse Top Right */}
+      <Image
+        source={require("../assets/Ellipse.png")}
+        style={[styles.ellipse, styles.topRight]}
+      />
     </View>
   );
 };
@@ -15,6 +23,20 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+  },
+  ellipse: {
+    position: "absolute",
+    width: 700,
+    height: 700,
+    resizeMode: "contain",
+  },
+  bottomLeft: {
+    bottom: -280,
+    left: -280,
+  },
+  topRight: {
+    top: -280,
+    right: -280,
   },
 });
 
