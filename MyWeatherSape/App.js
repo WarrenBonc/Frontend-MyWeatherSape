@@ -7,11 +7,13 @@ import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 
 import User from "./reducers/user";
+import Weather from "./reducers/weather";
 
 //creation du store
 const store = configureStore({
   reducer: {
     user: User,
+    weather: Weather,
   },
 });
 
