@@ -17,6 +17,10 @@ const userSlice = createSlice({
     setUser: (state, action) => {
       state.value = action.payload; // Met à jour le nom de l'utilisateur
     },
+    updateUser: (state, action) => {
+      state.value.firstName = action.payload.firstName;
+      state.value.email = action.payload.email;
+    },
     setToken: (state, action) => {
       state.token = action.payload; // Met à jour le token d'authentification
       state.isAuthenticated = true; // L'utilisateur est authentifié

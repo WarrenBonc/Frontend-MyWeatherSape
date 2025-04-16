@@ -1,14 +1,23 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function LegalScreen() {
   const navigation = useNavigation();
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Text style={styles.backButtonText}>← Retour</Text>
+      
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <LinearGradient
+          colors={['#34C8E8', '#4E4AF2']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.backGradient}
+        >
+          <Text style={styles.backButtonText}>←</Text>
+        </LinearGradient>
       </TouchableOpacity>
 
       <Text style={styles.title}>Mentions légales</Text>
@@ -20,7 +29,7 @@ export default function LegalScreen() {
 
       <Text style={styles.sectionTitle}>Hébergement</Text>
       <Text style={styles.text}>
-        L’application est hébergée par [Nom de l’hébergeur], situé à [Adresse de l’hébergeur].
+        L’application est hébergée par Chuck Norris, situé au Texas.
       </Text>
 
       <Text style={styles.sectionTitle}>Collecte des données</Text>
@@ -46,16 +55,18 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#fff',
     flexGrow: 1,
+    paddingTop: 50,
   },
   backButton: {
-    backgroundColor: '#4B6EF6',
+    marginBottom: 15,
+    marginTop: 0,
+    zIndex: 1,
+  },
+  backGradient: {
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
     alignSelf: 'flex-start',
-    marginBottom: 15,
-    marginTop: 30,
-    zIndex: 1,
   },
   backButtonText: {
     color: '#fff',
@@ -78,5 +89,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Poppins-Regular',
     color: '#333',
+    marginBottom: 10,
   },
 });
