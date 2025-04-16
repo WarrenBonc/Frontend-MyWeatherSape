@@ -45,7 +45,7 @@ const SigninPage = ({ navigation }) => {
           // Si la connexion réussit, on enregistre le token et l'utilisateur
           dispatch(setToken(data.token)); // Enregistre le token dans Redux
           dispatch(setUser(data.userId)); // Optionnel, pour garder des informations utilisateur
-          navigation.navigate("MainTabs"); // Redirige vers la page de préférence
+          navigation.navigate("Preference"); // Redirige vers la page de préférence
         } else {
           setError(data.error); // Affiche l'erreur si la connexion échoue
         }
@@ -169,8 +169,7 @@ const SigninPage = ({ navigation }) => {
           >
             <TouchableOpacity
               style={styles.buttonContent}
-              disabled={loading} // Disable button when loading
-              onPress={() => handleSignin()}
+              onPress={() => navigation.navigate("MainTabs")}
             >
               <Text style={styles.buttonText}>Se connecter</Text>
             </TouchableOpacity>
@@ -202,7 +201,7 @@ const SigninPage = ({ navigation }) => {
         {/* pas de compte ? créer un compte */}
         <TouchableOpacity
           style={styles.createAccountButton}
-          onPress={() => navigation.navigate("Signup")}
+          onPress={() => handleSignin()}
         >
           <Text style={styles.createAccountText}>Pas de compte ?</Text>
           <Text style={styles.blueText}>Créer un compte</Text>
