@@ -29,40 +29,35 @@ const SigninPage = ({ navigation }) => {
       return;
     }
 
-  setLoading(true);
-  setError(''); // Réinitialise l'erreur avant de commencer la requête
-  fetch('http://192.168.1.45:3000/api/users/signin', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email, password }),
-  })
-  .then(response => response.json())  // Gère la réponse de l'API
-  .then(data => {
-    console.log("Réponse API :", data);
-    if (data.result===true) {
-      // Si la connexion réussit, on enregistre le token et l'utilisateur
-      dispatch(setToken(data.token));  // Enregistre le token dans Redux
-      dispatch(setUser(data.userId));  // Optionnel, pour garder des informations utilisateur
-      navigation.navigate('Preference');  // Redirige vers la page de préférence
-    } else {
-      setError(data.error);  // Affiche l'erreur si la connexion échoue
-    }
-  })
-  .catch(err => {
-    console.error(err);
-    setError('Une erreur est survenue, veuillez réessayer.');
-  })
-  .finally(() => {
-    setLoading(false);  // Réinitialise l'état de chargement
-  });
-};
-
-
-
-
-
+    setLoading(true);
+    setError(""); // Réinitialise l'erreur avant de commencer la requête
+    fetch("http://192.168.1.45:3000/api/users/signin", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    })
+      .then((response) => response.json()) // Gère la réponse de l'API
+      .then((data) => {
+        console.log("Réponse API :", data);
+        if (data.result === true) {
+          // Si la connexion réussit, on enregistre le token et l'utilisateur
+          dispatch(setToken(data.token)); // Enregistre le token dans Redux
+          dispatch(setUser(data.userId)); // Optionnel, pour garder des informations utilisateur
+          navigation.navigate("Preference"); // Redirige vers la page de préférence
+        } else {
+          setError(data.error); // Affiche l'erreur si la connexion échoue
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        setError("Une erreur est survenue, veuillez réessayer.");
+      })
+      .finally(() => {
+        setLoading(false); // Réinitialise l'état de chargement
+      });
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -163,7 +158,7 @@ const SigninPage = ({ navigation }) => {
         {/* pas de compte ? créer un compte */}
         <TouchableOpacity
           style={styles.createAccountButton}
-          onPress={() => navigation.navigate("Signup")}
+          onPress={() => handleSignin()}
         >
           <Text style={styles.createAccountText}>Pas de compte ?</Text>
           <Text style={styles.blueText}>Créer un compte</Text>

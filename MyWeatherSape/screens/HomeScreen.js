@@ -4,9 +4,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { FlatList } from "react-native";
 import { setForecast, setRecommendation } from "../reducers/weather";
 import WeatherDisplay from "../components/weatherDisplay";
+import PagerView from "react-native-pager-view";
+
+import ChartDisplay from "../components/chartDisplay";
 
 const HomePage = () => {
   const dispatch = useDispatch();
+  const city = useSelector((state) => state.weather.city) || "Estissac";
+
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   const [selectedDay, setSelectedDay] = useState(0);
   const [searchCity, setSearchCity] = useState(city);
@@ -14,8 +20,6 @@ const HomePage = () => {
     const labels = ["Aujourd’hui", "Demain", "Jour 3", "Jour 4", "Jour 5"];
     return labels[dayOffset] || `Jour ${dayOffset + 1}`;
   };
-
-  const city = useSelector((state) => state.weather.city) || "Estissac";
 
   const fetchAllWeatherData = async () => {
     try {
@@ -76,7 +80,20 @@ const HomePage = () => {
     }
   };
 
-  fetchAllWeatherData();
+  const swiperOption = {
+    loop: true,
+    grabCursor: false,
+    slidesPerView: "auto",
+    centeredSlides: true,
+    autoplay: {
+      delay: 2500,
+      disableOnInteraction: false,
+    },
+  };
+
+  useEffect(() => {
+    fetchAllWeatherData();
+  }, [city]);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -113,12 +130,15 @@ const HomePage = () => {
         </Text>
       </View>
       {/* Ville et météo actuelle */}
-      <View style={styles.widgetmeteo}>
-        <WeatherDisplay num={selectedDay} city={city} />
-        <View style={styles.pagination}>
-          <View style={styles.dotActive} />
-          <View style={styles.dot} />
-        </View>
+      <View style={styles.swipercontainer}>
+        <PagerView style={styles.wrapper} horizontal={false} pageMargin={10}>
+          <View style={styles.widgetmeteo}>
+            <WeatherDisplay num={selectedDay} city={city} />
+          </View>
+          <View style={styles.widgetmeteo}>
+            <ChartDisplay num={selectedDay} city={city} />
+          </View>
+        </PagerView>
       </View>
       {/* Recommandation IA */}
       <View style={styles.widgetTips}>
@@ -300,6 +320,21 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
+    marginTop: 20,
+  },
+  wrapper: {
+    height: "100%",
+    width: "205%",
+    display: "flex",
+    borderRadius: 20,
+    gap: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  swipercontainer: {
+    height: 260,
+    width: "50%",
+    borderRadius: 20,
     marginTop: 20,
   },
 });
