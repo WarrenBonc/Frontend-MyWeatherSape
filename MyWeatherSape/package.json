@@ -19,6 +19,7 @@
     "@reduxjs/toolkit": "^2.6.1",
     "chart.js": "^4.4.9",
     "expo": "~52.0.43",
+    "expo-constants": "~17.0.8",
     "expo-linear-gradient": "~14.0.2",
     "expo-localization": "^16.0.1",
     "expo-location": "^18.0.10",
@@ -47,7 +48,8 @@
     "swiper": "^11.2.6"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.20.0",
+    "react-native-dotenv": "^3.4.11"
   },
   "private": true
 }

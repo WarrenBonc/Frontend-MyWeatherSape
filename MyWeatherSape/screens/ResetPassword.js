@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
+import { API_BASE_URL } from "../config";
 
 const ResetPassword = ({ route, navigation }) => {
   const { email } = route.params; // Récupérer l'email passé depuis la page de connexion ou "Mot de passe oublié"
@@ -24,7 +25,7 @@ const ResetPassword = ({ route, navigation }) => {
     setError("");
 
     // Appel API pour mettre à jour le mot de passe
-    fetch(`${process.env.adresse_ip}/api/users/reset-password`, {
+    fetch(`${API_BASE_URL}/api/users/reset-password`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

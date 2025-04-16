@@ -12,6 +12,7 @@ import {
 import { useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
+import { API_BASE_URL } from "../config";
 
 const DressingPage = () => {
   const user = useSelector((state) => state.user.value);
@@ -25,20 +26,20 @@ const DressingPage = () => {
     if (!user || !user._id) return;
 
     // Récupérer vêtements utilisateur
-    fetch(`${process.env.adresse_ip}/api/dressing/user/${user._id}`)
+    fetch(`${API_BASE_URL}/api/dressing/user/${user._id}`)
       .then((res) => res.json())
       .then((data) => setClothes(data.clothingItems))
       .catch((err) => console.error("Erreur fetch vêtements :", err));
 
     // Récupérer vêtements enfants
-    fetch(`${process.env.adresse_ip}/api/dressing/child/${user._id}`)
+    fetch(`${API_BASE_URL}/api/dressing/child/${user._id}`)
       .then((res) => res.json())
       .then((data) => setChildClothes(data.clothingItems))
       .catch((err) => console.error("Erreur fetch vêtements enfants :", err));
   }, [user]);
 
   const handleDelete = (id) => {
-    fetch(`${process.env.adresse_ip}/api/delete-clothes/${id}`, {
+    fetch(`${API_BASE_URL}/api/delete-clothes/${id}`, {
       method: "DELETE",
     })
       .then((res) => res.json())
@@ -56,7 +57,7 @@ const DressingPage = () => {
       season: "été",
       userId: user._id,
     };
-    fetch(`${process.env.adresse_ip}/api/add-clothes`, {
+    fetch(`${API_BASE_URL}/api/add-clothes`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newItem),
@@ -73,7 +74,7 @@ const DressingPage = () => {
       season: "hiver",
       userId: user._id,
     };
-    fetch(`${process.env.adresse_ip}/api/add-child-clothes`, {
+    fetch(`${API_BASE_URL}/api/add-child-clothes`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newItem),
@@ -84,7 +85,7 @@ const DressingPage = () => {
   };
 
   const handleEditSubmit = (id) => {
-    fetch(`${process.env.adresse_ip}/api/edit-clothes/${id}`, {
+    fetch(`${API_BASE_URL}/api/edit-clothes/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ label: editingLabel }),

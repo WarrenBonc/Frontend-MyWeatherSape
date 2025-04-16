@@ -13,6 +13,7 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { API_BASE_URL } from "../config";
 
 const SigninPage = ({ navigation }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -31,7 +32,7 @@ const SigninPage = ({ navigation }) => {
 
     setLoading(true);
     setError(""); // Réinitialise l'erreur avant de commencer la requête
-    fetch(`${process.env.adresse_ip}/api/users/signin`, {
+    fetch(`${API_BASE_URL}/api/users/signin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -70,7 +71,7 @@ const SigninPage = ({ navigation }) => {
     setError(""); // Réinitialise l'erreur avant de commencer la requête
     console.log("Demande de réinitialisation du mot de passe pour:", email);
 
-    fetch(`${process.env.adresse_ip}/api/users/forgot-password`, {
+    fetch(`${API_BASE_URL}/api/users/forgot-password`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
