@@ -31,7 +31,7 @@ const SigninPage = ({ navigation }) => {
 
     setLoading(true);
     setError(""); // Réinitialise l'erreur avant de commencer la requête
-    fetch("http://192.168.0.32:3000/api/users/signin", {
+    fetch(`${process.env.adresse_ip}/api/users/signin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -70,7 +70,7 @@ const SigninPage = ({ navigation }) => {
     setError(""); // Réinitialise l'erreur avant de commencer la requête
     console.log("Demande de réinitialisation du mot de passe pour:", email);
 
-    fetch("http://192.168.0.32:3000/api/users/forgot-password", {
+    fetch(`${process.env.adresse_ip}/api/users/forgot-password`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -80,7 +80,7 @@ const SigninPage = ({ navigation }) => {
       .then((response) => response.json())
       .then((data) => {
         console.log("Réponse de l'API:", data);
-        
+
         if (data.result === true) {
           // Si la demande est réussie, l'utilisateur reçoit un email
           setError(""); // Réinitialise l'erreur
@@ -97,8 +97,6 @@ const SigninPage = ({ navigation }) => {
         setLoading(false); // Réinitialise l'état de chargement
       });
   };
-
-
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -154,8 +152,9 @@ const SigninPage = ({ navigation }) => {
           </View>
           {error && <Text style={{ color: "red" }}>{error}</Text>}
           {/* Forgot Password */}
-          <TouchableOpacity style={styles.forgotPasswordButton} 
-          onPress={handleForgotPassword}
+          <TouchableOpacity
+            style={styles.forgotPasswordButton}
+            onPress={handleForgotPassword}
           >
             <Text style={styles.forgotPasswordText}>Mot de passe oublié ?</Text>
           </TouchableOpacity>
@@ -169,7 +168,7 @@ const SigninPage = ({ navigation }) => {
           >
             <TouchableOpacity
               style={styles.buttonContent}
-              onPress={() => navigation.navigate("MainTabs")}
+              onPress={() => handleSignin()}
             >
               <Text style={styles.buttonText}>Se connecter</Text>
             </TouchableOpacity>

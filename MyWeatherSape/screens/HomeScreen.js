@@ -25,7 +25,7 @@ const HomePage = () => {
     try {
       // On fait une requête à l'API pour récupérer les données météo
       const fetchData = await fetch(
-        `http://192.168.0.44:3000/api/weather/7days-hourly/${city}`
+        `${process.env.adresse_ip}/api/weather/7days-hourly/${city}`
       );
 
       if (!fetchData.ok) {
