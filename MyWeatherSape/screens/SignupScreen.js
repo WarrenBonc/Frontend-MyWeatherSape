@@ -75,7 +75,11 @@ const SignupPage = ({ navigation }) => {
       .then((response) => response.json())
       .then((data) => {
         if (data.result) {
-          navigation.navigate("Preference");
+          if (!data.preferencesCompleted) {
+            navigation.navigate("Preference"); // Redirige vers le questionnaire
+          } else {
+            navigation.navigate("MainTabs"); // Redirige vers la page principale
+          }
         } else if (data.error === "User already exists") {
           alert("Cet email est déjà utilisé.");
         } else {
@@ -184,7 +188,7 @@ const SignupPage = ({ navigation }) => {
           >
             <TouchableOpacity
               style={styles.buttonContent}
-              onPress={() => navigation.navigate("Preference")}
+              onPress={() => handleSignup()}
               disabled={loading}
             >
               <Text style={styles.buttonText}>Créer un compte</Text>

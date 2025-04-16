@@ -33,21 +33,28 @@ const SigninPage = ({ navigation }) => {
 
     setLoading(true);
     setError(""); // Réinitialise l'erreur avant de commencer la requête
+
     fetch(`${config.API_BASE_URL}/api/users/signin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ email, password }),
+      credentials: "include", // Inclure les cookies dans la requête
     })
       .then((response) => response.json()) // Gère la réponse de l'API
       .then((data) => {
         console.log("Réponse API :", data);
         if (data.result === true) {
-          // Si la connexion réussit, on enregistre le token et l'utilisateur
-          dispatch(setToken(data.token)); // Enregistre le token dans Redux
-          dispatch(setUser(data.userId)); // Optionnel, pour garder des informations utilisateur
-          navigation.navigate("MainTabs"); // Redirige vers la page de préférence
+          // Si la connexion réussit, on enregistre les informations utilisateur
+          dispatch(setUser(data.userId)); // Enregistre l'ID utilisateur dans Redux
+
+          // Redirige en fonction de l'état des préférences
+          if (!data.preferencesCompleted) {
+            navigation.navigate("Preference"); // Redirige vers le questionnaire
+          } else {
+            navigation.navigate("MainTabs"); // Redirige vers la page principale
+          }
         } else {
           setError(data.error); // Affiche l'erreur si la connexion échoue
         }
@@ -72,7 +79,7 @@ const SigninPage = ({ navigation }) => {
     setError(""); // Réinitialise l'erreur avant de commencer la requête
     console.log("Demande de réinitialisation du mot de passe pour:", email);
 
-    fetch(`${API_BASE_URL}/api/users/forgot-password`, {
+    fetch(`${config.API_BASE_URL}/api/users/forgot-password`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

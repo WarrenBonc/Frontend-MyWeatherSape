@@ -7,6 +7,7 @@ import {
   Animated,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import config from "../config";
 
 const Questionnaire = ({ navigation }) => {
   const [question, setQuestion] = useState(0);
@@ -53,7 +54,7 @@ const Questionnaire = ({ navigation }) => {
     },
   ];
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
     if (question < totalQuestions - 1) {
       setReponseTotal([...reponseTotal, reponse]);
       setQuestion(question + 1);
@@ -62,13 +63,78 @@ const Questionnaire = ({ navigation }) => {
       // Ajoutez la dernière réponse directement dans une copie locale
       const finalResponses = [...reponseTotal, reponse];
       setReponseTotal(finalResponses);
+
       console.log("Questionnaire terminé :", finalResponses);
 
-      // Redirige vers la page d'accueil
-      navigation.navigate("MainTabs");
+      // Mapper les réponses utilisateur aux valeurs attendues par le backend
+      const mappedResponses = {
+        gender: finalResponses[0] === "Homme" ? "M" : "F", // Mapper "Homme" -> "M", "Femme" -> "F"
+        sensitivity: finalResponses[1].toLowerCase(), // Convertir en minuscule
+        accessories: finalResponses[2]
+          .split(", ")
+          .map((item) => item.toLowerCase()), // Convertir chaque accessoire en minuscule
+        recommendationFrequency: finalResponses[3], // Pas de modification nécessaire
+      };
+
+      console.log("Réponses mappées :", mappedResponses);
+
+      // Envoyer les réponses au backend
+      try {
+        const response = await fetch(
+          `${config.API_BASE_URL}/api/users/update-preferences`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include", // Inclure les cookies pour l'authentification
+            body: JSON.stringify(mappedResponses),
+          }
+        );
+
+        const result = await response.json();
+
+        if (result.success) {
+          console.log("Préférences enregistrées avec succès :", result);
+
+          // Marquer le questionnaire comme terminé
+          const completeResponse = await fetch(
+            `${config.API_BASE_URL}/api/users/complete-preferences`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              credentials: "include", // Inclure les cookies pour l'authentification
+            }
+          );
+
+          const completeResult = await completeResponse.json();
+
+          if (completeResult.success) {
+            console.log("Questionnaire marqué comme terminé :", completeResult);
+            navigation.navigate("MainTabs"); // Redirige vers la page principale
+          } else {
+            Alert.alert(
+              "Erreur",
+              "Impossible de marquer le questionnaire comme terminé."
+            );
+          }
+        } else {
+          Alert.alert(
+            "Erreur",
+            "Impossible d'enregistrer vos préférences. Veuillez réessayer."
+          );
+        }
+      } catch (error) {
+        console.error("Erreur lors de l'envoi des réponses :", error);
+        Alert.alert(
+          "Erreur",
+          "Une erreur est survenue lors de l'enregistrement. Veuillez réessayer."
+        );
+      }
     }
   };
-
   // Animation de la barre de progression
   useEffect(() => {
     Animated.timing(progressAnim, {
