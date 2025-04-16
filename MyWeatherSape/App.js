@@ -25,6 +25,7 @@ import PreferenceScreen from "./screens/PreferenceScreen";
 import HomeScreen from "./screens/HomeScreen";
 import DressingScreen from "./screens/DressingScreen";
 import SettingsScreen from "./screens/SettingsScreen";
+import ResetPassword from "./screens/ResetPassword";
 
 // Simuler un token (à remplacer avec un vrai AsyncStorage ou contexte plus tard)
 const token = null;
@@ -58,6 +59,8 @@ export default function App() {
           <Stack.Screen name="Signup" component={SignupScreen} />
           <Stack.Screen name="Preference" component={PreferenceScreen} />
           <Stack.Screen name="MainTabs" component={BottomTabs} />
+          <Stack.Screen name="ResetPassword" component={ResetPassword} />
+
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>
