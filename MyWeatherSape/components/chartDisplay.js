@@ -63,12 +63,13 @@ const WeatherDisplay = ({ num }) => {
       <View style={styles.chartContainer}>
         <LineChart
           data={data}
-          width={350} // Largeur plus petite
-          height={200} // Hauteur plus petite
+          width={350}
+          height={200}
           chartConfig={chartConfig}
-          bezier // Courbe lisse
-          withInnerLines={false} // Supprimer les lignes internes
-          withOuterLines={false} // Supprimer les lignes extérieures
+          bezier
+          withInnerLines={true}
+          withOuterLines={true}
+          formatYLabel={(yValue) => `${yValue}°`} // << Ajouté ici
         />
       </View>
     </View>
@@ -96,7 +97,8 @@ const styles = StyleSheet.create({
   chartContainer: {
     alignItems: "center", // Centrer le graphique
     justifyContent: "center",
-    paddingHorizontal: 10, // Espacement autour du graphique
+    marginRight: 20,
+    // Espacement autour du graphique
   },
 });
 
