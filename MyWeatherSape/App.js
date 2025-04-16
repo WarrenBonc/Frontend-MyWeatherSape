@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import config from "./config";
-import CookieManager from "@react-native-cookies/cookies";
 
 import User from "./reducers/user";
 import Weather from "./reducers/weather";
@@ -58,40 +57,32 @@ export default function App() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const cookies = await CookieManager.get("http://localhost:3000"); // Remplacez par l'URL de votre backend
-        if (cookies.token) {
-          console.log("Token trouvé dans les cookies :", cookies.token.value);
+        const response = await fetch(
+          `${config.API_BASE_URL}/api/users/verify-token`,
+          {
+            method: "GET",
+            credentials: "include", // Inclure les cookies dans la requête
+          }
+        );
 
-          // Optionnel : Valider le token avec le backend
-          const response = await fetch(
-            `${config.API_BASE_URL}/api/users/verify-token`,
-            {
-              method: "GET",
-              credentials: "include", // Inclure les cookies dans la requête
-            }
-          );
-
-          if (response.ok) {
-            const data = await response.json();
-            if (data.valid) {
-              setIsAuthenticated(true); // Le token est valide
-            } else {
-              setIsAuthenticated(false); // Le token est invalide
-            }
+        if (response.ok) {
+          const data = await response.json();
+          if (data.valid) {
+            setIsAuthenticated(true); // Le token est valide
           } else {
-            setIsAuthenticated(false); // Erreur dans la requête
+            setIsAuthenticated(false); // Le token est invalide
           }
         } else {
-          console.log("Aucun token trouvé dans les cookies");
-          setIsAuthenticated(false);
+          setIsAuthenticated(false); // Erreur dans la requête
         }
       } catch (error) {
-        console.error("Erreur lors de la vérification des cookies :", error);
+        console.error("Erreur lors de la vérification du token :", error);
         setIsAuthenticated(false);
       } finally {
         setIsLoading(false); // Chargement terminé
       }
     };
+
     checkAuth();
   }, []);
 
