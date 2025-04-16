@@ -8,8 +8,7 @@ import { configureStore } from "@reduxjs/toolkit";
 
 import User from "./reducers/user";
 import Weather from "./reducers/weather";
-import LegalScreen from "./screens/LegalScreen";
-import NotificationsScreen from "./screens/NotificationsScreen";
+
 
 
 //creation du store
@@ -28,6 +27,9 @@ import PreferenceScreen from "./screens/PreferenceScreen";
 import HomeScreen from "./screens/HomeScreen";
 import DressingScreen from "./screens/DressingScreen";
 import SettingsScreen from "./screens/SettingsScreen";
+import LegalScreen from "./screens/LegalScreen";
+import NotificationsScreen from "./screens/NotificationsScreen";
+import EditProfileScreen from './screens/EditProfileScreen';
 
 // Simuler un token (à remplacer avec un vrai AsyncStorage ou contexte plus tard)
 const token = null;
@@ -63,6 +65,7 @@ export default function App() {
           <Stack.Screen name="MainTabs" component={BottomTabs} />
           <Stack.Screen name="Legal" component={LegalScreen} />
           <Stack.Screen name="NotificationSettings" component={NotificationsScreen} />
+          <Stack.Screen name="EditProfile" component={EditProfileScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

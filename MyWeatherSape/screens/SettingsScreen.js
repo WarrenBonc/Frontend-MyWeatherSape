@@ -1,49 +1,73 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { useDispatch } from 'react-redux';
-import { logout } from '../reducers/user';
-import LegalScreen from './LegalScreen';
+import React from 'react'; 
+import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Alert } from 'react-native'; // Import des composants de base React Native
+import { useNavigation } from '@react-navigation/native';// Hook de navigation fourni par React Navigation
+import { useDispatch } from 'react-redux';// Hook Redux pour dispatcher des actions
+import { logout } from '../reducers/user';// Action logout du reducer utilisateur
+import LegalScreen from './LegalScreen';// Composant d'écran légal (utilisé dans la navigation)
+import { LinearGradient } from 'expo-linear-gradient';// Composant pour créer un fond en dégradé
 
 export default function SettingsScreen() {
+ // Récupération de l'objet navigation pour naviguer entre les écrans
   const navigation = useNavigation();
+  // Initialisation du dispatch pour envoyer des actions Redux
   const dispatch = useDispatch();
 
+  // Fonction appelée quand l'utilisateur appuie sur "Déconnexion"
   const handleLogout = () => {
-    dispatch(logout()); // ← vide le store utilisateur
-    navigation.navigate('SignIn'); // ← redirige vers la connexion
+    dispatch(logout()); // Réinitialise les données utilisateur dans le store
+    navigation.navigate('SignIn'); // Redirige vers l'écran de connexion
   };
 
   return (
+    // Conteneur principal de l'écran
     <View style={styles.container}>
-      {/* Arrière-plan bleu */}
+      {/* Image de fond bleue */}
       <Image source={require('../assets/Ellipse.png')} style={styles.background} />
 
+      {/* Conteneur scrollable pour le contenu */}
       <ScrollView contentContainerStyle={styles.content}>
-        {/* Bouton retour */}
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Text style={styles.backButtonText}>← Retour</Text>
+        {/* Bouton retour avec fond en dégradé */}
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <LinearGradient
+            colors={['#34C8E8', '#4E4AF2']} // Dégradé du bleu clair au bleu foncé
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.backGradient}
+          >
+            <Text style={styles.backButtonText}>←</Text>
+          </LinearGradient>
         </TouchableOpacity>
 
+        {/* Bouton pour aller à la page Notifications */}
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('NotificationSettings')}>
           <Text style={styles.buttonText}>Notifications</Text>
           <Text style={styles.arrow}>→</Text>
         </TouchableOpacity>
 
+        {/* Bouton pour aller à la page des mentions légales */}
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Legal')}>
           <Text style={styles.buttonText}>Mentions légales</Text>
           <Text style={styles.arrow}>→</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('EditProfile')}>
+  <Text style={styles.buttonText}>Modifier mon profil</Text>
+  <Text style={styles.arrow}>→</Text>
+        </TouchableOpacity>
+
+        {/* Bouton pour se déconnecter */}
         <TouchableOpacity style={styles.button} onPress={handleLogout}>
           <Text style={styles.buttonText}>Déconnexion</Text>
           <Text style={styles.arrow}>→</Text>
         </TouchableOpacity>
+
+
       </ScrollView>
     </View>
   );
 }
 
+// Définition des styles pour tous les composants de la page
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -62,14 +86,19 @@ const styles = StyleSheet.create({
     paddingTop: 50,
   },
   backButton: {
-    backgroundColor: '#4B6EF6',
     paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: 0,
     borderRadius: 8,
     alignSelf: 'flex-start',
     marginBottom: 15,
     marginTop: 0,
     zIndex: 1,
+  },
+  backGradient: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
   },
   backButtonText: {
     color: '#fff',
