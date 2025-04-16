@@ -67,12 +67,27 @@ const HomePage = () => {
 
   const fetchAllWeatherData = async () => {
     try {
-      const fetchedData = await fetch(
-        `http://192.168.0.44:3000/api/weather?city=${city}`
-      );
-      const data = await fetchedData.json();
-      console.log("data", data);
-    } catch (error) {}
+      const [currentRes, forecastRes, aiRes] = await Promise.all([
+        fetch(`http://localhost:3000/api/weather?city=${city}`),
+        fetch(`http://localhost:3000/api/weather/forecast?city=${city}&days=5`),
+        fetch(`http://localhost:3000/api/weather/recommendation`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId, city }),
+        }),
+      ]);
+
+      const current = await currentRes.json();
+      const forecast = await forecastRes.json();
+      const recommendation = await aiRes.json();
+
+      // On envoie les données dans Redux
+      dispatch(setCurrentWeather(current));
+      dispatch(setForecast(forecast.forecast));
+      dispatch(setRecommendation(recommendation.advice));
+    } catch (error) {
+      console.error("Erreur météo :", error.message);
+    }
   };
 
   fetchAllWeatherData();
