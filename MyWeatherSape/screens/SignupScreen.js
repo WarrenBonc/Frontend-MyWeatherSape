@@ -10,7 +10,7 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { API_BASE_URL } from "../config";
+import config from "../config";
 
 const SignupPage = ({ navigation }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -62,7 +62,7 @@ const SignupPage = ({ navigation }) => {
     }
     setLoading(true);
 
-    fetch(`${API_BASE_URL}/api/users/signup`, {
+    fetch(`${config.API_BASE_URL}/api/users/signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -184,7 +184,7 @@ const SignupPage = ({ navigation }) => {
           >
             <TouchableOpacity
               style={styles.buttonContent}
-              onPress={handleSignup}
+              onPress={() => navigation.navigate("Preference")}
               disabled={loading}
             >
               <Text style={styles.buttonText}>Créer un compte</Text>

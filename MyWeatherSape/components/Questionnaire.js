@@ -40,6 +40,7 @@ const Questionnaire = ({ navigation }) => {
         "Gants",
         "Sac à dos",
         "Lunettes de soleil",
+        "Aucun",
       ],
     },
     {

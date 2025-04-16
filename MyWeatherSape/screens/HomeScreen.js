@@ -1,31 +1,78 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, ScrollView, TextInput } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { FlatList } from "react-native";
+import * as Location from "expo-location";
 import { setForecast, setRecommendation } from "../reducers/weather";
+import { setCity } from "../reducers/user";
 import WeatherDisplay from "../components/weatherDisplay";
 import PagerView from "react-native-pager-view";
+import config from "../config";
 
 import ChartDisplay from "../components/chartDisplay";
 
 const HomePage = () => {
   const dispatch = useDispatch();
-  const city = useSelector((state) => state.weather.city) || "Estissac";
+  const city = useSelector((state) => state.user.city) || "Estissac";
 
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const [selectedDay, setSelectedDay] = useState(0);
-  const [searchCity, setSearchCity] = useState(city);
+  const [searchCity, setSearchCity] = useState("");
   const getLabelForDay = (dayOffset) => {
     const labels = ["Aujourd’hui", "Demain", "Jour 3", "Jour 4", "Jour 5"];
     return labels[dayOffset] || `Jour ${dayOffset + 1}`;
   };
 
+  const fetchUserLocation = async () => {
+    try {
+      // Demander la permission d'accès à la localisation
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission refusée",
+          "L'accès à la localisation est nécessaire pour déterminer votre ville."
+        );
+        return;
+      }
+
+      // Obtenir la position actuelle
+      const location = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = location.coords;
+
+      // Convertir les coordonnées GPS en nom de ville
+      const geoRes = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+      );
+      const geoData = await geoRes.json();
+      const userCity =
+        geoData.address?.city ||
+        geoData.address?.town ||
+        geoData.address?.village;
+
+      if (userCity) {
+        dispatch(setCity(userCity)); // Mettre à jour Redux avec la ville actuelle
+        // Mettre à jour l'état local
+      } else {
+        Alert.alert("Erreur", "Impossible de déterminer votre ville.");
+      }
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération de la localisation :",
+        error
+      );
+      Alert.alert("Erreur", "Impossible de récupérer votre localisation.");
+    }
+  };
+
+  useEffect(() => {
+    fetchUserLocation(); // Appeler la fonction pour récupérer la localisation au chargement
+  }, []);
+
   const fetchAllWeatherData = async () => {
     try {
       // On fait une requête à l'API pour récupérer les données météo
       const fetchData = await fetch(
-        `${API_BASE_URL}/api/weather/7days-hourly/${city}`
+        `${config.API_BASE_URL}/api/weather/7days-hourly/${city}`
       );
 
       if (!fetchData.ok) {
@@ -96,7 +143,10 @@ const HomePage = () => {
             value={searchCity}
             onChangeText={setSearchCity}
             onSubmitEditing={() => {
-              dispatch({ type: "user/setCity", payload: searchCity });
+              if (searchCity !== city) {
+                dispatch(setCity(searchCity)); // Met à jour la ville dans Redux
+                fetchAllWeatherData(); // Re-fetch des données météo avec la nouvelle ville
+              }
             }}
             placeholderTextColor="#999"
           />

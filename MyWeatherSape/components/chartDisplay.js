@@ -24,7 +24,7 @@ const WeatherDisplay = ({ num }) => {
   // Préparer les données du graphique
   const chartData = filteredHours.map((hourObj, index) => ({
     temperature: hourObj.temperature,
-    label: `${index * 6}h`, // Afficher 0h, 6h, 12h, 18h
+    label: `${index * 8}h`, // Afficher 0h, 6h, 12h, 18h
   }));
 
   // Données pour le graphique

@@ -13,7 +13,8 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { API_BASE_URL } from "../config";
+
+import config from "../config";
 
 const SigninPage = ({ navigation }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -32,7 +33,7 @@ const SigninPage = ({ navigation }) => {
 
     setLoading(true);
     setError(""); // Réinitialise l'erreur avant de commencer la requête
-    fetch(`${API_BASE_URL}/api/users/signin`, {
+    fetch(`${config.API_BASE_URL}/api/users/signin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -46,7 +47,7 @@ const SigninPage = ({ navigation }) => {
           // Si la connexion réussit, on enregistre le token et l'utilisateur
           dispatch(setToken(data.token)); // Enregistre le token dans Redux
           dispatch(setUser(data.userId)); // Optionnel, pour garder des informations utilisateur
-          navigation.navigate("Preference"); // Redirige vers la page de préférence
+          navigation.navigate("MainTabs"); // Redirige vers la page de préférence
         } else {
           setError(data.error); // Affiche l'erreur si la connexion échoue
         }
@@ -201,7 +202,7 @@ const SigninPage = ({ navigation }) => {
         {/* pas de compte ? créer un compte */}
         <TouchableOpacity
           style={styles.createAccountButton}
-          onPress={() => handleSignin()}
+          onPress={() => navigation.navigate("Signup")}
         >
           <Text style={styles.createAccountText}>Pas de compte ?</Text>
           <Text style={styles.blueText}>Créer un compte</Text>

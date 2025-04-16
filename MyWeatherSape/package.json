@@ -22,7 +22,7 @@
     "expo-constants": "~17.0.8",
     "expo-linear-gradient": "~14.0.2",
     "expo-localization": "^16.0.1",
-    "expo-location": "^18.0.10",
+    "expo-location": "~18.0.10",
     "expo-notifications": "~0.29.14",
     "expo-status-bar": "~2.0.1",
     "i18next": "^25.0.0",
