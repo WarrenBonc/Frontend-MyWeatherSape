@@ -1,13 +1,20 @@
-import React, { useState } from "react";
-import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
+import React, { useState, useRef, useEffect } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Animated,
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
-const Questionnaire = () => {
+const Questionnaire = ({ navigation }) => {
   const [question, setQuestion] = useState(0);
   const [reponse, setReponse] = useState("");
   const [reponseTotal, setReponseTotal] = useState([]);
+  const progressAnim = useRef(new Animated.Value(0)).current; // Animation pour la barre de progression
 
-  const totalQuestions = 3; // Nombre total de questions
+  const totalQuestions = 4; // Nombre total de questions
 
   const questions = [
     {
@@ -51,31 +58,47 @@ const Questionnaire = () => {
       setQuestion(question + 1);
       setReponse(""); // Réinitialise la réponse pour la prochaine question
     } else {
-      setReponseTotal([...reponseTotal, reponse]);
-      console.log("Questionnaire terminé :", reponseTotal);
-      // Ajoutez ici la logique pour terminer le questionnaire
+      // Ajoutez la dernière réponse directement dans une copie locale
+      const finalResponses = [...reponseTotal, reponse];
+      setReponseTotal(finalResponses);
+      console.log("Questionnaire terminé :", finalResponses);
+
+      // Redirige vers la page d'accueil
+      navigation.navigate("MainTabs");
     }
   };
+
+  // Animation de la barre de progression
+  useEffect(() => {
+    Animated.timing(progressAnim, {
+      toValue: (question + 1) / totalQuestions, // Proportion de progression
+      duration: 500, // Durée de l'animation
+      useNativeDriver: false, // Nécessaire pour les animations de style
+    }).start();
+  }, [question]);
 
   return (
     <View style={styles.container}>
       <View style={styles.Topsection}>
-        <Text style={styles.title}>
-          Question {question + 1} sur {totalQuestions}
-        </Text>
+        {/* Affiche le titre de la question */}
+        <Text style={styles.title}>{questions[question].text}</Text>
         {/* Barre de progression */}
         <View style={styles.progressBar}>
-          <View
+          <Animated.View
             style={[
               styles.progress,
-              { width: `${((question + 1) / totalQuestions) * 100}%` },
+              {
+                width: progressAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ["0%", "100%"],
+                }),
+              },
             ]}
           />
         </View>
       </View>
 
       <View style={styles.questionContainer}>
-        <Text style={styles.questionText}>{questions[question].text}</Text>
         {questions[question].options.map((option, index) => (
           <TouchableOpacity
             key={index}
@@ -98,18 +121,23 @@ const Questionnaire = () => {
       </View>
 
       <View style={styles.Btnsection}>
-        <TouchableOpacity
-          onPress={handleNextQuestion}
-          disabled={!reponse} // Désactive le bouton si aucune réponse n'est sélectionnée
-          style={[
-            styles.nextButton,
-            !reponse && styles.disabledNextButton, // Applique le style gris si désactivé
-          ]}
+        <LinearGradient
+          colors={reponse ? ["#34C8E8", "#4E4AF2"] : ["#cccccc", "#cccccc"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          locations={[0, 0.99]}
+          style={[styles.button, !reponse && styles.disabledNextButton]}
         >
-          <Text style={styles.nextButtonText}>
-            {question < totalQuestions - 1 ? "Continuer" : "Terminer"}
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.buttonContent}
+            onPress={handleNextQuestion}
+            disabled={!reponse}
+          >
+            <Text style={styles.nextButtonText}>
+              {question < totalQuestions - 1 ? "Continuer" : "Terminer"}
+            </Text>
+          </TouchableOpacity>
+        </LinearGradient>
       </View>
     </View>
   );
@@ -126,6 +154,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 100,
     alignItems: "center",
+    marginTop: 20,
     marginBottom: 20,
   },
   title: {
@@ -133,6 +162,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "black",
     marginBottom: 10,
+    textAlign: "center",
   },
   progressBar: {
     width: "80%",
@@ -143,7 +173,7 @@ const styles = StyleSheet.create({
   },
   progress: {
     height: "100%",
-    backgroundColor: "#4E4AF2",
+    backgroundColor: "blue",
   },
   questionText: {
     fontSize: 18,
@@ -153,14 +183,14 @@ const styles = StyleSheet.create({
   },
   optionButton: {
     backgroundColor: "#f0f0f0",
-    width: "80%",
+    width: "100%",
     padding: 15,
     borderRadius: 10,
     marginBottom: 10,
     alignItems: "center",
   },
   selectedOptionButton: {
-    backgroundColor: "#34C8E8",
+    backgroundColor: "green",
   },
   optionText: {
     fontSize: 16,
@@ -188,13 +218,29 @@ const styles = StyleSheet.create({
   },
   questionContainer: {
     width: "100%",
+    height: 400,
     alignItems: "center",
     marginBottom: 20,
   },
   Btnsection: {
     width: "100%",
+    height: 250,
     alignItems: "center",
     justifyContent: "center",
+  },
+  buttonContent: {
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  button: {
+    width: "100%",
+    height: 50,
+    borderRadius: 5,
+    marginTop: 10,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

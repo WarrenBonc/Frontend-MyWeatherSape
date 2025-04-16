@@ -11,79 +11,91 @@ import {
 
 const HomePage = () => {
   const dispatch = useDispatch();
-  const [searchCity, setSearchCity] = useState(city);
-  const [selectedDay, setSelectedDay] = useState(0);
 
+  const [selectedDay, setSelectedDay] = useState(0);
+  const [searchCity, setSearchCity] = useState(city);
   const getLabelForDay = (dayOffset) => {
     const labels = ["Aujourd’hui", "Demain", "Jour 3", "Jour 4", "Jour 5"];
     return labels[dayOffset] || `Jour ${dayOffset + 1}`;
   };
 
   // On récupère les infos utilisateur et ville depuis Redux
-  const userId = useSelector((state) => state.user.value?._id);
-  const city = useSelector((state) => state.user.city) || "Paris"; // par défaut
+  const userToken = useSelector((state) => state.user.token);
+  const city = useSelector((state) => state.user.city) || "Paris";
 
   // On récupère les données météo depuis Redux
-  const current = useSelector((state) => state.weather.current);
-  const today = useSelector((state) => state.weather.today);
-  const forecast = useSelector((state) => state.weather.forecast);
-  const recommendation = useSelector((state) => state.weather.recommendation);
-console.log("📍 Ville sélectionnée :", city);
-console.log("🧑‍💻 ID utilisateur :", userId);
-console.log("🌡️ Météo actuelle :", current);
-console.log("🕓 Météo heure par heure :", today);
-console.log("📆 Prévisions des jours suivants :", forecast);
-console.log("🧥 Recommandation IA :", recommendation);
+  // const current = useSelector((state) => state.weather.current);
+  // const today = useSelector((state) => state.weather.today) || []; // Par défaut, tableau vide
+  // const forecast = useSelector((state) => state.weather.forecast) || []; // Par défaut, tableau vide
+  // const recommendation = useSelector((state) => state.weather.recommendation);
+  // console.log("📍 Ville sélectionnée :", city);
+  // console.log("🧑‍💻 Token utilisateur :", userToken);
+  // console.log("🌡️ Météo actuelle :", current);
+  // console.log("🕓 Météo heure par heure :", today);
+  // console.log("📆 Prévisions des jours suivants :", forecast);
+  // console.log("🧥 Recommandation IA :", recommendation);
 
   // Fonction qui fetch toutes les données météo depuis le backend
+  // const fetchAllWeatherData = async () => {
+  //   if (!userToken || !city) return;
+
+  //   try {
+  //     const [currentRes, forecastRes, aiRes] = await Promise.all([
+  //       fetch(`http://192.168.0.44:3000/api/weather?city=${city}`),
+  //       fetch(
+  //         `http://192.168.0.44:3000/api/weather/forecast?city=${city}&days=5`
+  //       ),
+  //       fetch(`http://192.168.0.44:3000/api/weather/recommendation`, {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify({ userToken, city }),
+  //       }),
+  //     ]);
+
+  //     const current = await currentRes.json();
+  //     const forecast = await forecastRes.json();
+  //     const recommendation = await aiRes.json();
+
+  //     // On envoie les données dans Redux
+  //     dispatch(setCurrentWeather(current));
+  //     dispatch(setForecast(forecast.forecast));
+  //     dispatch(setRecommendation(recommendation.advice));
+  //   } catch (error) {
+  //     console.error("Erreur météo :", error.message);
+  //   }
+  // };
+
   const fetchAllWeatherData = async () => {
-    if (!userId || !city) return;
-
     try {
-      const [currentRes, forecastRes, aiRes] = await Promise.all([
-        fetch(`http://localhost:3000/api/weather?city=${city}`),
-        fetch(`http://localhost:3000/api/weather/forecast?city=${city}&days=5`),
-        fetch(`http://localhost:3000/api/weather/recommendation`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId, city }),
-        }),
-      ]);
-
-      const current = await currentRes.json();
-      const forecast = await forecastRes.json();
-      const recommendation = await aiRes.json();
-
-      // On envoie les données dans Redux
-      dispatch(setCurrentWeather(current));
-      dispatch(setForecast(forecast.forecast));
-      dispatch(setRecommendation(recommendation.advice));
-    } catch (error) {
-      console.error("Erreur météo :", error.message);
-    }
+      const fetchedData = await fetch(
+        `http://192.168.0.44:3000/api/weather?city=${city}`
+      );
+      const data = await fetchedData.json();
+      console.log("data", data);
+    } catch (error) {}
   };
 
-  // On appelle la fonction quand la ville change
-  useEffect(() => {
-    fetchAllWeatherData();
-  }, [city]);
-
-  useEffect(() => {
-    if (!city) return;
-
-    fetch(`http://localhost:3000/api/weather/day?city=${city}&day=${selectedDay}`)
-      .then(res => res.json())
-      .then(data => {
-        dispatch(setTodayWeather(data.forecast));
-      })
-      .catch(error => console.error("Erreur jour météo :", error.message));
-  }, [selectedDay, city]);
+  fetchAllWeatherData();
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
         <Text style={styles.logoText}>MyWeatherSape</Text>
+
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Rechercher une ville"
+            value={searchCity}
+            onChangeText={setSearchCity}
+            onSubmitEditing={() => {
+              dispatch({ type: "user/setCity", payload: searchCity });
+            }}
+            placeholderTextColor="#999"
+          />
+        </View>
       </View>
+      {/* Sélecteur de jour */}
       <View style={styles.daySelector}>
         <Text
           style={styles.arrow}
@@ -99,73 +111,19 @@ console.log("🧥 Recommandation IA :", recommendation);
           →
         </Text>
       </View>
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Rechercher une ville"
-          value={searchCity}
-          onChangeText={setSearchCity}
-          onSubmitEditing={() => {
-            dispatch({ type: "user/setCity", payload: searchCity });
-          }}
-          placeholderTextColor="#999"
-        />
+      {/* Ville et météo actuelle */}
+      <View style={styles.widgetmeteo}>
+        <View style={styles.pagination}>
+          <View style={styles.dotActive} />
+          <View style={styles.dot} />
+        </View>
       </View>
-      {/* Météo actuelle */}
-      {current && (
-        <>
-          <Text style={styles.city}>{current.city}</Text>
-          <Text style={styles.temp}>{current.temperature}°C</Text>
-          <Text style={styles.feelsLike}>RESSENTI : {current.feels_like}°</Text>
-          <Text style={styles.condition}>{current.condition}</Text>
-        </>
-      )}
-
       {/* Recommandation IA */}
-      {recommendation && (
-        <View style={styles.advice}>
-          <Text>🧥 Conseil : {recommendation}</Text>
+      <View style={styles.widgetTips}>
+        <View style={styles.pagination}>
+          <View style={styles.dotActive} />
+          <View style={styles.dot} />
         </View>
-      )}
-
-      {/* Prévisions heure par heure */}
-      {today.length > 0 && (
-        <View style={styles.block}>
-          <Text style={styles.title}>Prévisions heure par heure :</Text>
-          <FlatList
-            horizontal
-            data={today}
-            keyExtractor={(item, index) => index.toString()}
-            showsHorizontalScrollIndicator={false}
-            renderItem={({ item }) => (
-              <View style={styles.hourCard}>
-                <Text style={styles.hour}>{item.hour}h</Text>
-                <Text style={styles.tempHour}>{item.temp}°C</Text>
-                <Text style={styles.conditionHour}>{item.condition}</Text>
-              </View>
-            )}
-          />
-        </View>
-      )}
-      <View style={styles.pagination}>
-        <View style={styles.dotActive} />
-        <View style={styles.dot} />
-      </View>
-
-      {/* Prévisions sur les prochains jours */}
-      {forecast.length > 0 && (
-        <View style={styles.block}>
-          <Text style={styles.title}>Prévisions des jours suivants :</Text>
-          {forecast.map((day, i) => (
-            <Text key={i}>
-              {day.date} : {day.temp_min}° / {day.temp_max}° - {day.condition}
-            </Text>
-          ))}
-        </View>
-      )}
-      <View style={{ flexDirection: "row", marginTop: 10 }}>
-        <Text style={styles.tag}>Comfortable</Text>
-        <Text style={styles.tag}>Casual</Text>
       </View>
     </ScrollView>
   );
@@ -190,7 +148,8 @@ const styles = StyleSheet.create({
   },
   city: {
     fontSize: 32,
-    fontWeight: "600",
+    marginTop: 10,
+    fontWeight: "300",
     fontFamily: "Poppins",
     textAlign: "center",
     marginBottom: 4,
@@ -245,6 +204,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
     marginBottom: 20,
+    marginTop: 10,
   },
   searchInput: {
     flex: 1,
@@ -320,6 +280,23 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: "#333",
     marginHorizontal: 4,
+  },
+  widgetmeteo: {
+    height: 240,
+    backgroundColor: "gray",
+    flexDirection: "column",
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
+  },
+  widgetTips: {
+    height: 240,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
   },
 });
 

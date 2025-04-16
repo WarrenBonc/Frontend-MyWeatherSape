@@ -15,35 +15,34 @@ const SignupPage = ({ navigation }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [dateOfBirth, setDateOfBirth] = useState("");
 
-const [firstName, setFirstName] = useState("");
-const [email, setEmail] = useState("");
-const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-const handleSignup = () => {
-  fetch("http://192.168.0.32:3000/api/users/signup", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      firstName,
-      email,
-      password,
-      birthdate: dateOfBirth.split("/").reverse().join("-"), // Format yyyy-mm-dd
-    }),
-  })
-    .then(response => response.json())
-    .then(data => {
-      if (data.result) {
-        navigation.navigate("Preference");
-      } else {
-        alert(data.error);
-      }
+  const handleSignup = () => {
+    fetch("http://192.168.0.44:3000/api/users/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        firstName,
+        email,
+        password,
+        birthdate: dateOfBirth.split("/").reverse().join("-"), // Format yyyy-mm-dd
+      }),
     })
-    .catch(error => {
-      alert("Une erreur est survenue lors de l'inscription.");
-      console.error(error);
-    });
-};
-
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.result) {
+          navigation.navigate("Preference");
+        } else {
+          alert(data.error);
+        }
+      })
+      .catch((error) => {
+        alert("Une erreur est survenue lors de l'inscription.");
+        console.error(error);
+      });
+  };
 
   const handleDateInput = (text) => {
     // Supprime tout caractère non numérique
@@ -140,7 +139,9 @@ const handleSignup = () => {
           >
             <TouchableOpacity
               style={styles.buttonContent}
-              onPress={handleSignup}
+              onPress={() => {
+                navigation.navigate("Preference");
+              }}
             >
               <Text style={styles.buttonText}>Créer un compte</Text>
             </TouchableOpacity>

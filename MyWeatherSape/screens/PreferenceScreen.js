@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, Text, View, Image } from "react-native";
 import Questionaire from "../components/Questionnaire";
 
-const PreferencePage = () => {
+const PreferencePage = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Image
@@ -14,7 +14,7 @@ const PreferencePage = () => {
         source={require("../assets/Ellipse.png")}
         style={[styles.ellipse, styles.topRight]}
       />
-      <Questionaire />
+      <Questionaire navigation={navigation} />
     </View>
   );
 };
