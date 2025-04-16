@@ -2,12 +2,8 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, ScrollView, TextInput } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { FlatList } from "react-native";
-import {
-  setCurrentWeather,
-  setTodayWeather,
-  setForecast,
-  setRecommendation,
-} from "../reducers/weather";
+import { setForecast, setRecommendation } from "../reducers/weather";
+import WeatherDisplay from "../components/weatherDisplay";
 
 const HomePage = () => {
   const dispatch = useDispatch();
@@ -19,72 +15,62 @@ const HomePage = () => {
     return labels[dayOffset] || `Jour ${dayOffset + 1}`;
   };
 
-  // On récupère les infos utilisateur et ville depuis Redux
-  const userToken = useSelector((state) => state.user.token);
-  const city = useSelector((state) => state.user.city) || "Paris";
-
-  // On récupère les données météo depuis Redux
-  // const current = useSelector((state) => state.weather.current);
-  // const today = useSelector((state) => state.weather.today) || []; // Par défaut, tableau vide
-  // const forecast = useSelector((state) => state.weather.forecast) || []; // Par défaut, tableau vide
-  // const recommendation = useSelector((state) => state.weather.recommendation);
-  // console.log("📍 Ville sélectionnée :", city);
-  // console.log("🧑‍💻 Token utilisateur :", userToken);
-  // console.log("🌡️ Météo actuelle :", current);
-  // console.log("🕓 Météo heure par heure :", today);
-  // console.log("📆 Prévisions des jours suivants :", forecast);
-  // console.log("🧥 Recommandation IA :", recommendation);
-
-  // Fonction qui fetch toutes les données météo depuis le backend
-  // const fetchAllWeatherData = async () => {
-  //   if (!userToken || !city) return;
-
-  //   try {
-  //     const [currentRes, forecastRes, aiRes] = await Promise.all([
-  //       fetch(`http://192.168.0.44:3000/api/weather?city=${city}`),
-  //       fetch(
-  //         `http://192.168.0.44:3000/api/weather/forecast?city=${city}&days=5`
-  //       ),
-  //       fetch(`http://192.168.0.44:3000/api/weather/recommendation`, {
-  //         method: "POST",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: JSON.stringify({ userToken, city }),
-  //       }),
-  //     ]);
-
-  //     const current = await currentRes.json();
-  //     const forecast = await forecastRes.json();
-  //     const recommendation = await aiRes.json();
-
-  //     // On envoie les données dans Redux
-  //     dispatch(setCurrentWeather(current));
-  //     dispatch(setForecast(forecast.forecast));
-  //     dispatch(setRecommendation(recommendation.advice));
-  //   } catch (error) {
-  //     console.error("Erreur météo :", error.message);
-  //   }
-  // };
+  const city = useSelector((state) => state.weather.city) || "Estissac";
 
   const fetchAllWeatherData = async () => {
     try {
-      const [currentRes, forecastRes, aiRes] = await Promise.all([
-        fetch(`http://localhost:3000/api/weather?city=${city}`),
-        fetch(`http://localhost:3000/api/weather/forecast?city=${city}&days=5`),
-        fetch(`http://localhost:3000/api/weather/recommendation`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId, city }),
-        }),
-      ]);
+      // On fait une requête à l'API pour récupérer les données météo
+      const fetchData = await fetch(
+        `http://192.168.0.44:3000/api/weather/7days-hourly/${city}`
+      );
 
-      const current = await currentRes.json();
-      const forecast = await forecastRes.json();
-      const recommendation = await aiRes.json();
+      if (!fetchData.ok) {
+        throw new Error(`Erreur HTTP : ${fetchData.status}`);
+      }
 
-      // On envoie les données dans Redux
-      dispatch(setCurrentWeather(current));
-      dispatch(setForecast(forecast.forecast));
-      dispatch(setRecommendation(recommendation.advice));
+      const weatherData = await fetchData.json();
+
+      // Vérification de la structure des données
+      if (!weatherData || !weatherData.forecast) {
+        throw new Error("Données météo invalides ou manquantes");
+      }
+
+      console.log("Structure des données météo :", weatherData); // Affichage des données pour examen
+
+      // Trier les jours en fonction de la date (du plus proche au plus éloigné)
+      const sortedDays = Object.keys(weatherData.forecast).sort((a, b) => {
+        return new Date(a) - new Date(b); // Compare les dates
+      });
+
+      // Affichage des jours triés
+      console.log("Jours triés :", sortedDays);
+
+      // Création de la structure pour les jours et les heures
+      const dailyData = sortedDays.map((day) => {
+        return {
+          date: day,
+          condition: weatherData.forecast[day].condition,
+          temperature:
+            weatherData.forecast[day].hours[0]?.temperature ||
+            "Données non disponibles",
+          feels_like:
+            weatherData.forecast[day].hours[0]?.feels_like ||
+            "Données non disponibles",
+          hours: weatherData.forecast[day].hours.map((hourData) => ({
+            temperature: hourData.temperature,
+            feels_like: hourData.feels_like,
+            hour: hourData.hour,
+          })),
+        };
+      });
+      console.log("Structure des données météo :", dailyData[0].condition);
+      // Exemple de recommandation spécifique
+      const recommendation = { advice: "Restez au chaud!" };
+
+      // On envoie les données globales de tous les jours dans Redux
+      // Action pour les conditions des 7 jours avec températures et ressentis
+      dispatch(setForecast(dailyData)); // Action pour la prévision des 7 jours avec heures
+      dispatch(setRecommendation(recommendation.advice)); // Action pour les recommandations
     } catch (error) {
       console.error("Erreur météo :", error.message);
     }
@@ -121,13 +107,14 @@ const HomePage = () => {
         <Text style={styles.date}>{getLabelForDay(selectedDay)}</Text>
         <Text
           style={styles.arrow}
-          onPress={() => selectedDay < 4 && setSelectedDay(selectedDay + 1)}
+          onPress={() => selectedDay < 5 && setSelectedDay(selectedDay + 1)}
         >
           →
         </Text>
       </View>
       {/* Ville et météo actuelle */}
       <View style={styles.widgetmeteo}>
+        <WeatherDisplay num={selectedDay} city={city} />
         <View style={styles.pagination}>
           <View style={styles.dotActive} />
           <View style={styles.dot} />
@@ -149,7 +136,7 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 40,
     paddingHorizontal: 20,
-    backgroundColor: "#fff",
+    backgroundColor: "#F3F4F6",
   },
   header: {
     alignItems: "left",
@@ -214,7 +201,7 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f1f1f1",
+    backgroundColor: "#fff",
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 8,
@@ -265,6 +252,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
     paddingHorizontal: 20,
+    backgroundColor: "#fff",
+    borderRadius: 10,
   },
   arrow: {
     fontSize: 22,
@@ -298,7 +287,7 @@ const styles = StyleSheet.create({
   },
   widgetmeteo: {
     height: 240,
-    backgroundColor: "gray",
+    backgroundColor: "#fff",
     flexDirection: "column",
     borderRadius: 20,
     alignItems: "center",
@@ -307,7 +296,7 @@ const styles = StyleSheet.create({
   },
   widgetTips: {
     height: 240,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#ffff",
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",

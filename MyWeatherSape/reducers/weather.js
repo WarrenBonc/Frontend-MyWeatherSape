@@ -1,25 +1,16 @@
-// reducers/weather.js
-
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  current: null,           // météo actuelle
-  today: [],               // météo par heure
-  forecast: [],            // météo sur plusieurs jours
-  recommendation: "",      // conseil vestimentaire IA
+  forecast: [], // Météo actuelle + prévisions sur plusieurs jours (y compris heures)
+  recommendation: "", // Conseil vestimentaire IA
 };
 
 export const weatherSlice = createSlice({
   name: "weather",
   initialState,
   reducers: {
-    setCurrentWeather: (state, action) => {
-      state.current = action.payload;
-    },
-    setTodayWeather: (state, action) => {
-      state.today = action.payload;
-    },
     setForecast: (state, action) => {
+      // On stocke directement les 7 jours (y compris le jour actuel)
       state.forecast = action.payload;
     },
     setRecommendation: (state, action) => {
@@ -28,11 +19,6 @@ export const weatherSlice = createSlice({
   },
 });
 
-export const {
-  setCurrentWeather,
-  setTodayWeather,
-  setForecast,
-  setRecommendation,
-} = weatherSlice.actions;
+export const { setForecast, setRecommendation } = weatherSlice.actions;
 
 export default weatherSlice.reducer;
