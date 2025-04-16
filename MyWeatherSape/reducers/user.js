@@ -8,6 +8,10 @@ const userSlice = createSlice({
     isAuthenticated: false, // Indique si l'utilisateur est authentifié
     loading: false, // Indique si une requête est en cours
     error: null, // Stocke l'erreur (si existante)
+    notifications: {
+      enabled: true,
+      frequency: 'morning',
+    },
   },
   reducers: {
     setUser: (state, action) => {
@@ -23,14 +27,24 @@ const userSlice = createSlice({
     setError: (state, action) => {
       state.error = action.payload; // Met à jour l'erreur
     },
+    updateNotifications: (state, action) => {
+      state.notifications = action.payload;
+    },
     logout: (state) => {
-      state.token = null; // Efface le token
-      state.value = null; // Efface le nom de l'utilisateur
-      state.isAuthenticated = false; // L'utilisateur n'est plus authentifié
+      return {
+        value: null,
+        token: null,
+        isAuthenticated: false,
+        loading: false,
+        error: null,
+        notifications: {
+          enabled: true,
+          frequency: 'morning',
+        },
+      };
     },
   },
 });
 
-export const { setUser, setToken, setLoading, setError, logout } =
-  userSlice.actions;
+export const { setUser, setToken, setLoading, setError, logout, updateNotifications } = userSlice.actions;
 export default userSlice.reducer;
