@@ -20,7 +20,7 @@ const [email, setEmail] = useState("");
 const [password, setPassword] = useState("");
 
 const handleSignup = () => {
-  fetch("http://192.168.0.32:3000/api/users/signup", {
+  fetch("http://192.168.1.45:3000/api/users/signup", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
