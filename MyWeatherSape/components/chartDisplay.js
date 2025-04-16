@@ -63,8 +63,8 @@ const WeatherDisplay = ({ num }) => {
       <View style={styles.chartContainer}>
         <LineChart
           data={data}
-          width={350}
-          height={200}
+          width={320}
+          height={180}
           chartConfig={chartConfig}
           bezier
           withInnerLines={true}
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff",
+
     height: 200, // Ajuster la taille totale du conteneur
     width: 270,
   },

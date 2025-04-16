@@ -80,17 +80,6 @@ const HomePage = () => {
     }
   };
 
-  const swiperOption = {
-    loop: true,
-    grabCursor: false,
-    slidesPerView: "auto",
-    centeredSlides: true,
-    autoplay: {
-      delay: 2500,
-      disableOnInteraction: false,
-    },
-  };
-
   useEffect(() => {
     fetchAllWeatherData();
   }, [city]);
@@ -330,6 +319,7 @@ const styles = StyleSheet.create({
     gap: 10,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#fff",
   },
   swipercontainer: {
     height: 260,
