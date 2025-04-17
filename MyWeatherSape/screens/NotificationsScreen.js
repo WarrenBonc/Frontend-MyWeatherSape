@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient'; // Pour le dégradé du b
 import * as Notifications from 'expo-notifications'; // Pour gérer les notifications
 import { useSelector } from 'react-redux';
 import config from '../config';
+import { useIsFocused } from '@react-navigation/native'; // pour re-fetcher les données quand l'écran est actif
 
 export default function NotificationsScreen({ navigation }) {
   // États pour gérer si les notifications sont activées et à quels moments de la journée
@@ -11,7 +12,8 @@ export default function NotificationsScreen({ navigation }) {
   const [morning, setMorning] = useState(false);
   const [noon, setNoon] = useState(false);
   const [evening, setEvening] = useState(false);
-  const userId = useSelector((state) => state.user.value?._id);
+  const [userIdFromApi, setUserIdFromApi] = useState(null);
+  const isFocused = useIsFocused();
 
   // Active/désactive les notifications
   const toggleSwitch = () => setNotificationsEnabled(previousState => !previousState);
@@ -26,6 +28,29 @@ export default function NotificationsScreen({ navigation }) {
     };
     requestPermissions();
   }, []);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetch(`${config.API_BASE_URL}/api/users/me`, {
+          credentials: 'include', // inclure le cookie
+        });
+        const data = await response.json();
+        if (data && data._id) {
+          setUserIdFromApi(data._id);
+          console.log("✅ Utilisateur récupéré via /me :", data._id);
+        } else {
+          console.warn("⚠️ Utilisateur non trouvé via /me");
+        }
+      } catch (error) {
+        console.error("❌ Erreur lors de la récupération de l'utilisateur :", error);
+      }
+    };
+
+    if (isFocused) {
+      fetchUser();
+    }
+  }, [isFocused]);
 
   // Planifie ou annule les notifications en fonction des préférences utilisateur
   useEffect(() => {
@@ -69,7 +94,7 @@ export default function NotificationsScreen({ navigation }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId,
+          userId: userIdFromApi,
           preferences: {
             morning,
             noon,
@@ -86,7 +111,7 @@ export default function NotificationsScreen({ navigation }) {
     }
   };
 
-  console.log('👤 Utilisateur :', userId);
+  console.log('👤 Utilisateur :', userIdFromApi);
   console.log('🔔 Notifications :', { morning, noon, evening });
 
   return (
