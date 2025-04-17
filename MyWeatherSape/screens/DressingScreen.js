@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   TextInput,
+  ScrollView,
 } from "react-native";
 import { useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
@@ -161,14 +162,17 @@ const DressingPage = () => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.sectionTitle}>Mon dressing :</Text>
-      <View style={{ width: '60%', alignSelf: 'flex-start' }}>
+      <View style={{ width: "60%", alignSelf: "flex-start" }}>
         <LinearGradient
-          colors={['#34C8E8', '#4E4AF2']}
+          colors={["#34C8E8", "#4E4AF2"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.gradientButton}
         >
-          <TouchableOpacity style={styles.buttonInner} onPress={handleAddClothes}>
+          <TouchableOpacity
+            style={styles.buttonInner}
+            onPress={handleAddClothes}
+          >
             <Text style={styles.btnText}>+ Ajouter un vêtement</Text>
           </TouchableOpacity>
         </LinearGradient>
@@ -183,14 +187,17 @@ const DressingPage = () => {
       />
 
       <Text style={styles.sectionTitle}>🧒 Vêtements enfants</Text>
-      <View style={{ width: '60%', alignSelf: 'flex-start' }}>
+      <View style={{ width: "60%", alignSelf: "flex-start" }}>
         <LinearGradient
-          colors={['#34C8E8', '#4E4AF2']}
+          colors={["#34C8E8", "#4E4AF2"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.gradientButton}
         >
-          <TouchableOpacity style={styles.buttonInner} onPress={handleAddChildClothes}>
+          <TouchableOpacity
+            style={styles.buttonInner}
+            onPress={handleAddChildClothes}
+          >
             <Text style={styles.btnText}>+ Ajouter un vêtement enfant</Text>
           </TouchableOpacity>
         </LinearGradient>
@@ -247,15 +254,15 @@ const styles = StyleSheet.create({
   },
   gradientButton: {
     borderRadius: 5,
-    overflow: 'hidden',
-    alignSelf: 'flex-start',
+    overflow: "hidden",
+    alignSelf: "flex-start",
     marginVertical: 5,
     paddingHorizontal: 0,
   },
   button: {
     paddingVertical: 10,
     paddingHorizontal: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   btnText: {
     color: "#fff",
