@@ -30,7 +30,7 @@ const Questionnaire = ({ navigation }) => {
         "Sensible au froid",
         "Neutre",
         "Le froid ne me dérange pas trop",
-        "J’ai vite chaud",
+        "J'ai vite chaud",
         "Résistant au froid",
       ],
     },
