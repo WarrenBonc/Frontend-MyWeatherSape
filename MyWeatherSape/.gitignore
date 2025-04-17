@@ -37,3 +37,8 @@ yarn-error.*
 
 # config file
 Frontend-MyWeatherSape/MyWeatherSape/config.js
+# Ignore config.js
+MyWeatherSape/config.js
+
+# Ignore config.js
+MyWeatherSape/config.js

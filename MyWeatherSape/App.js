@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useEffect, useState } from "react";
 import { Provider } from "react-redux";
+import { Image } from "react-native";
 import { configureStore } from "@reduxjs/toolkit";
 import config from "./config";
 
@@ -29,6 +30,8 @@ import SettingsScreen from "./screens/SettingsScreen";
 import LegalScreen from "./screens/LegalScreen";
 import NotificationsScreen from "./screens/NotificationsScreen";
 import EditProfileScreen from "./screens/EditProfileScreen";
+import ForgotPasswordPage from "./screens/ForgotPasswordPage";
+import ResetPassword from "./screens/ResetPassword";
 
 // Simuler un token (à remplacer avec un vrai AsyncStorage ou contexte plus tard)
 const token = null;
@@ -38,7 +41,31 @@ const Tab = createBottomTabNavigator();
 
 function BottomTabs() {
   return (
-    <Tab.Navigator screenOptions={{ headerShown: false }}>
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarIcon: ({ focused }) => {
+          let iconName;
+
+          if (route.name === "Home") {
+            iconName = focused
+              ? require("./assets/home-active.png")
+              : require("./assets/home.png");
+          } else if (route.name === "Dressing") {
+            iconName = focused
+              ? require("./assets/dressingIcon-active.png")
+              : require("./assets/dressingIcon.png");
+          } else if (route.name === "Settings") {
+            iconName = focused
+              ? require("./assets/setting-active.png")
+              : require("./assets/setting.png");
+          }
+
+          // Retourne l'icône correspondante
+          return <Image source={iconName} style={{ width: 20, height: 20 }} />;
+        },
+      })}
+    >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Dressing" component={DressingScreen} />
       <Tab.Screen name="Settings" component={SettingsScreen} />
@@ -100,6 +127,8 @@ export default function App() {
           <Stack.Screen name="Welcome" component={WelcomeScreen} />
           <Stack.Screen name="SignIn" component={SigninScreen} />
           <Stack.Screen name="Signup" component={SignupScreen} />
+          <Stack.Screen name="ForgotPassword" component={ForgotPasswordPage} />
+          <Stack.Screen name="ResetPassword" component={ResetPassword} />
           <Stack.Screen name="Preference" component={PreferenceScreen} />
           <Stack.Screen name="MainTabs" component={BottomTabs} />
           <Stack.Screen name="Legal" component={LegalScreen} />
