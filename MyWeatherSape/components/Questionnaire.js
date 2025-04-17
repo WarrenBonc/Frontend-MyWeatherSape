@@ -36,7 +36,8 @@ const Questionnaire = ({ navigation }) => {
     {
       text: "Accessoires préférés :",
       options: [
-        "Casquette / Bonnet",
+        "Casquette",
+        "Bonnet",
         "Écharpe",
         "Gants",
         "Sac à dos",
