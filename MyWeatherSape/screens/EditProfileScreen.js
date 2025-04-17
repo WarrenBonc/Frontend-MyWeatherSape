@@ -1,8 +1,12 @@
 import React from "react";
 import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSelector } from 'react-redux';
 
 const EditProfileScreen = ({ navigation }) => {
+  const user = useSelector((state) => state.user.value);
+  console.log("👤 Utilisateur actuel :", user);
+
   return (
     <View style={styles.container}>
       {/* Bouton retour comme dans Settings */}
@@ -18,6 +22,12 @@ const EditProfileScreen = ({ navigation }) => {
       </TouchableOpacity>
 
       <Text style={styles.title}>Mes préférences</Text>
+
+      {user && (
+        <Text style={styles.userInfo}>
+          Bonjour {user.firstName} {user.lastName}
+        </Text>
+      )}
 
       <TouchableOpacity onPress={() => navigation.navigate('PreferenceScreen')} style={styles.button}>
         <LinearGradient
@@ -75,6 +85,13 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontFamily: 'Poppins-SemiBold',
+  },
+  userInfo: {
+    fontSize: 16,
+    fontFamily: 'Poppins-Regular',
+    marginBottom: 20,
+    textAlign: 'center',
+    color: '#444',
   },
 });
 
