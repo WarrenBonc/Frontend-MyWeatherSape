@@ -74,10 +74,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   title: {
-    fontSize: 24,
-    fontFamily: 'Poppins-Bold',
-    marginBottom: 20,
+    fontSize: 28,
+    fontFamily: 'Poppins-SemiBold',
+    marginBottom: 30,
+    color : '222',
     textAlign: 'center',
+    fontWeight : 'bold'
   },
   sectionTitle: {
     fontSize: 18,

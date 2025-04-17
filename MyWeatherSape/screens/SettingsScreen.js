@@ -75,6 +75,14 @@ export default function SettingsScreen() {
           <Text style={styles.arrow}>→</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("EditProfile")}
+        >
+          <Text style={styles.buttonText}>Modifier mes préférences</Text>
+          <Text style={styles.arrow}>→</Text>
+        </TouchableOpacity>
+
         {/* Bouton pour aller à la page des mentions légales */}
         <TouchableOpacity
           style={styles.button}
@@ -84,13 +92,7 @@ export default function SettingsScreen() {
           <Text style={styles.arrow}>→</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("EditProfile")}
-        >
-          <Text style={styles.buttonText}>Modifier mon profil</Text>
-          <Text style={styles.arrow}>→</Text>
-        </TouchableOpacity>
+        
 
         {/* Bouton pour se déconnecter */}
         <TouchableOpacity style={styles.button} onPress={handleLogout}>
