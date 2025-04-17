@@ -10,80 +10,88 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import config from "../config";
 
 const SignupPage = ({ navigation }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [dateOfBirth, setDateOfBirth] = useState("");
 
-const [firstName, setFirstName] = useState("");
-const [email, setEmail] = useState("");
-const [password, setPassword] = useState("");
-const [loading, setLoading] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-const isValidDate = (dateString) => {
-  const [day, month, year] = dateString.split("/").map(Number);
-  const date = new Date(year, month - 1, day);
-  return (
-    date.getFullYear() === year &&
-    date.getMonth() === month - 1 &&
-    date.getDate() === day
-  );
-};
+  const isValidDate = (dateString) => {
+    const [day, month, year] = dateString.split("/").map(Number);
+    const date = new Date(year, month - 1, day);
+    return (
+      date.getFullYear() === year &&
+      date.getMonth() === month - 1 &&
+      date.getDate() === day
+    );
+  };
 
+  const handleSignup = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const dateRegex =
+      /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/(19|20)\d{2}$/;
 
-const handleSignup = () => {
+    if (
+      !firstName.trim() ||
+      !email.trim() ||
+      !password.trim() ||
+      !dateOfBirth.trim()
+    ) {
+      alert("Tous les champs sont obligatoires.");
+      return;
+    }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/(19|20)\d{2}$/;
+    if (!emailRegex.test(email)) {
+      alert("Veuillez entrer une adresse email valide.");
+      return;
+    }
 
-  if (!firstName.trim() || !email.trim() || !password.trim() || !dateOfBirth.trim()) {
-    alert("Tous les champs sont obligatoires.");
-    return;
-  }
+    if (!dateRegex.test(dateOfBirth)) {
+      alert("Format de date invalide. Utilisez jj/mm/aaaa.");
+      return;
+    }
 
-  if (!emailRegex.test(email)) {
-    alert("Veuillez entrer une adresse email valide.");
-    return;
-  }
+    if (!isValidDate(dateOfBirth)) {
+      alert("Veuillez entrer une date de naissance réelle.");
+      return;
+    }
+    setLoading(true);
 
-  if (!dateRegex.test(dateOfBirth)) {
-    alert("Format de date invalide. Utilisez jj/mm/aaaa.");
-    return;
-  }
-
-  if (!isValidDate(dateOfBirth)) {
-    alert("Veuillez entrer une date de naissance réelle.");
-    return;
-  }
-  setLoading(true);
-
-  fetch("http://192.168.0.32:3000/api/users/signup", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      firstName,
-      email,
-      password,
-      birthdate: dateOfBirth.split("/").reverse().join("-"), // Format yyyy-mm-dd
-    }),
-  })
-    .then(response => response.json())
-    .then(data => {
-      if (data.result) {
-        navigation.navigate("Preference");
-      } else if (data.error === "User already exists") {
-        alert("Cet email est déjà utilisé.");
-      } else {
-        alert(data.error || "Erreur inconnue.");
-      }
+    fetch(`${config.API_BASE_URL}/api/users/signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        firstName,
+        email,
+        password,
+        birthdate: dateOfBirth.split("/").reverse().join("-"), // Format yyyy-mm-dd
+      }),
     })
-    .catch((error) => {
-      setLoading(false);
-      alert("Erreur réseau ou serveur. Vérifiez votre connexion.");
-      console.error("Erreur lors de l'inscription :", error);
-    });
-};
-
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.result) {
+          if (!data.preferencesCompleted) {
+            navigation.navigate("Preference"); // Redirige vers le questionnaire
+          } else {
+            navigation.navigate("MainTabs"); // Redirige vers la page principale
+          }
+        } else if (data.error === "User already exists") {
+          alert("Cet email est déjà utilisé.");
+        } else {
+          alert(data.error || "Erreur inconnue.");
+        }
+      })
+      .catch((error) => {
+        setLoading(false);
+        alert("Erreur réseau ou serveur. Vérifiez votre connexion.");
+        console.error("Erreur lors de l'inscription :", error);
+      });
+  };
 
   const handleDateInput = (text) => {
     // Supprime tout caractère non numérique
@@ -180,7 +188,7 @@ const handleSignup = () => {
           >
             <TouchableOpacity
               style={styles.buttonContent}
-              onPress={handleSignup}
+              onPress={() => handleSignup()}
               disabled={loading}
             >
               <Text style={styles.buttonText}>Créer un compte</Text>

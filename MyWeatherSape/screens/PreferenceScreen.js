@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View, Image } from "react-native";
 import Questionaire from "../components/Questionnaire";
+import config from "../config";
 
 const PreferencePage = ({ navigation }) => {
   return (

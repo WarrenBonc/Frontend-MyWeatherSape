@@ -1,42 +1,49 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
+import config from "../config";
 
 const ResetPassword = ({ route, navigation }) => {
-  const { email } = route.params;  // Récupérer l'email passé depuis la page de connexion ou "Mot de passe oublié"
-  
-  const [newPassword, setNewPassword] = useState('');
-  const [error, setError] = useState('');
+  const { email } = route.params; // Récupérer l'email passé depuis la page de connexion ou "Mot de passe oublié"
+
+  const [newPassword, setNewPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleResetPassword = () => {
     if (!newPassword) {
-      setError('Veuillez entrer un nouveau mot de passe.');
+      setError("Veuillez entrer un nouveau mot de passe.");
       return;
     }
 
     setLoading(true);
-    setError('');
+    setError("");
 
     // Appel API pour mettre à jour le mot de passe
-    fetch("http://192.168.0.32:3000/api/users/reset-password", {
+    fetch(`${config.API_BASE_URL}/api/users/reset-password`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ email, newPassword }),
     })
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         if (data.result === true) {
           // Si la demande est réussie, redirige l'utilisateur vers la page de connexion
-          navigation.navigate('SignIn');
+          navigation.navigate("SignIn");
         } else {
-          setError(data.error);  // Affiche l'erreur
+          setError(data.error); // Affiche l'erreur
         }
       })
-      .catch(err => {
+      .catch((err) => {
         console.error(err);
-        setError('Une erreur est survenue, veuillez réessayer.');
+        setError("Une erreur est survenue, veuillez réessayer.");
       })
       .finally(() => {
         setLoading(false);
@@ -59,7 +66,9 @@ const ResetPassword = ({ route, navigation }) => {
         onPress={handleResetPassword}
         disabled={loading}
       >
-        <Text style={styles.buttonText}>{loading ? 'Chargement...' : 'Réinitialiser le mot de passe'}</Text>
+        <Text style={styles.buttonText}>
+          {loading ? "Chargement..." : "Réinitialiser le mot de passe"}
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -68,8 +77,8 @@ const ResetPassword = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
   title: {
@@ -77,31 +86,31 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   input: {
-    width: '100%',
+    width: "100%",
     height: 50,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 10,
     paddingHorizontal: 15,
     marginBottom: 15,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     fontSize: 16,
   },
   button: {
-    width: '100%',
+    width: "100%",
     height: 50,
-    backgroundColor: '#34C8E8',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#34C8E8",
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: 5,
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   errorText: {
-    color: 'red',
+    color: "red",
     marginBottom: 15,
   },
 });

@@ -5,12 +5,13 @@ const userSlice = createSlice({
   initialState: {
     value: null, // Stocke le nom de l'utilisateur
     token: null, // Stocke le token d'authentification
+    city: "Paris", // Stocke la ville actuelle
     isAuthenticated: false, // Indique si l'utilisateur est authentifié
     loading: false, // Indique si une requête est en cours
     error: null, // Stocke l'erreur (si existante)
     notifications: {
       enabled: true,
-      frequency: 'morning',
+      frequency: "morning",
     },
   },
   reducers: {
@@ -34,6 +35,9 @@ const userSlice = createSlice({
     updateNotifications: (state, action) => {
       state.notifications = action.payload;
     },
+    setCity: (state, action) => {
+      state.city = action.payload;
+    },
     logout: (state) => {
       return {
         value: null,
@@ -43,12 +47,20 @@ const userSlice = createSlice({
         error: null,
         notifications: {
           enabled: true,
-          frequency: 'morning',
+          frequency: "morning",
         },
       };
     },
   },
 });
 
-export const { setUser, setToken, setLoading, setError, logout, updateNotifications } = userSlice.actions;
+export const {
+  setUser,
+  setToken,
+  setLoading,
+  setError,
+  logout,
+  updateNotifications,
+  setCity,
+} = userSlice.actions;
 export default userSlice.reducer;
