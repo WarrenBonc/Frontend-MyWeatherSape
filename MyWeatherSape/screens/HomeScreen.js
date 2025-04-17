@@ -18,9 +18,41 @@ const HomePage = () => {
 
   const [selectedDay, setSelectedDay] = useState(0);
   const [searchCity, setSearchCity] = useState("");
+
   const getLabelForDay = (dayOffset) => {
-    const labels = ["Aujourd’hui", "Demain", "Jour 3", "Jour 4", "Jour 5"];
-    return labels[dayOffset] || `Jour ${dayOffset + 1}`;
+    const daysOfWeek = [
+      "Dimanche",
+      "Lundi",
+      "Mardi",
+      "Mercredi",
+      "Jeudi",
+      "Vendredi",
+      "Samedi",
+    ];
+    const months = [
+      "janvier",
+      "février",
+      "mars",
+      "avril",
+      "mai",
+      "juin",
+      "juillet",
+      "août",
+      "septembre",
+      "octobre",
+      "novembre",
+      "décembre",
+    ];
+
+    const today = new Date();
+    const targetDate = new Date(today);
+    targetDate.setDate(today.getDate() + dayOffset);
+
+    const dayName = daysOfWeek[targetDate.getDay()];
+    const day = targetDate.getDate();
+    const monthName = months[targetDate.getMonth()];
+
+    return `${dayName} ${day} ${monthName}`;
   };
 
   const fetchUserLocation = async () => {
