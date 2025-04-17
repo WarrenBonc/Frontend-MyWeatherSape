@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useEffect, useState } from "react";
 import { Provider } from "react-redux";
+import { Image } from "react-native";
 import { configureStore } from "@reduxjs/toolkit";
 import config from "./config";
 
@@ -38,7 +39,31 @@ const Tab = createBottomTabNavigator();
 
 function BottomTabs() {
   return (
-    <Tab.Navigator screenOptions={{ headerShown: false }}>
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarIcon: ({ focused }) => {
+          let iconName;
+
+          if (route.name === "Home") {
+            iconName = focused
+              ? require("./assets/home-active.png")
+              : require("./assets/home.png");
+          } else if (route.name === "Dressing") {
+            iconName = focused
+              ? require("./assets/dressingIcon-active.png")
+              : require("./assets/dressingIcon.png");
+          } else if (route.name === "Settings") {
+            iconName = focused
+              ? require("./assets/setting-active.png")
+              : require("./assets/setting.png");
+          }
+
+          // Retourne l'icône correspondante
+          return <Image source={iconName} style={{ width: 20, height: 20 }} />;
+        },
+      })}
+    >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Dressing" component={DressingScreen} />
       <Tab.Screen name="Settings" component={SettingsScreen} />
