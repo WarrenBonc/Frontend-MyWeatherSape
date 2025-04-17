@@ -5,6 +5,7 @@ import {
   View,
   TouchableOpacity,
   Animated,
+  Alert,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import config from "../config";
