@@ -10,34 +10,35 @@ import {
 } from "react-native";
 import { useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient } from "expo-linear-gradient";
+import config from "../config";
 
 const DressingPage = () => {
   const user = useSelector((state) => state.user.value);
   const [clothes, setClothes] = useState([]);
   const [childClothes, setChildClothes] = useState([]);
   const [editingItemId, setEditingItemId] = useState(null);
-  const [editingLabel, setEditingLabel] = useState('');
+  const [editingLabel, setEditingLabel] = useState("");
   const navigation = useNavigation();
 
   useEffect(() => {
     if (!user || !user._id) return;
 
     // Récupérer vêtements utilisateur
-    fetch(`http://localhost:3000/api/dressing/${user._id}`)
+    fetch(`${config.API_BASE_URL}/api/dressing/user/${user._id}`)
       .then((res) => res.json())
       .then((data) => setClothes(data.clothingItems))
       .catch((err) => console.error("Erreur fetch vêtements :", err));
 
     // Récupérer vêtements enfants
-    fetch(`http://localhost:3000/api/dressing/child/${user._id}`)
+    fetch(`${config.API_BASE_URL}/api/dressing/child/${user._id}`)
       .then((res) => res.json())
       .then((data) => setChildClothes(data.clothingItems))
       .catch((err) => console.error("Erreur fetch vêtements enfants :", err));
   }, [user]);
 
   const handleDelete = (id) => {
-    fetch(`http://localhost:3000/api/delete-clothes/${id}`, {
+    fetch(`${config.API_BASE_URL}/api/delete-clothes/${id}`, {
       method: "DELETE",
     })
       .then((res) => res.json())
@@ -51,41 +52,41 @@ const DressingPage = () => {
   const handleAddClothes = () => {
     if (!user || !user._id) return;
     const newItem = {
-      label: 'Nouveau vêtement',
-      category: 'haut',
-      season: 'été',
+      label: "Nouveau vêtement",
+      category: "haut",
+      season: "été",
       userId: user._id,
     };
-    fetch('http://localhost:3000/api/add-clothes', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    fetch(`${config.API_BASE_URL}/api/add-clothes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newItem),
     })
-      .then(res => res.json())
-      .then(data => setClothes(prev => [...prev, data.newItem]))
-      .catch(err => console.error('Erreur ajout vêtement :', err));
+      .then((res) => res.json())
+      .then((data) => setClothes((prev) => [...prev, data.newItem]))
+      .catch((err) => console.error("Erreur ajout vêtement :", err));
   };
 
   const handleAddChildClothes = () => {
     if (!user || !user._id) return;
     const newItem = {
-      label: 'Vêtement enfant',
-      category: 'bas',
-      season: 'hiver',
+      label: "Vêtement enfant",
+      category: "bas",
+      season: "hiver",
       userId: user._id,
     };
-    fetch('http://localhost:3000/api/add-child-clothes', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    fetch(`${config.API_BASE_URL}/api/add-child-clothes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newItem),
     })
-      .then(res => res.json())
-      .then(data => setChildClothes(prev => [...prev, data.newItem]))
-      .catch(err => console.error('Erreur ajout vêtement enfant :', err));
+      .then((res) => res.json())
+      .then((data) => setChildClothes((prev) => [...prev, data.newItem]))
+      .catch((err) => console.error("Erreur ajout vêtement enfant :", err));
   };
 
   const handleEditSubmit = (id) => {
-    fetch(`http://localhost:3000/api/edit-clothes/${id}`, {
+    fetch(`${config.API_BASE_URL}/api/edit-clothes/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ label: editingLabel }),
@@ -93,10 +94,14 @@ const DressingPage = () => {
       .then((res) => res.json())
       .then((updatedItem) => {
         setClothes((prev) =>
-          prev.map((item) => (item._id === id ? { ...item, label: editingLabel } : item))
+          prev.map((item) =>
+            item._id === id ? { ...item, label: editingLabel } : item
+          )
         );
         setChildClothes((prev) =>
-          prev.map((item) => (item._id === id ? { ...item, label: editingLabel } : item))
+          prev.map((item) =>
+            item._id === id ? { ...item, label: editingLabel } : item
+          )
         );
         setEditingItemId(null);
       })
@@ -121,7 +126,7 @@ const DressingPage = () => {
       <Text style={styles.badge}>Saison : {item.season}</Text>
       <View style={styles.actions}>
         <LinearGradient
-          colors={['#34C8E8', '#4E4AF2']}
+          colors={["#34C8E8", "#4E4AF2"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.gradientButton}
@@ -137,12 +142,15 @@ const DressingPage = () => {
           </TouchableOpacity>
         </LinearGradient>
         <LinearGradient
-          colors={['#34C8E8', '#4E4AF2']}
+          colors={["#34C8E8", "#4E4AF2"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.gradientButton}
         >
-          <TouchableOpacity onPress={() => handleDelete(item._id)} style={styles.button}>
+          <TouchableOpacity
+            onPress={() => handleDelete(item._id)}
+            style={styles.buttonInner}
+          >
             <Text style={styles.btnText}>Supprimer</Text>
           </TouchableOpacity>
         </LinearGradient>
@@ -151,56 +159,51 @@ const DressingPage = () => {
   );
 
   return (
-    <FlatList
-      ListHeaderComponent={
-        <>
-          <Text style={styles.sectionTitle}>Mon dressing :</Text>
-          <View style={{ width: '60%', alignSelf: 'flex-start' }}>
-            <LinearGradient
-              colors={['#34C8E8', '#4E4AF2']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.gradientButton}
-            >
-              <TouchableOpacity style={styles.button} onPress={handleAddClothes}>
-                <Text style={styles.btnText}>+ Ajouter un vêtement</Text>
-              </TouchableOpacity>
-            </LinearGradient>
-          </View>
-        </>
-      }
-      data={clothes}
-      renderItem={renderItem}
-      keyExtractor={(item) => item._id}
-      horizontal={false}
-      numColumns={2}
-      contentContainerStyle={styles.container}
-      ListFooterComponent={
-        <>
-          <Text style={styles.sectionTitle}>🧒 Vêtements enfants</Text>
-          <View style={{ width: '60%', alignSelf: 'flex-start' }}>
-            <LinearGradient
-              colors={['#34C8E8', '#4E4AF2']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.gradientButton}
-            >
-              <TouchableOpacity style={styles.button} onPress={handleAddChildClothes}>
-                <Text style={styles.btnText}>+ Ajouter un vêtement enfant</Text>
-              </TouchableOpacity>
-            </LinearGradient>
-          </View>
-          <FlatList
-            data={childClothes}
-            renderItem={renderItem}
-            keyExtractor={(item) => item._id}
-            horizontal={false}
-            numColumns={2}
-            contentContainerStyle={styles.list}
-          />
-        </>
-      }
-    />
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.sectionTitle}>Mon dressing :</Text>
+      <View style={{ width: '60%', alignSelf: 'flex-start' }}>
+        <LinearGradient
+          colors={['#34C8E8', '#4E4AF2']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.gradientButton}
+        >
+          <TouchableOpacity style={styles.buttonInner} onPress={handleAddClothes}>
+            <Text style={styles.btnText}>+ Ajouter un vêtement</Text>
+          </TouchableOpacity>
+        </LinearGradient>
+      </View>
+      <FlatList
+        data={clothes}
+        renderItem={renderItem}
+        keyExtractor={(item) => item._id}
+        horizontal={false}
+        numColumns={2}
+        contentContainerStyle={styles.list}
+      />
+
+      <Text style={styles.sectionTitle}>🧒 Vêtements enfants</Text>
+      <View style={{ width: '60%', alignSelf: 'flex-start' }}>
+        <LinearGradient
+          colors={['#34C8E8', '#4E4AF2']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.gradientButton}
+        >
+          <TouchableOpacity style={styles.buttonInner} onPress={handleAddChildClothes}>
+            <Text style={styles.btnText}>+ Ajouter un vêtement enfant</Text>
+          </TouchableOpacity>
+        </LinearGradient>
+      </View>
+      <FlatList
+        data={childClothes}
+        renderItem={renderItem}
+        keyExtractor={(item) => item._id}
+        horizontal={false}
+        numColumns={2}
+        contentContainerStyle={styles.list}
+      />
+    </ScrollView>
   );
 };
 
@@ -243,14 +246,16 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   gradientButton: {
-    borderRadius: 8,
-    marginBottom: 15,
+    borderRadius: 5,
+    overflow: 'hidden',
+    alignSelf: 'flex-start',
+    marginVertical: 5,
+    paddingHorizontal: 0,
   },
   button: {
     paddingVertical: 10,
     paddingHorizontal: 10,
-    alignItems: 'left',
-    justifyContent: 'center',
+    alignItems: 'center',
   },
   btnText: {
     color: "#fff",
