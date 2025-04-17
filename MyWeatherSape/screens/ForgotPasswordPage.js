@@ -1,11 +1,19 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
 import config from "../config";
 
 const ForgotPasswordPage = ({ navigation }) => {
   const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const handleSendResetLink = () => {
     if (!email) {
@@ -16,7 +24,7 @@ const ForgotPasswordPage = ({ navigation }) => {
     setLoading(true);
     setError("");
 
-    fetch(`${config.API_BASE_URL}/api/users/forgot-password`, {
+    fetch(`${config.API_BASE_URL}/api/users/send-email`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
@@ -24,7 +32,7 @@ const ForgotPasswordPage = ({ navigation }) => {
       .then((res) => res.json())
       .then((data) => {
         if (data.result) {
-          navigation.navigate("ResetPassword", { email }); // ✅ ici tu passes l'email
+          setSuccess(true);
         } else {
           setError(data.error || "Une erreur est survenue.");
         }
@@ -32,6 +40,81 @@ const ForgotPasswordPage = ({ navigation }) => {
       .catch(() => setError("Erreur réseau."))
       .finally(() => setLoading(false));
   };
+
+  const handleVerifyCode = async () => {
+    if (!code) {
+      setError("Veuillez entrer le code de verification.");
+
+      return;
+    }
+
+    // Remove any leading or trailing whitespace
+
+    const response = await fetch(
+      `${config.API_BASE_URL}/api/users/verify-code`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (data.result) {
+      setSuccess(true);
+      navigation.navigate("ResetPassword");
+      return;
+    } else {
+      setError(data.error || "Une erreur est survenue.");
+    }
+  };
+
+  if (!success) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>Mot de passe oublié</Text>
+        <Text style={styles.text}>
+          Saisis ton adresse email pour recevoir un lien de réinitialisation.
+        </Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
+        />
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+        <TouchableOpacity style={styles.button} onPress={handleSendResetLink}>
+          <Text style={styles.buttonText}>
+            {loading ? "Envoi..." : "Envoyer le lien"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  } else {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>Entrer le code de verification</Text>
+        <Text style={styles.text}>
+          Saisis ton code de verification pour réinitialiser ton mot de passe.
+        </Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Code de verification"
+          keyboardType="number-pad"
+          value={code}
+          onChangeText={setCode}
+        />
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+        <TouchableOpacity style={styles.button} onPress={handleVerifyCode}>
+          <Text style={styles.buttonText}>
+            {loading ? "Envoi..." : "Envoyer le lien"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>

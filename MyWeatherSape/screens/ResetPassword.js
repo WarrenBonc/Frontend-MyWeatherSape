@@ -8,46 +8,49 @@ import {
 } from "react-native";
 import config from "../config";
 
-const ResetPassword = ({ route, navigation }) => {
-  const { email } = route.params; // Récupérer l'email passé depuis la page de connexion ou "Mot de passe oublié"
-
+const ResetPassword = ({ navigation }) => {
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleResetPassword = () => {
-    if (!newPassword) {
+  const handleResetPassword = async () => {
+    if (newPassword !== confirmPassword) {
+      setError("Les mots de passe ne correspondent pas.");
+      return;
+    }
+    if (!newPassword || !confirmPassword) {
       setError("Veuillez entrer un nouveau mot de passe.");
       return;
     }
-
     setLoading(true);
     setError("");
-
-    // Appel API pour mettre à jour le mot de passe
-    fetch(`${config.API_BASE_URL}/api/users/reset-password`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, newPassword }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.result === true) {
-          // Si la demande est réussie, redirige l'utilisateur vers la page de connexion
-          navigation.navigate("SignIn");
-        } else {
-          setError(data.error); // Affiche l'erreur
+    try {
+      const response = await fetch(
+        `${config.API_BASE_URL}/api/users/reset-password`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ newPassword }),
+          credentials: "include", // Inclure les cookies dans la requête
         }
-      })
-      .catch((err) => {
-        console.error(err);
-        setError("Une erreur est survenue, veuillez réessayer.");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+      );
+      const data = await response.json();
+      console.log(data);
+      if (data.result) {
+        // Si la demande est réussie, l'utilisateur reçoit un email
+        navigation.navigate("SignIn");
+      } else {
+        setError(data.error); // Affiche l'erreur
+      }
+    } catch (error) {
+      console.error(error);
+      setError("Une erreur est survenue, veuillez réessayer.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -59,6 +62,13 @@ const ResetPassword = ({ route, navigation }) => {
         secureTextEntry
         value={newPassword}
         onChangeText={(text) => setNewPassword(text)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="confirmer le mot de passe"
+        secureTextEntry
+        value={confirmPassword}
+        onChangeText={(text) => setConfirmPassword(text)}
       />
       {error && <Text style={styles.errorText}>{error}</Text>}
       <TouchableOpacity

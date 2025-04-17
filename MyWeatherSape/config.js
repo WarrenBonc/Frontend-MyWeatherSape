@@ -9,7 +9,7 @@ const getLocalIp = () => {
 
   // Si debuggerHost n'est pas défini, essaie l'IP locale (fallback sur 192.168.0.44)
   // Ou tu peux remplacer avec ton adresse IP locale
-  return "192.168.0.32"; // Remplacer par l'IP de ton réseau localdsdsds
+  return "192.168.0.44"; // Remplacer par l'IP de ton réseau localdsdsds
 };
 
 const localIp = getLocalIp();

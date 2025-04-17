@@ -170,7 +170,12 @@ const HomePage = () => {
       </View>
       {/* Ville et météo actuelle */}
       <View style={styles.swipercontainer}>
-        <PagerView style={styles.wrapper} horizontal={false} pageMargin={10}>
+        <PagerView
+          style={styles.wrapper}
+          horizontal={false}
+          pageMargin={10}
+          onPageSelected={(e) => setCurrentSlide(e.nativeEvent.position)}
+        >
           <View style={styles.widgetmeteo}>
             <WeatherDisplay num={selectedDay} city={city} />
           </View>
@@ -178,14 +183,31 @@ const HomePage = () => {
             <ChartDisplay num={selectedDay} city={city} />
           </View>
         </PagerView>
-      </View>
-      {/* Recommandation IA */}
-      <View style={styles.widgetTips}>
         <View style={styles.pagination}>
-          <View style={styles.dotActive} />
-          <View style={styles.dot} />
+          <View
+            style={[
+              styles.dot,
+              currentSlide === 0 && styles.dotActive, // Active si la page est 0
+            ]}
+          />
+          <View
+            style={[
+              styles.dot,
+              currentSlide === 1 && styles.dotActive, // Active si la page est 1
+            ]}
+          />
         </View>
       </View>
+      {/* Recommandation IA */}
+      <PagerView>
+        <View></View>
+        <View style={styles.widgetTips}>
+          <View style={styles.pagination}>
+            <View style={styles.dotActive} />
+            <View style={styles.dot} />
+          </View>
+        </View>
+      </PagerView>
     </ScrollView>
   );
 };
@@ -325,10 +347,15 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   pagination: {
+    position: "absolute",
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     marginTop: 10,
+    top: 230,
+    left: 93,
+    right: 0,
+    width: "100%",
   },
   dot: {
     width: 8,
@@ -373,6 +400,7 @@ const styles = StyleSheet.create({
   },
   swipercontainer: {
     height: 260,
+    position: "relative",
     width: "50%",
     borderRadius: 20,
     marginTop: 20,
