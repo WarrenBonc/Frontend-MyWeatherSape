@@ -163,7 +163,7 @@ const SigninPage = ({ navigation }) => {
           {/* Forgot Password */}
           <TouchableOpacity
             style={styles.forgotPasswordButton}
-            onPress={handleForgotPassword}
+            onPress={() => navigation.navigate("ForgotPassword")}
           >
             <Text style={styles.forgotPasswordText}>Mot de passe oublié ?</Text>
           </TouchableOpacity>

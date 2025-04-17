@@ -30,6 +30,8 @@ import SettingsScreen from "./screens/SettingsScreen";
 import LegalScreen from "./screens/LegalScreen";
 import NotificationsScreen from "./screens/NotificationsScreen";
 import EditProfileScreen from "./screens/EditProfileScreen";
+import ForgotPasswordPage from "./screens/ForgotPasswordPage";
+import ResetPassword from "./screens/ResetPassword";
 
 // Simuler un token (à remplacer avec un vrai AsyncStorage ou contexte plus tard)
 const token = null;
@@ -125,6 +127,8 @@ export default function App() {
           <Stack.Screen name="Welcome" component={WelcomeScreen} />
           <Stack.Screen name="SignIn" component={SigninScreen} />
           <Stack.Screen name="Signup" component={SignupScreen} />
+          <Stack.Screen name="ForgotPassword" component={ForgotPasswordPage} />
+          <Stack.Screen name="ResetPassword" component={ResetPassword} />
           <Stack.Screen name="Preference" component={PreferenceScreen} />
           <Stack.Screen name="MainTabs" component={BottomTabs} />
           <Stack.Screen name="Legal" component={LegalScreen} />
