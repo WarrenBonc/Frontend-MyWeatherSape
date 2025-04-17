@@ -120,7 +120,7 @@ const ForgotPasswordPage = ({ navigation }) => {
     <View style={styles.container}>
       <Text style={styles.title}>Mot de passe oublié</Text>
       <Text style={styles.text}>
-        Saisis ton adresse email pour recevoir un lien de réinitialisation.
+        Entrez votre adresse email, afin de réinitialiser votre mot de passe
       </Text>
       <TextInput
         style={styles.input}
@@ -132,7 +132,7 @@ const ForgotPasswordPage = ({ navigation }) => {
       {error ? <Text style={styles.error}>{error}</Text> : null}
       <TouchableOpacity style={styles.button} onPress={handleSendResetLink}>
         <Text style={styles.buttonText}>
-          {loading ? "Envoi..." : "Envoyer le lien"}
+          {loading ? "Envoi..." : "RÉINITIALISER"}
         </Text>
       </TouchableOpacity>
     </View>

@@ -51,20 +51,7 @@ export default function SettingsScreen() {
 
       {/* Conteneur scrollable pour le contenu */}
       <ScrollView contentContainerStyle={styles.content}>
-        {/* Bouton retour avec fond en dégradé */}
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <LinearGradient
-            colors={["#34C8E8", "#4E4AF2"]} // Dégradé du bleu clair au bleu foncé
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.backGradient}
-          >
-            <Text style={styles.backButtonText}>←</Text>
-          </LinearGradient>
-        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Paramètres</Text>
 
         {/* Bouton pour aller à la page Notifications */}
         <TouchableOpacity
@@ -75,20 +62,20 @@ export default function SettingsScreen() {
           <Text style={styles.arrow}>→</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("EditProfile")}
+        >
+          <Text style={styles.buttonText}>Modifier mes préférences</Text>
+          <Text style={styles.arrow}>→</Text>
+        </TouchableOpacity>
+
         {/* Bouton pour aller à la page des mentions légales */}
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate("Legal")}
         >
           <Text style={styles.buttonText}>Mentions légales</Text>
-          <Text style={styles.arrow}>→</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("EditProfile")}
-        >
-          <Text style={styles.buttonText}>Modifier mon profil</Text>
           <Text style={styles.arrow}>→</Text>
         </TouchableOpacity>
 
@@ -120,26 +107,6 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 50,
   },
-  backButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 0,
-    borderRadius: 8,
-    alignSelf: "flex-start",
-    marginBottom: 15,
-    marginTop: 0,
-    zIndex: 1,
-  },
-  backGradient: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    alignSelf: "flex-start",
-  },
-  backButtonText: {
-    color: "#fff",
-    fontFamily: "Poppins-SemiBold",
-    fontSize: 16,
-  },
   button: {
     backgroundColor: "#D9D9D9",
     borderRadius: 10,
@@ -162,5 +129,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "#555",
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    fontFamily: "Poppins",
+    color: "#222",
+    marginBottom: 20,
+    marginTop: 10,
   },
 });

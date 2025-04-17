@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react'; // Import des hooks React
 import { View, Text, Switch, StyleSheet, TouchableOpacity } from 'react-native'; // Composants natifs
 import { LinearGradient } from 'expo-linear-gradient'; // Pour le dégradé du bouton retour
 import * as Notifications from 'expo-notifications'; // Pour gérer les notifications
+import { useSelector } from 'react-redux';
+import config from '../config';
+import { useIsFocused } from '@react-navigation/native'; // pour re-fetcher les données quand l'écran est actif
 
 export default function NotificationsScreen({ navigation }) {
   // États pour gérer si les notifications sont activées et à quels moments de la journée
@@ -9,6 +12,8 @@ export default function NotificationsScreen({ navigation }) {
   const [morning, setMorning] = useState(false);
   const [noon, setNoon] = useState(false);
   const [evening, setEvening] = useState(false);
+  const [userIdFromApi, setUserIdFromApi] = useState(null);
+  const isFocused = useIsFocused();
 
   // Active/désactive les notifications
   const toggleSwitch = () => setNotificationsEnabled(previousState => !previousState);
@@ -23,6 +28,29 @@ export default function NotificationsScreen({ navigation }) {
     };
     requestPermissions();
   }, []);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetch(`${config.API_BASE_URL}/api/users/me`, {
+          credentials: 'include', // inclure le cookie
+        });
+        const data = await response.json();
+        if (data && data._id) {
+          setUserIdFromApi(data._id);
+          console.log("✅ Utilisateur récupéré via /me :", data._id);
+        } else {
+          console.warn("⚠️ Utilisateur non trouvé via /me");
+        }
+      } catch (error) {
+        console.error("❌ Erreur lors de la récupération de l'utilisateur :", error);
+      }
+    };
+
+    if (isFocused) {
+      fetchUser();
+    }
+  }, [isFocused]);
 
   // Planifie ou annule les notifications en fonction des préférences utilisateur
   useEffect(() => {
@@ -57,6 +85,34 @@ export default function NotificationsScreen({ navigation }) {
 
     scheduleNotifications();
   }, [notificationsEnabled, morning, noon, evening]); // Re-déclenche à chaque changement
+
+  const handleSavePreferences = async () => {
+    try {
+      const response = await fetch(`${config.API_BASE_URL}/api/notifications/save-preferences`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: userIdFromApi,
+          preferences: {
+            morning,
+            noon,
+            evening,
+          },
+          notificationsEnabled,
+        }),
+      });
+
+      const data = await response.json();
+      console.log('✅ Préférences sauvegardées via bouton :', data);
+    } catch (error) {
+      console.error('❌ Erreur bouton Enregistrer :', error);
+    }
+  };
+
+  console.log('👤 Utilisateur :', userIdFromApi);
+  console.log('🔔 Notifications :', { morning, noon, evening });
 
   return (
     <View style={styles.container}>
@@ -101,6 +157,17 @@ export default function NotificationsScreen({ navigation }) {
           </View>
         </View>
       )}
+
+      <TouchableOpacity style={styles.saveButton} onPress={handleSavePreferences}>
+        <LinearGradient
+          colors={['#34C8E8', '#4E4AF2']}
+          style={styles.saveButtonGradient}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+        >
+          <Text style={styles.saveButtonText}>Enregistrer</Text>
+        </LinearGradient>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -145,5 +212,23 @@ const styles = StyleSheet.create({
   },
   freqSection: {
     marginTop: 20,
+  },
+  saveButton: {
+    marginTop: 30,
+    alignSelf: 'center',
+    width: '60%',
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  saveButtonGradient: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+  },
+  saveButtonText: {
+    color: 'white',
+    textAlign: 'center',
+    fontSize: 16,
+    fontFamily: 'Poppins-SemiBold',
   },
 });

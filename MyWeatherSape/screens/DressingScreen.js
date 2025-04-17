@@ -23,16 +23,18 @@ const DressingPage = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
+    console.log("🧥 DressingPage monté");
+    console.log("👤 Utilisateur courant :", user);
     if (!user || !user._id) return;
 
     // Récupérer vêtements utilisateur
-    fetch(`${config.API_BASE_URL}/api/dressing/user/${user._id}`)
+    fetch(`${config.API_BASE_URL}/api/dressing`, { credentials: "include" })
       .then((res) => res.json())
       .then((data) => setClothes(data.clothingItems))
       .catch((err) => console.error("Erreur fetch vêtements :", err));
 
     // Récupérer vêtements enfants
-    fetch(`${config.API_BASE_URL}/api/dressing/child/${user._id}`)
+    fetch(`${config.API_BASE_URL}/api/dressing/child`, { credentials: "include" })
       .then((res) => res.json())
       .then((data) => setChildClothes(data.clothingItems))
       .catch((err) => console.error("Erreur fetch vêtements enfants :", err));
@@ -51,39 +53,72 @@ const DressingPage = () => {
   };
 
   const handleAddClothes = () => {
-    if (!user || !user._id) return;
+    console.log("🧵 handleAddClothes appelé");
+    if (!user || !user._id) {
+      console.warn("⚠️ Pas d’utilisateur connecté");
+      return;
+    }
+    // Création du vêtement sans userId dans le corps
     const newItem = {
       label: "Nouveau vêtement",
       category: "haut",
       season: "été",
-      userId: user._id,
     };
     fetch(`${config.API_BASE_URL}/api/add-clothes`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify(newItem),
     })
       .then((res) => res.json())
-      .then((data) => setClothes((prev) => [...prev, data.newItem]))
-      .catch((err) => console.error("Erreur ajout vêtement :", err));
+      .then((data) => {
+        console.log("✅ Vêtement adulte ajouté :", data);
+        // Re-fetch les vêtements...
+        fetch(`${config.API_BASE_URL}/api/dressing`, { credentials: "include" })
+          .then((res) => res.json())
+          .then((data) => setClothes(data.clothingItems));
+        setEditingItemId(null);
+        setEditingLabel("");
+      })
+      .catch((err) => {
+        console.error("Erreur ajout vêtement :", err);
+        Alert.alert("Erreur", "Impossible d’ajouter le vêtement adulte.");
+      });
   };
 
   const handleAddChildClothes = () => {
-    if (!user || !user._id) return;
+    console.log("🧒 handleAddChildClothes appelé");
+    if (!user || !user._id) {
+      console.warn("⚠️ Pas d’utilisateur connecté");
+      return;
+    }
+    // Création du vêtement enfant sans userId dans le corps
     const newItem = {
       label: "Vêtement enfant",
       category: "bas",
       season: "hiver",
-      userId: user._id,
     };
     fetch(`${config.API_BASE_URL}/api/add-child-clothes`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify(newItem),
     })
       .then((res) => res.json())
-      .then((data) => setChildClothes((prev) => [...prev, data.newItem]))
-      .catch((err) => console.error("Erreur ajout vêtement enfant :", err));
+      .then((data) => {
+        console.log("✅ Vêtement enfant ajouté :", data);
+        // Re-fetch...
+        fetch(`${config.API_BASE_URL}/api/dressing/child`, { credentials: "include" })
+          .then((res) => res.json())
+          .then((data) => setChildClothes(data.clothingItems))
+          .catch((err) => console.error("Erreur rechargement vêtements enfant :", err));
+        setEditingItemId(null);
+        setEditingLabel("");
+      })
+      .catch((err) => {
+        console.error("Erreur ajout vêtement enfant :", err);
+        Alert.alert("Erreur", "Impossible d’ajouter le vêtement enfant.");
+      });
   };
 
   const handleEditSubmit = (id) => {
@@ -109,122 +144,131 @@ const DressingPage = () => {
       .catch((err) => Alert.alert("Erreur", "Échec de la modification"));
   };
 
-  const renderItem = ({ item }) => (
-    <View style={styles.card}>
-      {editingItemId === item._id ? (
-        <TextInput
-          style={styles.input}
-          value={editingLabel}
-          onChangeText={setEditingLabel}
-          onSubmitEditing={() => handleEditSubmit(item._id)}
-          onBlur={() => setEditingItemId(null)}
-          autoFocus
-        />
-      ) : (
-        <Text style={styles.label}>{item.label}</Text>
-      )}
-      <Text style={styles.badge}>Catégorie : {item.category}</Text>
-      <Text style={styles.badge}>Saison : {item.season}</Text>
-      <View style={styles.actions}>
-        <LinearGradient
-          colors={["#34C8E8", "#4E4AF2"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.gradientButton}
-        >
-          <TouchableOpacity
-            onPress={() => {
-              setEditingItemId(item._id);
-              setEditingLabel(item.label);
-            }}
-            style={styles.button}
+  const renderItem = ({ item }) => {
+    console.log("👕 Affichage vêtement :", item.label);
+    return (
+      <View style={styles.card}>
+        {editingItemId === item._id ? (
+          <TextInput
+            style={styles.input}
+            value={editingLabel}
+            onChangeText={setEditingLabel}
+            onSubmitEditing={() => handleEditSubmit(item._id)}
+            onBlur={() => setEditingItemId(null)}
+            autoFocus
+          />
+        ) : (
+          <Text style={styles.label}>{item.label}</Text>
+        )}
+        <Text style={styles.badge}>Catégorie : {item.category}</Text>
+        <Text style={styles.badge}>Saison : {item.season}</Text>
+        <View style={styles.actions}>
+          <LinearGradient
+            colors={["#34C8E8", "#4E4AF2"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.gradientButton}
           >
-            <Text style={styles.btnText}>Modifier</Text>
-          </TouchableOpacity>
-        </LinearGradient>
-        <LinearGradient
-          colors={["#34C8E8", "#4E4AF2"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.gradientButton}
-        >
-          <TouchableOpacity
-            onPress={() => handleDelete(item._id)}
-            style={styles.buttonInner}
+            <TouchableOpacity
+              onPress={() => {
+                setEditingItemId(item._id);
+                setEditingLabel(item.label);
+              }}
+              style={styles.button}
+            >
+              <Text style={styles.btnText}>Modifier</Text>
+            </TouchableOpacity>
+          </LinearGradient>
+          <LinearGradient
+            colors={["#34C8E8", "#4E4AF2"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.gradientButton}
           >
-            <Text style={styles.btnText}>Supprimer</Text>
-          </TouchableOpacity>
-        </LinearGradient>
+            <TouchableOpacity
+              onPress={() => handleDelete(item._id)}
+              style={styles.button}
+            >
+              <Text style={styles.btnText}>Supprimer</Text>
+            </TouchableOpacity>
+          </LinearGradient>
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.sectionTitle}>Mon dressing :</Text>
-      <View style={{ width: "60%", alignSelf: "flex-start" }}>
-        <LinearGradient
-          colors={["#34C8E8", "#4E4AF2"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.gradientButton}
-        >
-          <TouchableOpacity
-            style={styles.buttonInner}
-            onPress={handleAddClothes}
-          >
-            <Text style={styles.btnText}>+ Ajouter un vêtement</Text>
-          </TouchableOpacity>
-        </LinearGradient>
-      </View>
-      <FlatList
-        data={clothes}
-        renderItem={renderItem}
-        keyExtractor={(item) => item._id}
-        horizontal={false}
-        numColumns={2}
-        contentContainerStyle={styles.list}
-      />
-
-      <Text style={styles.sectionTitle}>🧒 Vêtements enfants</Text>
-      <View style={{ width: "60%", alignSelf: "flex-start" }}>
-        <LinearGradient
-          colors={["#34C8E8", "#4E4AF2"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.gradientButton}
-        >
-          <TouchableOpacity
-            style={styles.buttonInner}
-            onPress={handleAddChildClothes}
-          >
-            <Text style={styles.btnText}>+ Ajouter un vêtement enfant</Text>
-          </TouchableOpacity>
-        </LinearGradient>
-      </View>
-      <FlatList
-        data={childClothes}
-        renderItem={renderItem}
-        keyExtractor={(item) => item._id}
-        horizontal={false}
-        numColumns={2}
-        contentContainerStyle={styles.list}
-      />
-    </ScrollView>
+    <FlatList
+      ListHeaderComponent={
+        <View>
+          <Text style={styles.pageTitle}>Dressing</Text>
+          <Text style={styles.sectionTitle}>Mon dressing :</Text>
+          <View style={{ width: "60%", alignSelf: "flex-start" }}>
+            <LinearGradient
+              colors={["#34C8E8", "#4E4AF2"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.gradientButton}
+            >
+              <TouchableOpacity
+                style={styles.button}
+                onPress={handleAddClothes}
+              >
+                <Text style={styles.btnText}>+ Ajouter un vêtement</Text>
+              </TouchableOpacity>
+            </LinearGradient>
+          </View>
+          <View style={styles.list}>
+            {clothes.map((item) => renderItem({ item }))}
+          </View>
+          <Text style={styles.sectionTitle}>🧒 Vêtements enfants</Text>
+          <View style={{ width: "60%", alignSelf: "flex-start" }}>
+            <LinearGradient
+              colors={["#34C8E8", "#4E4AF2"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.gradientButton}
+            >
+              <TouchableOpacity
+                style={styles.button}
+                onPress={handleAddChildClothes}
+              >
+                <Text style={styles.btnText}>+ Ajouter un vêtement enfant</Text>
+              </TouchableOpacity>
+            </LinearGradient>
+          </View>
+        </View>
+      }
+      data={childClothes}
+      renderItem={renderItem}
+      keyExtractor={(item) => item._id}
+      horizontal={false}
+      numColumns={2}
+      contentContainerStyle={styles.container}
+    />
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flexGrow: 1,
     padding: 10,
     paddingTop: 90,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#FFFFFF",
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 10,
     fontFamily: "Poppins-SemiBold",
+  },
+  pageTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    fontFamily: "Poppins",
+    color: "#222",
+    marginBottom: 20,
+    marginTop: -30,
   },
   list: {
     gap: 10,
