@@ -6,7 +6,6 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
-  ScrollView,
   TextInput,
 } from "react-native";
 import { useSelector } from "react-redux";
@@ -51,6 +50,7 @@ const DressingPage = () => {
   };
 
   const handleAddClothes = () => {
+    if (!user || !user._id) return;
     const newItem = {
       label: "Nouveau vêtement",
       category: "haut",
@@ -68,6 +68,7 @@ const DressingPage = () => {
   };
 
   const handleAddChildClothes = () => {
+    if (!user || !user._id) return;
     const newItem = {
       label: "Vêtement enfant",
       category: "bas",
@@ -135,7 +136,7 @@ const DressingPage = () => {
               setEditingItemId(item._id);
               setEditingLabel(item.label);
             }}
-            style={styles.buttonInner}
+            style={styles.button}
           >
             <Text style={styles.btnText}>Modifier</Text>
           </TouchableOpacity>
@@ -160,17 +161,14 @@ const DressingPage = () => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.sectionTitle}>Mon dressing :</Text>
-      <View style={{ width: "60%", alignSelf: "flex-start" }}>
+      <View style={{ width: '60%', alignSelf: 'flex-start' }}>
         <LinearGradient
-          colors={["#34C8E8", "#4E4AF2"]}
+          colors={['#34C8E8', '#4E4AF2']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.gradientButton}
         >
-          <TouchableOpacity
-            style={styles.buttonInner}
-            onPress={handleAddClothes}
-          >
+          <TouchableOpacity style={styles.buttonInner} onPress={handleAddClothes}>
             <Text style={styles.btnText}>+ Ajouter un vêtement</Text>
           </TouchableOpacity>
         </LinearGradient>
@@ -185,17 +183,14 @@ const DressingPage = () => {
       />
 
       <Text style={styles.sectionTitle}>🧒 Vêtements enfants</Text>
-      <View style={{ width: "60%", alignSelf: "flex-start" }}>
+      <View style={{ width: '60%', alignSelf: 'flex-start' }}>
         <LinearGradient
-          colors={["#34C8E8", "#4E4AF2"]}
+          colors={['#34C8E8', '#4E4AF2']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.gradientButton}
         >
-          <TouchableOpacity
-            style={styles.buttonInner}
-            onPress={handleAddChildClothes}
-          >
+          <TouchableOpacity style={styles.buttonInner} onPress={handleAddChildClothes}>
             <Text style={styles.btnText}>+ Ajouter un vêtement enfant</Text>
           </TouchableOpacity>
         </LinearGradient>
@@ -252,19 +247,19 @@ const styles = StyleSheet.create({
   },
   gradientButton: {
     borderRadius: 5,
-    overflow: "hidden",
-    alignSelf: "flex-start",
+    overflow: 'hidden',
+    alignSelf: 'flex-start',
     marginVertical: 5,
     paddingHorizontal: 0,
   },
-  buttonInner: {
-    paddingVertical: 5,
+  button: {
+    paddingVertical: 10,
     paddingHorizontal: 10,
-    alignItems: "center",
+    alignItems: 'center',
   },
   btnText: {
     color: "#fff",
-    fontSize: 17,
+    fontSize: 16,
     fontFamily: "Poppins-SemiBold",
   },
   input: {
