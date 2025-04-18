@@ -69,43 +69,6 @@ const SigninPage = ({ navigation }) => {
   };
 
   // Fonction pour gérer l'oubli de mot de passe
-  const handleForgotPassword = () => {
-    if (!email) {
-      setError("Veuillez entrer votre email.");
-      return;
-    }
-
-    setLoading(true);
-    setError(""); // Réinitialise l'erreur avant de commencer la requête
-    console.log("Demande de réinitialisation du mot de passe pour:", email);
-
-    fetch(`${config.API_BASE_URL}/api/users/forgot-password`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Réponse de l'API:", data);
-
-        if (data.result === true) {
-          // Si la demande est réussie, l'utilisateur reçoit un email
-          setError(""); // Réinitialise l'erreur
-          navigation.navigate("ResetPassword", { email }); // Redirige vers la page de réinitialisation
-        } else {
-          setError(data.error); // Affiche l'erreur si la demande échoue
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        setError("Une erreur est survenue, veuillez réessayer.");
-      })
-      .finally(() => {
-        setLoading(false); // Réinitialise l'état de chargement
-      });
-  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>

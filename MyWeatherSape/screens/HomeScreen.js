@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, ScrollView, TextInput } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  TextInput,
+  Image,
+} from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import * as Location from "expo-location";
 import { setForecast, setRecommendation } from "../reducers/weather";
@@ -230,16 +237,45 @@ const HomePage = () => {
           />
         </View>
       </View>
-      {/* Recommandation IA */}
-      <PagerView>
-        <View></View>
-        <View style={styles.widgetTips}>
-          <View style={styles.pagination}>
-            <View style={styles.dotActive} />
-            <View style={styles.dot} />
+      <View style={styles.swipercontainer}>
+        <PagerView
+          style={styles.wrapper}
+          horizontal={false}
+          pageMargin={10}
+          onPageSelected={(e) => setCurrentSlide(e.nativeEvent.position)}
+        >
+          <View style={styles.widgetTips}>
+            <Text style={styles.title}>Voici nos recommandations :</Text>
+            <View style={styles.tipsContent}>
+              <View style={styles.display}>
+                <Image></Image>
+              </View>
+              <Text style={styles.tips}>
+                Il fait beauIl fait beauIl fait beauIl fait beauIl fait beauIl
+                fait beauIl fait beau Il fait beauIl fait beauIl fait be.
+              </Text>
+            </View>
           </View>
+          <View style={styles.widgetTips}>
+            <ChartDisplay num={selectedDay} city={city} />
+          </View>
+        </PagerView>
+        <View style={styles.pagination}>
+          <View
+            style={[
+              styles.dot,
+              currentSlide === 0 && styles.dotActive, // Active si la page est 0
+            ]}
+          />
+          <View
+            style={[
+              styles.dot,
+              currentSlide === 1 && styles.dotActive, // Active si la page est 1
+            ]}
+          />
         </View>
-      </PagerView>
+      </View>
+      {/* Recommandation IA */}
     </ScrollView>
   );
 };
@@ -250,6 +286,7 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
     paddingHorizontal: 20,
     backgroundColor: "#F3F4F6",
+    gap: 0,
   },
   header: {
     alignItems: "left",
@@ -310,6 +347,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 5,
     fontFamily: "Poppins",
+    color: "#000",
   },
   searchContainer: {
     flexDirection: "row",
@@ -318,7 +356,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 8,
-    marginBottom: 20,
+    marginBottom: 0,
     marginTop: 10,
   },
   searchInput: {
@@ -363,7 +401,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 0,
     paddingHorizontal: 20,
     backgroundColor: "#fff",
     borderRadius: 10,
@@ -430,12 +468,42 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#fff",
   },
+  wrappers: {
+    height: "60%",
+    width: "205%",
+    display: "flex",
+    borderRadius: 20,
+    gap: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+  },
   swipercontainer: {
     height: 260,
     position: "relative",
     width: "50%",
     borderRadius: 20,
     marginTop: 20,
+  },
+  display: {
+    width: 100,
+    height: 100,
+    borderRadius: 20,
+    backgroundColor: "#E5E7EB",
+  },
+  tipsContent: {
+    flexDirection: "row",
+    gap: 10,
+    alignItems: "center",
+    marginTop: 10,
+  },
+  tips: {
+    fontSize: 16,
+    fontFamily: "Poppins",
+    color: "#333",
+    width: "60%",
+    height: 90,
+    textAlign: "center",
   },
 });
 
