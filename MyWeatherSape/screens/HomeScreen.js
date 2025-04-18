@@ -248,11 +248,15 @@ const HomePage = () => {
             <Text style={styles.title}>Voici nos recommandations :</Text>
             <View style={styles.tipsContent}>
               <View style={styles.display}>
-                <Image></Image>
+                <Image
+                  source={require("../assets/tshirt.png")}
+                  style={{ width: 50, height: 50 }}
+                />
               </View>
               <Text style={styles.tips}>
-                Il fait beauIl fait beauIl fait beauIl fait beauIl fait beauIl
-                fait beauIl fait beau Il fait beauIl fait beauIl fait be.
+                Il fait beau, profites-en : opte pour un t-shirt léger, un short
+                ou un pantalon en toile, des lunettes de soleil et une casquette
+                pour te protéger du soleil ! 😎☀️
               </Text>
             </View>
           </View>
@@ -456,7 +460,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 20,
+    paddingBottom: 30,
   },
   wrapper: {
     height: "100%",
@@ -490,20 +494,25 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 20,
     backgroundColor: "#E5E7EB",
+    justifyContent: "center",
+    alignItems: "center",
   },
   tipsContent: {
     flexDirection: "row",
     gap: 10,
     alignItems: "center",
+    justifyContent: "center",
     marginTop: 10,
   },
   tips: {
-    fontSize: 16,
+    fontSize: 14,
+    fontWeight: "bold",
     fontFamily: "Poppins",
     color: "#333",
     width: "60%",
-    height: 90,
-    textAlign: "center",
+    height: 120,
+    textAlign: "left",
+    paddingTop: 10,
   },
 });
 
