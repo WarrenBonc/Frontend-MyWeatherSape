@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'; // Import des hooks React
-import { View, Text, Switch, StyleSheet, TouchableOpacity } from 'react-native'; // Composants natifs
+import { View, Text, Switch, StyleSheet, TouchableOpacity, Alert } from 'react-native'; // Composants natifs
 import { LinearGradient } from 'expo-linear-gradient'; // Pour le dégradé du bouton retour
 import * as Notifications from 'expo-notifications'; // Pour gérer les notifications
 import { useSelector } from 'react-redux';
@@ -11,8 +11,6 @@ export default function NotificationsScreen({ navigation }) {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [morning, setMorning] = useState(false);
   const [noon, setNoon] = useState(false);
-  const [evening, setEvening] = useState(false);
-  const [userIdFromApi, setUserIdFromApi] = useState(null);
   const isFocused = useIsFocused();
 
   // Active/désactive les notifications
@@ -30,25 +28,27 @@ export default function NotificationsScreen({ navigation }) {
   }, []);
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchPreferences = async () => {
       try {
-        const response = await fetch(`${config.API_BASE_URL}/api/users/me`, {
-          credentials: 'include', // inclure le cookie
+        const response = await fetch(`${config.API_BASE_URL}/api/notifications/preferences`, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
         });
         const data = await response.json();
-        if (data && data._id) {
-          setUserIdFromApi(data._id);
-          console.log("✅ Utilisateur récupéré via /me :", data._id);
-        } else {
-          console.warn("⚠️ Utilisateur non trouvé via /me");
+        if (data) {
+          setNotificationsEnabled(data.notificationsEnabled);
+          setMorning(data.preferences.includes("matin"));
+          setNoon(data.preferences.includes("midi"));
         }
       } catch (error) {
-        console.error("❌ Erreur lors de la récupération de l'utilisateur :", error);
+        console.error("❌ Erreur lors de la récupération des préférences :", error);
       }
     };
 
     if (isFocused) {
-      fetchUser();
+      fetchPreferences();
     }
   }, [isFocused]);
 
@@ -65,7 +65,6 @@ export default function NotificationsScreen({ navigation }) {
       const times = [];
       if (morning) times.push({ hour: 8, minute: 0 });
       if (noon) times.push({ hour: 12, minute: 0 });
-      if (evening) times.push({ hour: 18, minute: 0 });
 
       // Planifie une notification pour chaque moment choisi
       for (const time of times) {
@@ -84,35 +83,34 @@ export default function NotificationsScreen({ navigation }) {
     };
 
     scheduleNotifications();
-  }, [notificationsEnabled, morning, noon, evening]); // Re-déclenche à chaque changement
+  }, [notificationsEnabled, morning, noon]); // Re-déclenche à chaque changement
 
   const handleSavePreferences = async () => {
     try {
+      const selectedPreferences = [];
+      if (morning) selectedPreferences.push("matin");
+      if (noon) selectedPreferences.push("midi");
       const response = await fetch(`${config.API_BASE_URL}/api/notifications/save-preferences`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: userIdFromApi,
-          preferences: {
-            morning,
-            noon,
-            evening,
-          },
+          preferences: selectedPreferences,
           notificationsEnabled,
         }),
+        credentials: 'include',
       });
 
       const data = await response.json();
       console.log('✅ Préférences sauvegardées via bouton :', data);
+      Alert.alert("✅ Préférences enregistrées !");
     } catch (error) {
       console.error('❌ Erreur bouton Enregistrer :', error);
     }
   };
 
-  console.log('👤 Utilisateur :', userIdFromApi);
-  console.log('🔔 Notifications :', { morning, noon, evening });
+  console.log('🔔 Notifications :', { morning, noon });
 
   return (
     <View style={styles.container}>
@@ -148,12 +146,8 @@ export default function NotificationsScreen({ navigation }) {
             <Switch value={morning} onValueChange={setMorning} />
           </View>
           <View style={styles.option}>
-            <Text>À midi</Text>
+            <Text>Une fois par semaine</Text>
             <Switch value={noon} onValueChange={setNoon} />
-          </View>
-          <View style={styles.option}>
-            <Text>Le soir</Text>
-            <Switch value={evening} onValueChange={setEvening} />
           </View>
         </View>
       )}

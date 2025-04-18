@@ -1,11 +1,29 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { updatePreferences } from "../reducers/user";
 
 const EditProfileScreen = ({ navigation }) => {
   const user = useSelector((state) => state.user.value);
-  console.log("👤 Utilisateur actuel :", user);
+  const preferences = useSelector((state) => state.user.preferences);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const fetchPreferences = async () => {
+      try {
+        const response = await fetch("http://192.168.1.45:3000/api/users/preferences", {
+          credentials: 'include',
+        });
+        const data = await response.json();
+        dispatch(updatePreferences(data));
+      } catch (error) {
+        console.error("Erreur lors du chargement des préférences :", error);
+      }
+    };
+
+    fetchPreferences();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -29,16 +47,34 @@ const EditProfileScreen = ({ navigation }) => {
         </Text>
       )}
 
-      <TouchableOpacity onPress={() => navigation.navigate('PreferenceScreen')} style={styles.button}>
-        <LinearGradient
-          colors={['#34C8E8', '#4E4AF2']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.buttonGradient}
-        >
-          <Text style={styles.buttonText}>Modifier</Text>
-        </LinearGradient>
-      </TouchableOpacity>
+      {preferences && (
+        <View style={{ marginBottom: 20 }}>
+          <TouchableOpacity onPress={() => navigation.navigate('TemperaturePreferenceScreen')} style={styles.button}>
+            <LinearGradient colors={['#34C8E8', '#4E4AF2']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.buttonGradient}>
+              <Text style={styles.buttonText}>Modifier la sensibilité</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => navigation.navigate('AccessoryPreferenceScreen')} style={styles.button}>
+            <LinearGradient colors={['#34C8E8', '#4E4AF2']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.buttonGradient}>
+              <Text style={styles.buttonText}>Modifier mes accessoires</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => navigation.navigate('GenderPreferenceScreen')} style={styles.button}>
+            <LinearGradient colors={['#34C8E8', '#4E4AF2']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.buttonGradient}>
+              <Text style={styles.buttonText}>Modifier le genre</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => navigation.navigate('RecommendationPreferenceScreen')} style={styles.button}>
+            <LinearGradient colors={['#34C8E8', '#4E4AF2']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.buttonGradient}>
+              <Text style={styles.buttonText}>Modifier la fréquence des recommandations</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+      )}
+
     </View>
   );
 };
