@@ -7,14 +7,30 @@ import config from '../config';
 import { useIsFocused } from '@react-navigation/native'; // pour re-fetcher les données quand l'écran est actif
 
 export default function NotificationsScreen({ navigation }) {
-  // États pour gérer si les notifications sont activées et à quels moments de la journée
+  // États pour gérer si les notifications sont activées
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
-  const [morning, setMorning] = useState(false);
-  const [noon, setNoon] = useState(false);
   const isFocused = useIsFocused();
 
   // Active/désactive les notifications
   const toggleSwitch = () => setNotificationsEnabled(previousState => !previousState);
+
+  // Sauvegarde automatique des préférences à chaque changement
+  useEffect(() => {
+    const savePref = async () => {
+      try {
+        await fetch(`${config.API_BASE_URL}/api/notifications/save-preferences`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ notificationsEnabled }),
+          credentials: 'include',
+        });
+      } catch (e) {
+        console.error("❌ Erreur sauvegarde auto notif :", e);
+      }
+    };
+
+    savePref();
+  }, [notificationsEnabled]);
 
   // Demande la permission d'envoyer des notifications lors du premier rendu du composant
   useEffect(() => {
@@ -39,8 +55,6 @@ export default function NotificationsScreen({ navigation }) {
         const data = await response.json();
         if (data) {
           setNotificationsEnabled(data.notificationsEnabled);
-          setMorning(data.preferences.includes("matin"));
-          setNoon(data.preferences.includes("midi"));
         }
       } catch (error) {
         console.error("❌ Erreur lors de la récupération des préférences :", error);
@@ -61,56 +75,23 @@ export default function NotificationsScreen({ navigation }) {
       // Si les notifications sont désactivées, on arrête ici
       if (!notificationsEnabled) return;
 
-      // Crée une liste d'heures selon les préférences
-      const times = [];
-      if (morning) times.push({ hour: 8, minute: 0 });
-      if (noon) times.push({ hour: 12, minute: 0 });
-
       // Planifie une notification pour chaque moment choisi
-      for (const time of times) {
-        await Notifications.scheduleNotificationAsync({
-          content: {
-            title: "🌤️ MyWeatherSape",
-            body: "Voici vos prévisions météo personnalisées !",
-          },
-          trigger: {
-            hour: time.hour,
-            minute: time.minute,
-            repeats: true,
-          },
-        });
-      }
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "🌤️ MyWeatherSape",
+          body: "Voici vos prévisions météo personnalisées !",
+        },
+        trigger: {
+          hour: 8,
+          minute: 0,
+          repeats: true,
+        },
+      });
     };
 
     scheduleNotifications();
-  }, [notificationsEnabled, morning, noon]); // Re-déclenche à chaque changement
+  }, [notificationsEnabled]); // Re-déclenche à chaque changement
 
-  const handleSavePreferences = async () => {
-    try {
-      const selectedPreferences = [];
-      if (morning) selectedPreferences.push("matin");
-      if (noon) selectedPreferences.push("midi");
-      const response = await fetch(`${config.API_BASE_URL}/api/notifications/save-preferences`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          preferences: selectedPreferences,
-          notificationsEnabled,
-        }),
-        credentials: 'include',
-      });
-
-      const data = await response.json();
-      console.log('✅ Préférences sauvegardées via bouton :', data);
-      Alert.alert("✅ Préférences enregistrées !");
-    } catch (error) {
-      console.error('❌ Erreur bouton Enregistrer :', error);
-    }
-  };
-
-  console.log('🔔 Notifications :', { morning, noon });
 
   return (
     <View style={styles.container}>
@@ -135,33 +116,6 @@ export default function NotificationsScreen({ navigation }) {
         <Switch value={notificationsEnabled} onValueChange={toggleSwitch} />
       </View>
 
-      {/* Section des fréquences visibles uniquement si notifications activées */}
-      {notificationsEnabled && (
-        <View style={styles.freqSection}>
-          <Text style={styles.subtitle}>Fréquence des notifications :</Text>
-
-          {/* Switch pour chaque moment de la journée */}
-          <View style={styles.option}>
-            <Text>Le matin</Text>
-            <Switch value={morning} onValueChange={setMorning} />
-          </View>
-          <View style={styles.option}>
-            <Text>Une fois par semaine</Text>
-            <Switch value={noon} onValueChange={setNoon} />
-          </View>
-        </View>
-      )}
-
-      <TouchableOpacity style={styles.saveButton} onPress={handleSavePreferences}>
-        <LinearGradient
-          colors={['#34C8E8', '#4E4AF2']}
-          style={styles.saveButtonGradient}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-        >
-          <Text style={styles.saveButtonText}>Enregistrer</Text>
-        </LinearGradient>
-      </TouchableOpacity>
     </View>
   );
 }
@@ -203,9 +157,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 20,
-  },
-  freqSection: {
-    marginTop: 20,
   },
   saveButton: {
     marginTop: 30,

@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
-import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, Image, Platform } from "react-native";
+import { Picker } from '@react-native-picker/picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSelector, useDispatch } from 'react-redux';
 import { updatePreferences } from "../reducers/user";
@@ -8,6 +9,11 @@ const EditProfileScreen = ({ navigation }) => {
   const user = useSelector((state) => state.user.value);
   const preferences = useSelector((state) => state.user.preferences);
   const dispatch = useDispatch();
+  const selectedAccessory = preferences.accessories?.find((a) => a) || "aucune";
+  
+  const gender = preferences.gender || "aucune";
+  const sensitivity = preferences.sensitivity || "aucune";
+  const recommendationFrequency = preferences.recommendationFrequency || "aucune";
 
   useEffect(() => {
     const fetchPreferences = async () => {
@@ -46,35 +52,78 @@ const EditProfileScreen = ({ navigation }) => {
           Bonjour {user.firstName} {user.lastName}
         </Text>
       )}
-
+      
       {preferences && (
-        <View style={{ marginBottom: 20 }}>
-          <TouchableOpacity onPress={() => navigation.navigate('TemperaturePreferenceScreen')} style={styles.button}>
-            <LinearGradient colors={['#34C8E8', '#4E4AF2']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.buttonGradient}>
-              <Text style={styles.buttonText}>Modifier la sensibilité</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+        <>
+          <View style={styles.pickerContainer}>
+            <Text style={styles.preferenceText}>Genre :</Text>
+            <Picker
+              mode="dropdown"
+              selectedValue={gender}
+              onValueChange={(value) => dispatch(updatePreferences({ ...preferences, gender: value === "aucune" ? null : value }))}
+              style={styles.picker}
+              enabled={true}
+            >
+              <Picker.Item label="Aucune" value="aucune" />
+              <Picker.Item label="Homme" value="homme" />
+              <Picker.Item label="Femme" value="femme" />
+            </Picker>
+          </View>
 
-          <TouchableOpacity onPress={() => navigation.navigate('AccessoryPreferenceScreen')} style={styles.button}>
-            <LinearGradient colors={['#34C8E8', '#4E4AF2']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.buttonGradient}>
-              <Text style={styles.buttonText}>Modifier mes accessoires</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+          <View style={styles.pickerContainer}>
+            <Text style={styles.preferenceText}>Sensibilité au froid :</Text>
+            <Picker
+              mode="dropdown"
+              selectedValue={sensitivity}
+              onValueChange={(value) => dispatch(updatePreferences({ ...preferences, sensitivity: value === "aucune" ? null : value }))}
+              style={styles.picker}
+              enabled={true}
+            >
+              <Picker.Item label="Aucune" value="aucune" />
+              <Picker.Item label="Frileux" value="frileux" />
+              <Picker.Item label="Frileuse" value="frileuse" />
+              <Picker.Item label="Peu frileux" value="peu frileux" />
+              <Picker.Item label="Peu frileuse" value="peu frileuse" />
+            </Picker>
+          </View>
 
-          <TouchableOpacity onPress={() => navigation.navigate('GenderPreferenceScreen')} style={styles.button}>
-            <LinearGradient colors={['#34C8E8', '#4E4AF2']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.buttonGradient}>
-              <Text style={styles.buttonText}>Modifier le genre</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+          <View style={styles.pickerContainer}>
+            <Text style={styles.preferenceText}>Accessoires préférés :</Text>
+            <Picker
+              mode="dropdown"
+              selectedValue={selectedAccessory}
+              onValueChange={(value) =>
+                dispatch(updatePreferences({
+                  ...preferences,
+                  accessories: value === "aucune" ? [] : [value],
+                }))
+              }
+              style={styles.picker}
+              enabled={true}
+            >
+             <Picker.Item label="Aucun" value="aucune" />
+             <Picker.Item label="Bonnet" value="bonnet" />
+             <Picker.Item label="Écharpe" value="écharpe" />
+             <Picker.Item label="Gants" value="gants" />
+             <Picker.Item label="Parapluie" value="parapluie" />
+            </Picker>
+          </View>
 
-          <TouchableOpacity onPress={() => navigation.navigate('RecommendationPreferenceScreen')} style={styles.button}>
-            <LinearGradient colors={['#34C8E8', '#4E4AF2']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.buttonGradient}>
-              <Text style={styles.buttonText}>Modifier la fréquence des recommandations</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
+          <View style={styles.pickerContainer}>
+            <Text style={styles.preferenceText}>Fréquence des recommandations :</Text>
+            <Picker
+              mode="dropdown"
+              selectedValue={recommendationFrequency}
+              onValueChange={(value) => dispatch(updatePreferences({ ...preferences, recommendationFrequency: value === "aucune" ? null : value }))}
+              style={styles.picker}
+              enabled={true}
+            >
+              <Picker.Item label="Aucune" value="aucune" />
+              <Picker.Item label="Matin" value="matin" />
+            </Picker>
+          </View>
+        </>
       )}
-
     </View>
   );
 };
@@ -108,26 +157,32 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins',
     color: '#222',
   },
-  button: {
-    marginVertical: 10,
-    alignSelf: 'center',
-  },
-  buttonGradient: {
-    paddingVertical: 12,
-    paddingHorizontal: 25,
-    borderRadius: 8,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontFamily: 'Poppins-SemiBold',
-  },
   userInfo: {
     fontSize: 16,
     fontFamily: 'Poppins-Regular',
     marginBottom: 20,
     textAlign: 'center',
     color: '#444',
+  },
+  preferenceText: {
+    fontSize: 16,
+    fontFamily: 'Poppins-SemiBold',
+    color: '#222',
+    marginBottom: 8,
+    textAlign: 'left',
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    marginBottom: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  picker: {
+    height: Platform.OS === 'ios' ? 200 : 44,
+    fontSize: 16,
+    color: '#333',
   },
 });
 
