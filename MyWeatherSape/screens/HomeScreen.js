@@ -22,6 +22,7 @@ const HomePage = () => {
   const city = useSelector((state) => state.user.city) || "Estissac";
 
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentSlide2, setCurrentSlide2] = useState(0);
 
   const [selectedDay, setSelectedDay] = useState(0);
   const [searchCity, setSearchCity] = useState("");
@@ -242,7 +243,7 @@ const HomePage = () => {
           style={styles.wrapper}
           horizontal={false}
           pageMargin={10}
-          onPageSelected={(e) => setCurrentSlide(e.nativeEvent.position)}
+          onPageSelected={(e) => setCurrentSlide2(e.nativeEvent.position)}
         >
           <View style={styles.widgetTips}>
             <Text style={styles.title}>Voici nos recommandations :</Text>
@@ -260,21 +261,19 @@ const HomePage = () => {
               </Text>
             </View>
           </View>
-          <View style={styles.widgetTips}>
-            <ChartDisplay num={selectedDay} city={city} />
-          </View>
+          <View style={styles.widgetTips}></View>
         </PagerView>
         <View style={styles.pagination}>
           <View
             style={[
               styles.dot,
-              currentSlide === 0 && styles.dotActive, // Active si la page est 0
+              currentSlide2 === 0 && styles.dotActive, // Active si la page est 0
             ]}
           />
           <View
             style={[
               styles.dot,
-              currentSlide === 1 && styles.dotActive, // Active si la page est 1
+              currentSlide2 === 1 && styles.dotActive, // Active si la page est 1
             ]}
           />
         </View>
