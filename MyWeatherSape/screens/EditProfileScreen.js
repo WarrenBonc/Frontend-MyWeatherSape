@@ -11,7 +11,7 @@ const EditProfileScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const savePreferences = async (updatedPreferences) => {
     try {
-      await fetch("http://192.168.1.45:3000/api/users/update-preferences", {
+      await fetch("http://192.168.1.23:3000/api/users/update-preferences", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -65,11 +65,6 @@ const EditProfileScreen = ({ navigation }) => {
 
       <Text style={styles.title}>Mes préférences</Text>
 
-      {user && (
-        <Text style={styles.userInfo}>
-          Bonjour {user.firstName} {user.lastName}
-        </Text>
-      )}
       
       {preferences && (
         <>
@@ -98,7 +93,7 @@ const EditProfileScreen = ({ navigation }) => {
                     key={item}
                   onPress={() => {
                       dispatch(updatePreferences({ ...preferences, gender: item === "aucune" ? null : item }));
-                      savePreferences({ ...preferences, gender: item === "aucune" ? null : item });
+                      savePreferences({ preferences: { ...preferences, gender: item === "aucune" ? null : item } });
                       setGenderModalVisible(false);
                     }}
                     style={{ paddingVertical: 10 }}
@@ -137,7 +132,7 @@ const EditProfileScreen = ({ navigation }) => {
                     key={item}
                     onPress={() => {
                       dispatch(updatePreferences({ ...preferences, sensitivity: item === "aucune" ? null : item }));
-                      savePreferences({ ...preferences, sensitivity: item === "aucune" ? null : item });
+                      savePreferences({ preferences: { ...preferences, sensitivity: item === "aucune" ? null : item } });
                       setSensitivityModalVisible(false);
                     }}
                     style={styles.modalOption}
@@ -179,7 +174,7 @@ const EditProfileScreen = ({ navigation }) => {
                     key={item}
                     onPress={() => {
                       dispatch(updatePreferences({ ...preferences, accessories: item === "aucune" ? [] : [item] }));
-                      savePreferences({ ...preferences, accessories: item === "aucune" ? [] : [item] });
+                      savePreferences({ preferences: { ...preferences, accessories: item === "aucune" ? [] : [item] } });
                       setAccessoryModalVisible(false);
                     }}
                     style={styles.modalOption}
@@ -221,7 +216,7 @@ const EditProfileScreen = ({ navigation }) => {
                     key={item}
                     onPress={() => {
                       dispatch(updatePreferences({ ...preferences, recommendationFrequency: item === "aucune" ? null : item }));
-                      savePreferences({ ...preferences, recommendationFrequency: item === "aucune" ? null : item });
+                      savePreferences({ preferences: { ...preferences, recommendationFrequency: item === "aucune" ? null : item } });
                       setFrequencyModalVisible(false);
                     }}
                     style={styles.modalOption}
