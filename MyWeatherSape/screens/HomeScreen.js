@@ -6,6 +6,7 @@ import {
   ScrollView,
   TextInput,
   Image,
+  Alert,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import * as Location from "expo-location";
@@ -20,11 +21,14 @@ import ChartDisplay from "../components/chartDisplay";
 const HomePage = () => {
   const dispatch = useDispatch();
   const city = useSelector((state) => state.user.city) || "Estissac";
+  const userToken = useSelector((state) => state.user.token); // Récupérer le token utilisateur depuis Redux
 
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentSlide2, setCurrentSlide2] = useState(0);
 
   const [selectedDay, setSelectedDay] = useState(0);
   const [searchCity, setSearchCity] = useState("");
+  const [tips, setTips] = useState("Chargement des recommandations...");
 
   const getLabelForDay = (dayOffset) => {
     const daysOfWeek = [
@@ -64,7 +68,6 @@ const HomePage = () => {
 
   const fetchUserLocation = async () => {
     try {
-      // Demander la permission d'accès à la localisation
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
@@ -74,11 +77,9 @@ const HomePage = () => {
         return;
       }
 
-      // Obtenir la position actuelle
       const location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
 
-      // Convertir les coordonnées GPS en nom de ville
       const geoRes = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
       );
@@ -89,8 +90,7 @@ const HomePage = () => {
         geoData.address?.village;
 
       if (userCity) {
-        dispatch(setCity(userCity)); // Mettre à jour Redux avec la ville actuelle
-        // Mettre à jour l'état local
+        dispatch(setCity(userCity));
       } else {
         Alert.alert("Erreur", "Impossible de déterminer votre ville.");
       }
@@ -103,13 +103,46 @@ const HomePage = () => {
     }
   };
 
+  const fetchRecommendations = async () => {
+    try {
+      const response = await fetch(
+        `${config.API_BASE_URL}/api/weather/recommendation`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userToken}`, // Inclure le token JWT
+          },
+          body: JSON.stringify({ city, dayOffset: selectedDay }),
+        }
+      );
+
+      const data = await response.json();
+      if (data.advice) {
+        setTips(data.advice); // Mettre à jour l'état avec les recommandations
+      } else {
+        console.error(
+          "Erreur lors de la récupération des recommandations :",
+          data.message
+        );
+        setTips("Impossible de charger les recommandations.");
+      }
+    } catch (error) {
+      console.error("Erreur réseau :", error);
+      setTips("Erreur réseau. Veuillez réessayer.");
+    }
+  };
+
   useEffect(() => {
-    fetchUserLocation(); // Appeler la fonction pour récupérer la localisation au chargement
+    fetchUserLocation();
   }, []);
+
+  useEffect(() => {
+    fetchRecommendations();
+  }, [city, selectedDay]);
 
   const fetchAllWeatherData = async () => {
     try {
-      // On fait une requête à l'API pour récupérer les données météo
       const fetchData = await fetch(
         `${config.API_BASE_URL}/api/weather/7days-hourly/${city}`
       );
@@ -120,22 +153,14 @@ const HomePage = () => {
 
       const weatherData = await fetchData.json();
 
-      // Vérification de la structure des données
       if (!weatherData || !weatherData.forecast) {
         throw new Error("Données météo invalides ou manquantes");
       }
 
-      console.log("Structure des données météo :", weatherData); // Affichage des données pour examen
-
-      // Trier les jours en fonction de la date (du plus proche au plus éloigné)
       const sortedDays = Object.keys(weatherData.forecast).sort((a, b) => {
-        return new Date(a) - new Date(b); // Compare les dates
+        return new Date(a) - new Date(b);
       });
 
-      // Affichage des jours triés
-      console.log("Jours triés :", sortedDays);
-
-      // Création de la structure pour les jours et les heures
       const dailyData = sortedDays.map((day) => {
         return {
           date: day,
@@ -153,14 +178,11 @@ const HomePage = () => {
           })),
         };
       });
-      console.log("Structure des données météo :", dailyData[0].condition);
-      // Exemple de recommandation spécifique
+
       const recommendation = { advice: "Restez au chaud!" };
 
-      // On envoie les données globales de tous les jours dans Redux
-      // Action pour les conditions des 7 jours avec températures et ressentis
-      dispatch(setForecast(dailyData)); // Action pour la prévision des 7 jours avec heures
-      dispatch(setRecommendation(recommendation.advice)); // Action pour les recommandations
+      dispatch(setForecast(dailyData));
+      dispatch(setRecommendation(recommendation.advice));
     } catch (error) {
       console.error("Erreur météo :", error.message);
     }
@@ -183,15 +205,14 @@ const HomePage = () => {
             onChangeText={setSearchCity}
             onSubmitEditing={() => {
               if (searchCity !== city) {
-                dispatch(setCity(searchCity)); // Met à jour la ville dans Redux
-                fetchAllWeatherData(); // Re-fetch des données météo avec la nouvelle ville
+                dispatch(setCity(searchCity));
+                fetchAllWeatherData();
               }
             }}
             placeholderTextColor="#999"
           />
         </View>
       </View>
-      {/* Sélecteur de jour */}
       <View style={styles.daySelector}>
         <Text
           style={styles.arrow}
@@ -207,7 +228,6 @@ const HomePage = () => {
           →
         </Text>
       </View>
-      {/* Ville et météo actuelle */}
       <View style={styles.swipercontainer}>
         <PagerView
           style={styles.wrapper}
@@ -223,18 +243,8 @@ const HomePage = () => {
           </View>
         </PagerView>
         <View style={styles.pagination}>
-          <View
-            style={[
-              styles.dot,
-              currentSlide === 0 && styles.dotActive, // Active si la page est 0
-            ]}
-          />
-          <View
-            style={[
-              styles.dot,
-              currentSlide === 1 && styles.dotActive, // Active si la page est 1
-            ]}
-          />
+          <View style={[styles.dot, currentSlide === 0 && styles.dotActive]} />
+          <View style={[styles.dot, currentSlide === 1 && styles.dotActive]} />
         </View>
       </View>
       <View style={styles.swipercontainer}>
@@ -242,7 +252,7 @@ const HomePage = () => {
           style={styles.wrapper}
           horizontal={false}
           pageMargin={10}
-          onPageSelected={(e) => setCurrentSlide(e.nativeEvent.position)}
+          onPageSelected={(e) => setCurrentSlide2(e.nativeEvent.position)}
         >
           <View style={styles.widgetTips}>
             <Text style={styles.title}>Voici nos recommandations :</Text>
@@ -253,33 +263,17 @@ const HomePage = () => {
                   style={{ width: 50, height: 50 }}
                 />
               </View>
-              <Text style={styles.tips}>
-                Il fait beau, profites-en : opte pour un t-shirt léger, un short
-                ou un pantalon en toile, des lunettes de soleil et une casquette
-                pour te protéger du soleil ! 😎☀️
-              </Text>
+
+              <Text style={styles.tips}>{tips}</Text>
             </View>
           </View>
-          <View style={styles.widgetTips}>
-            <ChartDisplay num={selectedDay} city={city} />
-          </View>
+          <View style={styles.widgetTips}></View>
         </PagerView>
         <View style={styles.pagination}>
-          <View
-            style={[
-              styles.dot,
-              currentSlide === 0 && styles.dotActive, // Active si la page est 0
-            ]}
-          />
-          <View
-            style={[
-              styles.dot,
-              currentSlide === 1 && styles.dotActive, // Active si la page est 1
-            ]}
-          />
+          <View style={[styles.dot, currentSlide2 === 0 && styles.dotActive]} />
+          <View style={[styles.dot, currentSlide2 === 1 && styles.dotActive]} />
         </View>
       </View>
-      {/* Recommandation IA */}
     </ScrollView>
   );
 };
@@ -505,14 +499,16 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   tips: {
-    fontSize: 14,
+    fontSize: 11,
     fontWeight: "bold",
     fontFamily: "Poppins",
     color: "#333",
     width: "60%",
-    height: 120,
+    height: 90,
     textAlign: "left",
     paddingTop: 10,
+
+    // le texte ne doit pas depasser, mais je veux le voir en entier
   },
 });
 

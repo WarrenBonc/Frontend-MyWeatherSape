@@ -18,8 +18,10 @@ const userSlice = createSlice({
 
     // Préférences issues du questionnaire initial (ajouté récemment)
     preferences: {
-      temperatureSensitivity: null, // "je suis frileux", "je suis frileuse", etc.
+      gender: null,
+      sensitivity: null,
       accessories: [], // Liste d'accessoires cochés : ["bonnet", "gants"]
+      recommendationFrequency: null,
     },
   },
   reducers: {
@@ -63,8 +65,10 @@ const userSlice = createSlice({
           frequency: "morning",
         },
         preferences: {
-          temperatureSensitivity: null,
+          gender: null,
+          sensitivity: null,
           accessories: [],
+          recommendationFrequency: null,
         },
       };
     },

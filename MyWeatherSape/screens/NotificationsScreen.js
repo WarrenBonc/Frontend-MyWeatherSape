@@ -9,6 +9,7 @@ import { useIsFocused } from '@react-navigation/native'; // pour re-fetcher les 
 export default function NotificationsScreen({ navigation }) {
   // États pour gérer si les notifications sont activées
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [hasLoadedPreferences, setHasLoadedPreferences] = useState(false);
   const isFocused = useIsFocused();
 
   // Active/désactive les notifications
@@ -21,7 +22,7 @@ export default function NotificationsScreen({ navigation }) {
         await fetch(`${config.API_BASE_URL}/api/notifications/save-preferences`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ notificationsEnabled }),
+          body: JSON.stringify({ preferences: { notificationsEnabled } }),
           credentials: 'include',
         });
       } catch (e) {
@@ -29,8 +30,10 @@ export default function NotificationsScreen({ navigation }) {
       }
     };
 
-    savePref();
-  }, [notificationsEnabled]);
+    if (hasLoadedPreferences) {
+      savePref();
+    }
+  }, [notificationsEnabled, hasLoadedPreferences]);
 
   // Demande la permission d'envoyer des notifications lors du premier rendu du composant
   useEffect(() => {
@@ -49,12 +52,14 @@ export default function NotificationsScreen({ navigation }) {
         const response = await fetch(`${config.API_BASE_URL}/api/notifications/preferences`, {
           headers: {
             'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache',
           },
           credentials: 'include',
         });
         const data = await response.json();
-        if (data) {
+        if (data && typeof data.notificationsEnabled === 'boolean') {
           setNotificationsEnabled(data.notificationsEnabled);
+          setHasLoadedPreferences(true);
         }
       } catch (error) {
         console.error("❌ Erreur lors de la récupération des préférences :", error);
