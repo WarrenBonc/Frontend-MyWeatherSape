@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 10,
     borderRadius: 8,
-    marginBottom: 20,
+    marginBottom: 50,
     marginTop: 20,
     justifyContent: "center",
     alignItems: "center",
