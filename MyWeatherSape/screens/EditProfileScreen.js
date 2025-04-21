@@ -103,6 +103,9 @@ const EditProfileScreen = ({ navigation }) => {
                     </Text>
                   </TouchableOpacity>
                 ))}
+                <TouchableOpacity onPress={() => setGenderModalVisible(false)} style={styles.cancelButton}>
+                  <Text style={styles.cancelButtonText}>Annuler</Text>
+                </TouchableOpacity>
               </View>
             </View>
           </Modal>
