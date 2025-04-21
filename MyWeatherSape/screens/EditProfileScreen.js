@@ -36,7 +36,7 @@ const EditProfileScreen = ({ navigation }) => {
   useEffect(() => {
     const fetchPreferences = async () => {
       try {
-        const response = await fetch("http://192.168.1.45:3000/api/users/preferences", {
+        const response = await fetch("http://192.168.1.23:3000/api/users/preferences", {
           credentials: 'include',
         });
         const data = await response.json();
@@ -88,7 +88,7 @@ const EditProfileScreen = ({ navigation }) => {
             <View style={{ flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
               <View style={{ margin: 20, backgroundColor: '#fff', borderRadius: 10, padding: 20 }}>
                 <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Choisir un genre</Text>
-                {["aucune", "homme", "femme"].map((item) => (
+                {["homme", "femme"].map((item) => (
                   <TouchableOpacity
                     key={item}
                   onPress={() => {
@@ -169,7 +169,7 @@ const EditProfileScreen = ({ navigation }) => {
             <View style={{ flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
               <View style={{ margin: 20, backgroundColor: '#fff', borderRadius: 10, padding: 20 }}>
                 <Text style={styles.modalTitle}>Choisir un accessoire</Text>
-                {["aucune", "bonnet", "écharpe", "gants", "parapluie"].map((item) => (
+                {["aucune", "bonnet", "écharpe", "gants", "parapluie", "casquette"].map((item) => (
                   <TouchableOpacity
                     key={item}
                     onPress={() => {
