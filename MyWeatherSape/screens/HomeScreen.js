@@ -280,7 +280,9 @@ const HomePage = () => {
                 />
               </View>
 
-              <Text style={styles.tips}>{tips}</Text>
+              <ScrollView style={styles.tipsScroll} contentContainerStyle={styles.tipsScrollContent}>
+                <Text style={styles.tips}>{tips}</Text>
+              </ScrollView>
             </View>
           </View>
           <View style={styles.widgetTips}>
@@ -511,7 +513,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   display: {
-    width: 100,
+    width: 110,
     height: 100,
     borderRadius: 20,
     backgroundColor: "#E5E7EB",
@@ -523,19 +525,25 @@ const styles = StyleSheet.create({
     gap: 10,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 10,
+    marginTop: 30,
+    paddingHorizontal: 10,
   },
   tips: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: "bold",
     fontFamily: "Poppins",
     color: "#333",
     width: "60%",
-    height: 90,
     textAlign: "left",
-    paddingTop: 10,
-
+    paddingTop: 0,
     // le texte ne doit pas depasser, mais je veux le voir en entier
+  },
+  tipsScroll: {
+    maxHeight: 120,
+    width: '80%',
+  },
+  tipsScrollContent: {
+    paddingVertical: 5,
   },
   ellipse: {
     position: "absolute",
