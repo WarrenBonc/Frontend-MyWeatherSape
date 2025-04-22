@@ -5,7 +5,7 @@ const userSlice = createSlice({
   initialState: {
     value: null, // Stocke les infos de l'utilisateur connecté (nom, email, etc.)
     token: null, // Stocke le token d'authentification
-    city: "Paris", // Ville sélectionnée ou détectée par défaut
+    city: null, // Ville sélectionnée ou détectée par défaut
     isAuthenticated: false, // Indique si l'utilisateur est authentifié
     loading: false, // Indique si une requête est en cours (chargement global)
     error: null, // Stocke une éventuelle erreur d'authentification ou de requête

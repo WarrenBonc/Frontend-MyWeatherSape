@@ -11,7 +11,8 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import * as Location from "expo-location";
 import { setForecast, setRecommendation } from "../reducers/weather";
-import { setCity } from "../reducers/user";
+
+import { setCity, setUser } from "../reducers/user";
 import WeatherDisplay from "../components/weatherDisplay";
 import PagerView from "react-native-pager-view";
 import config from "../config";
@@ -21,7 +22,7 @@ import ChartDisplay from "../components/chartDisplay";
 const HomePage = () => {
   const dispatch = useDispatch();
   const city = useSelector((state) => state.user.city) || "Estissac";
-  const userToken = useSelector((state) => state.user.token); // Récupérer le token utilisateur depuis Redux
+  const user = useSelector((state) => state.user.value);
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [currentSlide2, setCurrentSlide2] = useState(0);
@@ -74,6 +75,7 @@ const HomePage = () => {
           "Permission refusée",
           "L'accès à la localisation est nécessaire pour déterminer votre ville."
         );
+        dispatch(setCity("Paris")); // Valeur par défaut si la permission est refusée
         return;
       }
 
@@ -93,6 +95,7 @@ const HomePage = () => {
         dispatch(setCity(userCity));
       } else {
         Alert.alert("Erreur", "Impossible de déterminer votre ville.");
+        dispatch(setCity("Paris"));
       }
     } catch (error) {
       console.error(
@@ -100,6 +103,7 @@ const HomePage = () => {
         error
       );
       Alert.alert("Erreur", "Impossible de récupérer votre localisation.");
+      dispatch(setCity("Paris"));
     }
   };
 
@@ -111,7 +115,7 @@ const HomePage = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${userToken}`, // Inclure le token JWT
+            include: "credentials",
           },
           body: JSON.stringify({ city, dayOffset: selectedDay }),
         }
@@ -119,7 +123,8 @@ const HomePage = () => {
 
       const data = await response.json();
       if (data.advice) {
-        setTips(data.advice); // Mettre à jour l'état avec les recommandations
+        setTips(data.advice);
+        dispatch(setUser(data.firstName)); // Mettre à jour l'état avec les recommandations
       } else {
         console.error(
           "Erreur lors de la récupération des recommandations :",
@@ -192,9 +197,20 @@ const HomePage = () => {
     fetchAllWeatherData();
   }, [city]);
 
+  const 
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
+        <Image
+          source={require("../assets/Ellipse.png")}
+          style={[styles.ellipse, styles.bottomLeft]}
+        />
+        {/* Ellipse Top Right */}
+        <Image
+          source={require("../assets/Ellipse.png")}
+          style={[styles.ellipse, styles.topRight]}
+        />
         <Text style={styles.logoText}>MyWeatherSape</Text>
 
         <View style={styles.searchContainer}>
@@ -255,7 +271,7 @@ const HomePage = () => {
           onPageSelected={(e) => setCurrentSlide2(e.nativeEvent.position)}
         >
           <View style={styles.widgetTips}>
-            <Text style={styles.title}>Voici nos recommandations :</Text>
+            <Text style={styles.title}>Voici nos recommandations {user} :</Text>
             <View style={styles.tipsContent}>
               <View style={styles.display}>
                 <Image
@@ -267,7 +283,18 @@ const HomePage = () => {
               <Text style={styles.tips}>{tips}</Text>
             </View>
           </View>
-          <View style={styles.widgetTips}></View>
+          <View style={styles.widgetTips}>
+            <View style={styles.crossContainer}>
+              <View style={styles.circleCross}>
+                <Image
+                  style={{ width: 30, height: 30 }}
+                  source={require("../assets/cross.png")}
+                />
+              </View>
+              <Text style={styles.crossText}>Ajouter un enfant</Text>
+            </View>
+            
+          </View>
         </PagerView>
         <View style={styles.pagination}>
           <View style={[styles.dot, currentSlide2 === 0 && styles.dotActive]} />
@@ -509,6 +536,45 @@ const styles = StyleSheet.create({
     paddingTop: 10,
 
     // le texte ne doit pas depasser, mais je veux le voir en entier
+  },
+  ellipse: {
+    position: "absolute",
+    width: 700,
+    height: 700,
+    resizeMode: "contain",
+  },
+  bottomLeft: {
+    bottom: -280,
+    left: -70,
+  },
+  topRight: {
+    top: 280,
+    right: -100,
+  },
+  circleCross: {
+    width: 40,
+    height: 40,
+    borderRadius: 25,
+    backgroundColor: "#7D62E0",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  crossContainer: {
+    position: "absolute",
+    top: 20,
+    left: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+  crossText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    fontFamily: "Poppins",
+
+    paddingBottom: 10,
   },
 });
 
