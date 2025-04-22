@@ -197,7 +197,7 @@ const HomePage = () => {
     fetchAllWeatherData();
   }, [city]);
 
-  const 
+  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
