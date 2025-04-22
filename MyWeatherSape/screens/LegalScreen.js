@@ -44,7 +44,7 @@ export default function LegalScreen() {
 
       <Text style={styles.sectionTitle}>Contact</Text>
       <Text style={styles.text}>
-        Pour toute question, veuillez nous contacter à : contact@myweathersape.com
+        Pour toute question, veuillez nous contacter à : myweathersape@gmail.com
       </Text>
     </ScrollView>
   );

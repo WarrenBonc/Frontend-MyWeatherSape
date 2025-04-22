@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View, Image } from "react-native";
-import Questionaire from "../components/Questionnaire";
+import QuestionnaireScreen from "../components/Questionnaire";
 import config from "../config";
 
 const PreferencePage = ({ navigation }) => {
@@ -15,7 +15,7 @@ const PreferencePage = ({ navigation }) => {
         source={require("../assets/Ellipse.png")}
         style={[styles.ellipse, styles.topRight]}
       />
-      <Questionaire navigation={navigation} />
+      <QuestionnaireScreen navigation={navigation} />
     </View>
   );
 };
