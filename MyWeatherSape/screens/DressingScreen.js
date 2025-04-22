@@ -13,6 +13,7 @@ import {
 import { useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
+import Icon from "react-native-vector-icons/FontAwesome";
 import config from "../config";
 
 const DressingPage = () => {
@@ -35,16 +36,21 @@ const DressingPage = () => {
 
     // Récupérer vêtements adulte
 
+    
     fetch(`${config.API_BASE_URL}/api/dressing`, { credentials: "include" })
-      .then((res) => res.json())
-      .then((data) => setClothes(data.data))
-      .catch((err) => console.error("Erreur fetch vêtements :", err));
-
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("Données récupérées :", data); // Ajoutez ce log
+      setClothes(data.data);
+    })
+    .catch((err) => console.error("Erreur fetch vêtements :", err));
       // Récupérer vêtements enfants
 
     fetch(`${config.API_BASE_URL}/api/dressing?child=true`, { credentials: "include" })
       .then((res) => res.json())
-      .then((data) => setChildClothes(data.data))
+      .then((data) => {
+        console.log("Données récupérées pour vêtements enfants :", data); // Ajoutez ce log
+        setChildClothes(data.data);})
       .catch((err) => console.error("Erreur fetch vêtements enfants :", err));
   }, [user]);
 
@@ -88,8 +94,10 @@ const groupedChildClothesArray = Object.entries(groupedChildClothes); // [ ["hau
     })
     .then((res) => res.json())
     .then((data) => {
+      console.log("Données récupérées :", data);
       if (data && data.message === "Vêtement ajouté avec succès") {
-        setClothes((prev) => [...prev, newClothing]);
+
+        setClothes((prev) => [...prev, data.item]);
         setNewClothing({ label: "", category: "haut", forChild: false });
         setModalVisible(false);
         Alert.alert("Succès", "Vêtement ajouté avec succès !");
@@ -102,11 +110,11 @@ const groupedChildClothesArray = Object.entries(groupedChildClothes); // [ ["hau
 // Fonction pour supprimer un vêtement
 
   const handleDelete = (id, forChild = false, childId = null) => {
-    // if (!id) {
-    //   console.error("ID invalide pour la suppression :", id);
-    //   Alert.alert("Erreur", "Impossible de supprimer le vêtement : ID invalide.");
-    //   return;
-    // }
+     if (!id) {
+       console.error("ID invalide pour la suppression :", id);
+       Alert.alert("Erreur", "Impossible de supprimer le vêtement : ID invalide.");
+       return;
+    }
 
     const url = forChild
       ? `${config.API_BASE_URL}/api/dressing/${id}?childId=${childId}`
@@ -114,8 +122,12 @@ const groupedChildClothesArray = Object.entries(groupedChildClothes); // [ ["hau
 
       console.log("URL de suppression :", url);
 
-    fetch(`{config.API_BASE_URL}/api/dressing/${id}`, { method: "DELETE", credentials: "include" })
-      .then((res) => {console.log("Statut de la réponse :", res.status);
+    fetch(url, {
+       method: "DELETE",
+       credentials: "include",
+       })
+      .then((res) => {
+      console.log("Statut de la réponse :", res.status);
         if (!res.ok) {
           throw new Error(`Erreur HTTP : ${res.status}`);
         }
@@ -125,18 +137,17 @@ const groupedChildClothesArray = Object.entries(groupedChildClothes); // [ ["hau
         console.log("Réponse de l'API :", data);
 
         if (data.message === "Vêtement supprimé avec succès") {
-          if (forChild) {
-            setChildClothes((prev) => prev.filter((item) => item._id !== id));
-          } else {
-            setClothes((prev) => prev.filter((item) => item._id !== id));
-          }
-          Alert.alert("Succès", "Vêtement supprimé avec succès !");
-        } else {
-          Alert.alert("Erreur", "Impossible de supprimer le vêtement.");
-        }
-      })
-      .catch(() => Alert.alert("Erreur", "Impossible de supprimer le vêtement."));
-  };
+          setClothes((prev) => prev.filter((item) => item._id !== id));
+        Alert.alert("Succès", "Vêtement supprimé avec succès !");
+      } else {
+        Alert.alert("Erreur", data.message || "Impossible de supprimer le vêtement.");
+      }
+    })
+    .catch((err) => {
+      console.error("Erreur lors de la suppression :", err);
+      Alert.alert("Erreur", "Impossible de supprimer le vêtement.");
+    });
+};
 
   const handleEditSubmit = (id, forChild = false, childId = null) => {
     const url = forChild
@@ -170,41 +181,26 @@ const groupedChildClothesArray = Object.entries(groupedChildClothes); // [ ["hau
       .catch(() => Alert.alert("Erreur", "Impossible de mettre à jour le vêtement."));
   };
   const renderItem = ({ item, forChild = false}) => {
-    const isChildClothing = forChild ? childClothes.some((childItem) => childItem._id === item._id) : false;
+    const [category, items] = item;
+    const isChildClothing = forChild;
 
 
     return (
-      <View style={styles.card}>
-        {editingItemId === item._id ? (
-          <TextInput
-            style={styles.input}
-            value={editingLabel}
-            onChangeText={setEditingLabel}
-            onSubmitEditing={() => handleEditSubmit(item._id, isChildClothing, item.childId)}
-            onBlur={() => setEditingItemId(null)}
-            autoFocus
-          />
-        ) : (
-          <Text style={styles.label}>{item.label}</Text>
-        )}
-        <Text style={styles.badge}>Catégorie : {item.category}</Text>
-        <View style={styles.actions}>
-          <TouchableOpacity
-            onPress={() => {
-              setEditingItemId(item._id);
-              setEditingLabel(item.label);
-            }}
-            style={styles.button}
-          >
-            <Text style={styles.btnText}>Modifier</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => handleDelete(clothingItem._id, false)}
-            style={styles.button}
-          >
-            <Text style={styles.btnText}>Supprimer</Text>
-          </TouchableOpacity>
-        </View>
+      <View>
+        <Text style={styles.categoryTitle}>
+  {category.charAt(0).toUpperCase() + category.slice(1)}
+</Text>
+        {items.map((clothingItem, index) => (
+          <View key={clothingItem._id || `${clothingItem.label}-${index}`} style={styles.card}>
+            <Text style={styles.label}>{clothingItem.label}</Text>
+            <TouchableOpacity
+              style={styles.deleteButton} 
+              onPress={() => handleDelete(clothingItem._id, isChildClothing, clothingItem.childId)}
+            >
+              <Icon name="times" size={20} color="#FF5C5C" /> {/* Icône croix */}
+            </TouchableOpacity>
+          </View>
+        ))}s
       </View>
     );
   };
@@ -212,101 +208,64 @@ const groupedChildClothesArray = Object.entries(groupedChildClothes); // [ ["hau
   return (
     <>
       <FlatList
-  ListHeaderComponent={
-    <View>
-      <Text style={styles.pageTitle}>Dressing</Text>
-      <Text style={styles.sectionTitle}>Mon dressing adulte :</Text>
-      <View style={{ width: "60%", alignSelf: "flex-start" }}>
-        <LinearGradient
-          colors={["#34C8E8", "#4E4AF2"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.gradientButton}
-        >
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              setModalVisible(true);
-            }}
-          >
-            <Text style={styles.btnText}>+ Ajouter un vêtement</Text>
-          </TouchableOpacity>
-        </LinearGradient>
-      </View>
-    </View>
-  }
-  data={groupedClothesArray} // Correction de la faute de frappe
-  renderItem={({ item }) => {
-    const [category, items] = item; // Déstructuration correcte
-    return (
-      <View>
-        <Text style={styles.categoryTitle}>{category}</Text>
-        {items.map((clothingItem, index) => (
-          <View key={clothingItem._id || `${clothingItem.label}-${index}`} style={styles.card}>
-            <Text style={styles.label}>{clothingItem.label}</Text>
-            <TouchableOpacity
-              style={[styles.addButton, { backgroundColor: "#FF5C5C", marginTop: 5 }]}
-              onPress={() => handleDelete(clothingItem._id, false)} // correction ici
-            >
-              <Text style={styles.addButtonText}>Supprimer</Text>
-            </TouchableOpacity>
+        ListHeaderComponent={
+          <View>
+            
+            <Text style={styles.sectionTitle}>Ma garde robe :</Text>
+            <View style={{ width: "60%", alignSelf: "center" }}>
+              <LinearGradient
+                colors={["#34C8E8", "#4E4AF2"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.gradientButton}
+              >
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => {
+                    setModalVisible(true);
+                  }}
+                >
+                  <Text style={styles.btnText}>+ Ajouter un vêtement</Text>
+                </TouchableOpacity>
+              </LinearGradient>
+            </View>
           </View>
-        ))}
-      </View>
-    );
-  }}
-  keyExtractor={(item) => item[0]} // Utilise le `category` comme clé ici
-  contentContainerStyle={styles.container}
-/>
+        }
+        data={groupedClothesArray}
+        renderItem={({ item }) => renderItem({ item, forChild: false })}
+        keyExtractor={(item) => item[0]}
+        contentContainerStyle={styles.container}
+      />
 
-<FlatList
-ListHeaderComponent={
-  <View>
-    <Text style={styles.sectionTitle}>Mon dressing enfant :</Text>
-    <View style={{ width: "60%", alignSelf: "flex-start" }}>
-      <LinearGradient
-        colors={["#34C8E8", "#4E4AF2"]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.gradientButton}
-      >
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => {
-            setModalVisible(true);
-            setNewClothing((prev) => ({ ...prev, forChild: true,  childId: "ID_DE_L_ENFANT" }));
-          }}
-        >
-          <Text style={styles.btnText}>+ Ajouter un vêtement</Text>
-        </TouchableOpacity>
-      </LinearGradient>
-    </View>
-  </View>
-}
-  data={groupedChildClothesArray} // Vérifie si c'est la bonne variable pour les vêtements enfants
-  renderItem={({ item }) => {
-    const [category, items] = item; // Déstructuration correcte
-    return (
-      <View>
-        <Text style={styles.categoryTitle}>{category}</Text>
-        {items.map((clothingItem, index) => (
-          <View key={clothingItem._id || `${clothingItem.label}-${index}`} style={styles.card}>
-            <Text style={styles.label}>{clothingItem.label}</Text>
-            <TouchableOpacity
-              style={[styles.addButton, { backgroundColor: "#FF5C5C", marginTop: 5 }]}
-
-              onPress={() => handleDelete(clothingItem._id, true)} // Suppression pour enfant
-            >
-              <Text style={styles.addButtonText}>Supprimer</Text>
-            </TouchableOpacity>
+      <FlatList
+        ListHeaderComponent={
+          <View>
+            <Text style={styles.sectionTitle}>Sa garde robe :</Text>
+            <View style={{ width: "60%", alignSelf: "center" }}>
+              <LinearGradient
+                colors={["#34C8E8", "#4E4AF2"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.gradientButton}
+              >
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => {
+                    setModalVisible(true);
+                    setNewClothing((prev) => ({ ...prev, forChild: true, childId: "ID_DE_L_ENFANT" }));
+                  }}
+                >
+                  <Text style={styles.btnText}>+ Ajouter un vêtement</Text>
+                </TouchableOpacity>
+              </LinearGradient>
+            </View>
           </View>
-        ))}
-      </View>
-    );
-  }}
-  keyExtractor={(item) => item[0]} // Utilise la catégorie comme clé
-  contentContainerStyle={styles.container}
-/>
+        }
+        data={groupedChildClothesArray}
+        renderItem={({ item }) => renderItem({ item, forChild: true })}
+        keyExtractor={(item) => item[0]}
+        contentContainerStyle={styles.container}
+      />
 
       {/* Modale pour ajouter un vêtement */}
       <Modal
@@ -328,45 +287,41 @@ ListHeaderComponent={
               style={styles.input}
             />
 
-            <View style={styles.dropdownContainer}>
-              <Text style={styles.categoryLabel}>Catégorie :</Text>
-              <TouchableOpacity
-                onPress={() => setShowCategoryDropdown(!showCategoryDropdown)}
-                style={styles.dropdownButton}
-              >
-                <Text style={styles.dropdownButtonText}>
-                  {newClothing.category || "Choisir une catégorie"}
-                </Text>
-              </TouchableOpacity>
-              {showCategoryDropdown && (
-                <View style={styles.dropdownList}>
-                  {["haut", "bas", "chaussure", "accessoire"].map((category) => (
-                    <TouchableOpacity
-                      key={category}
-                      onPress={() => {
-                        setNewClothing({ ...newClothing, category });
-                        setShowCategoryDropdown(false);
-                      }}
-                      style={styles.dropdownItem}
-                    >
-                      <Text style={styles.dropdownItemText}>{category}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-            </View>
+<View style={styles.dropdownContainer}>
+  <Text style={styles.categoryLabel}>Catégorie :</Text>
+  <TouchableOpacity
+    onPress={() => setShowCategoryDropdown(!showCategoryDropdown)}
+    style={styles.dropdownButton}
+  >
+    <Text style={styles.dropdownText}>{newClothing.category}</Text>
+  </TouchableOpacity>
 
-            <TouchableOpacity onPress={handleAddClothes} style={styles.addButton}>
-              <Text style={styles.addButtonText}>Ajouter</Text>
+  {showCategoryDropdown && (
+    <View style={styles.dropdownList}>
+      {["haut", "bas", "accessoire"].map((category) => (
+        <TouchableOpacity
+          key={category}
+          onPress={() => {
+            setNewClothing({ ...newClothing, category });
+            setShowCategoryDropdown(false);
+          }}
+          style={styles.dropdownItem}
+        >
+          <Text style={styles.dropdownItemText}>{category}</Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  )}
+</View>
+
+            <TouchableOpacity onPress={handleAddClothes} style={styles.submitButton}>
+              <Text style={styles.submitButtonText}>Ajouter</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => {
-                setModalVisible(false);
-                setNewClothing({ label: "", category: "haut", forChild: false });
-              }}
-              style={styles.cancelButton}
+              onPress={() => setModalVisible(false)}
+              style={styles.closeButton}
             >
-              <Text style={styles.cancelButtonText}>Annuler</Text>
+              <Text style={styles.closeButtonText}>Annuler</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -381,22 +336,21 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingTop: 90,
     backgroundColor: "#FFFFFF",
+    width: "80%"
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 28,
     fontWeight: "bold",
-    marginBottom: 10,
-    fontFamily: "Poppins-SemiBold",
-  },
-  pageTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    fontFamily: "Poppins",
-    color: "#222",
     marginBottom: 20,
-    marginTop: -30,
+    fontFamily: "Poppins-SemiBold",
+    textAlign: "center",
+    
   },
+
+  
   card: {
+    width: "60%",
+    marginVertical: 8,
     flex: 1,
     margin: 5,
     backgroundColor: "#fff",
@@ -530,6 +484,40 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#4E4AF2",
     fontFamily: "Poppins-SemiBold",
+  },
+  submitButton: {
+    backgroundColor: "#4E4AF2", // Couleur de fond
+    paddingVertical: 12,
+    borderRadius: 5,
+    marginTop: 20, // Espacement avec le champ de saisie
+    width: "100%",  // Pour faire occuper toute la largeur de la modale
+  },
+  submitButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontFamily: "Poppins-SemiBold",
+    textAlign: "center",
+  },
+  closeButton: {
+    marginTop: 15, // Espacement avec le bouton Ajouter
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: "#4E4AF2",
+    borderRadius: 5,
+    width: "100%",  // Pour faire occuper toute la largeur de la modale
+  },
+  closeButtonText: {
+    color: "#4E4AF2",
+    fontSize: 16,
+    fontFamily: "Poppins-SemiBold",
+    textAlign: "center",
+  },
+  deleteButton: {
+    position: "absolute", // Positionner l'icône à l'extérieur du card
+    top: 8, // Espacement par rapport au haut du card
+    right: 8, // Espacement par rapport à la droite du card
+    width: 20,
+
   },
 });
 
