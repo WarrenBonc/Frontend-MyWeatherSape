@@ -31,30 +31,37 @@ const DressingPage = () => {
     forChild: false,
   });
 
-  useEffect(() => {
-    if (!user || !user._id) return;
-
-    // Récupérer vêtements adulte
-
-    
-    fetch(`${config.API_BASE_URL}/api/dressing`, { credentials: "include" })
-    .then((res) => res.json())
-    .then((data) => {
-      console.log("Données récupérées :", data); // Ajoutez ce log
-      setClothes(data.data);
-
-    })
-    
-    .catch((err) => console.error("Erreur fetch vêtements :", err));
+  const fetchClothes = async () => {
+    try {
+      // Récupérer vêtements adultes
+      const adultResponse = await fetch(`${config.API_BASE_URL}/api/dressing`, { credentials: "include" });
+      const adultData = await adultResponse.json();
+      if (adultResponse.ok) {
+        setClothes(adultData.data);
+        console.log("Vêtements adultes récupérés :", adultData.data);
+      } else {
+        console.error("Erreur lors de la récupération des vêtements adultes :", adultData.message);
+      }
+  
       // Récupérer vêtements enfants
-
-    fetch(`${config.API_BASE_URL}/api/dressing?child=true`, { credentials: "include" })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Données récupérées pour vêtements enfants :", data); // Ajoutez ce log
-        setChildClothes(data.data);})
-      .catch((err) => console.error("Erreur fetch vêtements enfants :", err));
-  }, []);
+      const childResponse = await fetch(`${config.API_BASE_URL}/api/dressing?child=true`, { credentials: "include" });
+      const childData = await childResponse.json();
+      if (childResponse.ok) {
+        setChildClothes(childData.data);
+        console.log("Vêtements enfants récupérés :", childData.data);
+      } else {
+        console.error("Erreur lors de la récupération des vêtements enfants :", childData.message);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération des vêtements :", error);
+    }
+  };
+  
+  useEffect(() => {
+    if (user && user._id) {
+      fetchClothes();
+    }
+  }, [user]);
 
   // Fonction pour regrouper les vêtements par catégorie
   const groupByCategory = (items) => {
@@ -93,11 +100,15 @@ const GetCloth = async () =>{
     const data = await response.json();
     console.log("Données récupérées get :", data);
    
+    if (response.ok) {
+      console.log("Données récupérées get :", data);
+      setClothes(data.data); // Met à jour l'état local avec les vêtements récupérés
+    } else {
+      console.error("Erreur lors de la récupération des vêtements :", data.message);
+    }
   } catch (error) {
     console.error("Erreur lors de la récupération des vêtements :", error);
   }
-
-
 
 };
 
@@ -106,8 +117,10 @@ useEffect(() => {
 
   const handleAddClothes = () => {
     console.log("Données envoyées :", newClothing);
+
+    // Validation : Vérifiez que le label et la catégorie sont renseignés
     if (!newClothing.label || !newClothing.category) {
-      Alert.alert("Erreur", "Veuillez entrer un nom pour le vêtement.");
+      Alert.alert("Erreur", "Veuillez entrer un nom pour le vêtement et sélectionner une catégorie.");
       return;
     }
 
@@ -173,7 +186,7 @@ useEffect(() => {
     })
     .catch((err) => {
       console.error("Erreur lors de la suppression :", err);
-      Alert.alert("Erreur", "Impossible de supprimer le vêtement.");
+      Alert.alert("Erreur", "Impossible de supprimer le vêtement. Veuillez réessayer.");
     });
 };
 
@@ -263,6 +276,7 @@ useEffect(() => {
         renderItem={({ item }) => renderItem({ item, forChild: false })}
         keyExtractor={(item) => item[0]}
         contentContainerStyle={styles.container}
+        
       />
 
       <FlatList
@@ -326,7 +340,7 @@ useEffect(() => {
 
   {showCategoryDropdown && (
     <View style={styles.dropdownList}>
-      {["haut", "bas", "accessoire"].map((category) => (
+      {["haut", "bas", "accessoire", "chaussure"].map((category) => (
         <TouchableOpacity
           key={category}
           onPress={() => {
@@ -377,7 +391,7 @@ const styles = StyleSheet.create({
 
   
   card: {
-    width: "60%",
+    width: "80%",
     marginVertical: 8,
     flex: 1,
     margin: 5,
@@ -443,6 +457,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontFamily: "Poppins-SemiBold",
     marginBottom: 15,
+    width: "60%"
   },
   dropdownContainer: {
     marginVertical: 10,
