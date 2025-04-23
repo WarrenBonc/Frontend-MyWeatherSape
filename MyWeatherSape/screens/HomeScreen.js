@@ -31,6 +31,8 @@ const HomePage = () => {
   const [currentSlide2, setCurrentSlide2] = useState(0);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedChild, setSelectedChild] = useState("");
+  const [childName, setChildName] = useState("");
+  const [children, setChildren] = useState([]);
 
   const [selectedDay, setSelectedDay] = useState(0);
   const [searchCity, setSearchCity] = useState("");
@@ -76,6 +78,75 @@ const HomePage = () => {
 
     return `${dayName} ${day} ${monthName}`;
   };
+
+  const handleAddChild = async () => {
+    if (!childName || !selectedChild) {
+      Alert.alert("Erreur", "Veuillez remplir tous les champs.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${config.API_BASE_URL}/api/users/add-child`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            include: "credentials",
+          },
+          body: JSON.stringify({
+            firstName: childName,
+            gender: selectedChild,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Alert.alert("Succès", "Enfant ajouté avec succès !");
+        setChildName(""); // Réinitialiser le champ prénom
+        setSelectedChild(""); // Réinitialiser le champ sexe
+        setCreateChild(true); // Revenir à l'état initial
+      } else {
+        Alert.alert("Erreur", data.message || "Une erreur est survenue.");
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'ajout de l'enfant :", error);
+      Alert.alert("Erreur", "Impossible de communiquer avec le serveur.");
+    }
+  };
+
+  const getChild = async () => {
+    try {
+      const response = await fetch(
+        `${config.API_BASE_URL}/api/users/children`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            include: "credentials",
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setChildren(data.children); // Stocker les enfants dans l'état
+      } else {
+        Alert.alert("Erreur", data.message || "Une erreur est survenue.");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération des enfants :", error);
+      Alert.alert("Erreur", "Impossible de communiquer avec le serveur.");
+    }
+  };
+
+  // Appeler la fonction pour récupérer les enfants au chargement du composant
+  useEffect(() => {
+    getChild();
+  }, [handleAddChild]);
 
   const fetchUserLocation = async () => {
     try {
@@ -280,6 +351,7 @@ const HomePage = () => {
           pageMargin={10}
           onPageSelected={(e) => setCurrentSlide2(e.nativeEvent.position)}
         >
+          {/* Slide 1 : Recommandations */}
           <View style={styles.widgetTips}>
             <Text style={styles.title}>Voici nos recommandations {user} :</Text>
             <View style={styles.tipsContent}>
@@ -298,6 +370,28 @@ const HomePage = () => {
               </ScrollView>
             </View>
           </View>
+
+          {/* Slides dynamiques : Un slide par enfant */}
+          {children.map((child, index) => (
+            <View key={child._id} style={styles.widgetTips}>
+              <Text style={styles.title}>Informations sur {child.name} :</Text>
+              <Text style={{ fontSize: 14 }}>Genre : {child.gender}</Text>
+              <Text style={{ fontSize: 14 }}>
+                Vêtements : {child.dressing.length} articles
+              </Text>
+              <FlatList
+                data={child.dressing}
+                keyExtractor={(item, idx) => `${child._id}-${idx}`}
+                renderItem={({ item }) => (
+                  <Text style={{ fontSize: 12, color: "#555" }}>
+                    - {item.label} ({item.category})
+                  </Text>
+                )}
+              />
+            </View>
+          ))}
+
+          {/* Slide final : Création d'un enfant */}
           <View style={styles.widgetTips}>
             {createChild ? (
               <View style={styles.crossContainer}>
@@ -332,7 +426,12 @@ const HomePage = () => {
                     source={require("../assets/cross2.png")}
                   />
                 </TouchableOpacity>
-                <TextInput placeholder="Prenom" style={styles.input} />
+                <TextInput
+                  placeholder="Prenom"
+                  style={styles.input}
+                  value={childName}
+                  onChangeText={setChildName}
+                />
                 <TouchableOpacity
                   style={{
                     backgroundColor: "#007BFF",
@@ -359,6 +458,7 @@ const HomePage = () => {
                     width: "80%",
                     alignItems: "center",
                   }}
+                  onPress={handleAddChild}
                 >
                   <Text
                     style={{
@@ -369,7 +469,7 @@ const HomePage = () => {
                     Valider
                   </Text>
                 </TouchableOpacity>
-                {/* Modal here*/}
+                {/* Modal pour sélectionner le sexe */}
                 <Modal
                   visible={isModalVisible}
                   transparent={true}
@@ -438,8 +538,6 @@ const HomePage = () => {
                 </Modal>
               </View>
             )}
-
-            {/* dropdown menu */}
           </View>
         </PagerView>
         <View style={styles.pagination}>
