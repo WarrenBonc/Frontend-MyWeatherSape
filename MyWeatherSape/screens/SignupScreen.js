@@ -194,27 +194,6 @@ const SignupPage = ({ navigation }) => {
               <Text style={styles.buttonText}>Créer un compte</Text>
             </TouchableOpacity>
           </LinearGradient>
-          <Text style={styles.orText}>Ou inscrivez-vous avec</Text>
-          <View style={styles.socialButtonsContainer}>
-            <TouchableOpacity
-              style={[styles.socialButton, styles.googleButton]}
-            >
-              <Image
-                source={require("../assets/google.png")} // Replace with your Google icon
-                style={styles.socialIcon}
-              />
-              <Text style={styles.socialButtonText}>Google</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.socialButton, styles.facebookButton]}
-            >
-              <Image
-                source={require("../assets/Facebook.png")} // Replace with your Facebook icon
-                style={styles.socialIcon}
-              />
-              <Text style={styles.socialButtonText}>Facebook</Text>
-            </TouchableOpacity>
-          </View>
 
           <TouchableOpacity
             style={styles.haveAccountButton}
@@ -343,48 +322,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
     marginLeft: 5,
-  },
-  socialButtonsContainer: {
-    flexDirection: "column",
-    justifyContent: "center",
-    alignContent: "center",
-    height: 130,
-    width: "100%",
-  },
-  socialButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    height: 50,
-    marginBottom: 10,
-    borderRadius: 5,
-    justifyContent: "flex-start",
-    paddingHorizontal: 15,
-  },
-  googleButton: {
-    backgroundColor: "#fff",
-    borderColor: "#EFF0F6",
-    borderWidth: 1,
-  },
-  facebookButton: {
-    backgroundColor: "#fff",
-    borderColor: "#EFF0F6",
-    borderWidth: 1,
-  },
-  socialIcon: {
-    width: 24,
-    height: 24,
-    marginRight: 10,
-    resizeMode: "contain",
-  },
-  socialButtonText: {
-    color: "#00000",
-    fontSize: 14,
-    fontWeight: "bold",
-  },
-  orText: {
-    marginVertical: 15,
-    fontSize: 14,
-    color: "#666",
   },
 });
 

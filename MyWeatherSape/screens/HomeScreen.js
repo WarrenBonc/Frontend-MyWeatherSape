@@ -7,6 +7,9 @@ import {
   TextInput,
   Image,
   Alert,
+  TouchableOpacity,
+  Modal,
+  FlatList,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import * as Location from "expo-location";
@@ -26,10 +29,17 @@ const HomePage = () => {
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [currentSlide2, setCurrentSlide2] = useState(0);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedChild, setSelectedChild] = useState("");
 
   const [selectedDay, setSelectedDay] = useState(0);
   const [searchCity, setSearchCity] = useState("");
   const [tips, setTips] = useState("Chargement des recommandations...");
+
+  const childrenOptions = [
+    { label: "Garçon", value: "child1" },
+    { label: "Fille", value: "child2" },
+  ];
 
   const getLabelForDay = (dayOffset) => {
     const daysOfWeek = [
@@ -197,7 +207,7 @@ const HomePage = () => {
     fetchAllWeatherData();
   }, [city]);
 
-  
+  const [createChild, setCreateChild] = useState(true);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -280,20 +290,156 @@ const HomePage = () => {
                 />
               </View>
 
-              <Text style={styles.tips}>{tips}</Text>
+              <ScrollView
+                style={styles.tipsScroll}
+                contentContainerStyle={styles.tipsScrollContent}
+              >
+                <Text style={styles.tips}>{tips}</Text>
+              </ScrollView>
             </View>
           </View>
           <View style={styles.widgetTips}>
-            <View style={styles.crossContainer}>
-              <View style={styles.circleCross}>
-                <Image
-                  style={{ width: 30, height: 30 }}
-                  source={require("../assets/cross.png")}
-                />
+            {createChild ? (
+              <View style={styles.crossContainer}>
+                <TouchableOpacity onPress={() => setCreateChild(false)}>
+                  <View style={styles.circleCross}>
+                    <Image
+                      style={{ width: 30, height: 30 }}
+                      source={require("../assets/cross.png")}
+                    />
+                  </View>
+                </TouchableOpacity>
+                <Text style={styles.crossText}>Ajouter un enfant</Text>
               </View>
-              <Text style={styles.crossText}>Ajouter un enfant</Text>
-            </View>
-            
+            ) : (
+              <View
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <TouchableOpacity
+                  style={{ position: "absolute", top: 20, right: 20 }}
+                  onPress={() => setCreateChild(true)}
+                >
+                  <Image
+                    style={{
+                      width: 30,
+                      height: 30,
+                    }}
+                    source={require("../assets/cross2.png")}
+                  />
+                </TouchableOpacity>
+                <TextInput placeholder="Prenom" style={styles.input} />
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: "#007BFF",
+                    padding: 10,
+                    borderRadius: 5,
+                    marginTop: 20,
+                    width: "80%",
+                    alignItems: "center",
+                  }}
+                  onPress={() => setIsModalVisible(true)}
+                >
+                  <Text style={{ color: "#fff", fontSize: 16 }}>
+                    {selectedChild
+                      ? `${selectedChild}`
+                      : "Sélectionner le sexe de l'enfant"}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: "#007BFF",
+                    padding: 10,
+                    borderRadius: 5,
+                    marginTop: 20,
+                    width: "80%",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: "#fff",
+                      fontSize: 16,
+                    }}
+                  >
+                    Valider
+                  </Text>
+                </TouchableOpacity>
+                {/* Modal here*/}
+                <Modal
+                  visible={isModalVisible}
+                  transparent={true}
+                  animationType="slide"
+                  onRequestClose={() => setIsModalVisible(false)}
+                >
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      backgroundColor: "rgba(0, 0, 0, 0.5)",
+                    }}
+                  >
+                    <View
+                      style={{
+                        width: "80%",
+                        backgroundColor: "#fff",
+                        borderRadius: 10,
+                        padding: 20,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 18,
+                          fontWeight: "bold",
+                          marginBottom: 10,
+                        }}
+                      >
+                        Sélectionnez une option
+                      </Text>
+                      <FlatList
+                        data={childrenOptions}
+                        keyExtractor={(item) => item.value}
+                        renderItem={({ item }) => (
+                          <TouchableOpacity
+                            style={{
+                              padding: 10,
+                              borderBottomWidth: 1,
+                              borderBottomColor: "#ccc",
+                            }}
+                            onPress={() => {
+                              setSelectedChild(item.label);
+                              setIsModalVisible(false);
+                            }}
+                          >
+                            <Text style={{ fontSize: 16, color: "#333" }}>
+                              {item.label}
+                            </Text>
+                          </TouchableOpacity>
+                        )}
+                      />
+                      <TouchableOpacity
+                        style={{
+                          marginTop: 10,
+                          alignItems: "center",
+                        }}
+                        onPress={() => setIsModalVisible(false)}
+                      >
+                        <Text style={{ fontSize: 16, color: "#007BFF" }}>
+                          Fermer
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </Modal>
+              </View>
+            )}
+
+            {/* dropdown menu */}
           </View>
         </PagerView>
         <View style={styles.pagination}>
@@ -511,7 +657,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   display: {
-    width: 100,
+    width: 110,
     height: 100,
     borderRadius: 20,
     backgroundColor: "#E5E7EB",
@@ -523,19 +669,25 @@ const styles = StyleSheet.create({
     gap: 10,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 10,
+    marginTop: 30,
+    paddingHorizontal: 10,
   },
   tips: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: "bold",
     fontFamily: "Poppins",
     color: "#333",
     width: "60%",
-    height: 90,
     textAlign: "left",
-    paddingTop: 10,
-
+    paddingTop: 0,
     // le texte ne doit pas depasser, mais je veux le voir en entier
+  },
+  tipsScroll: {
+    maxHeight: 120,
+    width: "80%",
+  },
+  tipsScrollContent: {
+    paddingVertical: 5,
   },
   ellipse: {
     position: "absolute",
@@ -575,6 +727,17 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins",
 
     paddingBottom: 10,
+  },
+  input: {
+    width: "80%",
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: "#E5E7EB",
+    paddingHorizontal: 10,
+    fontSize: 16,
+    fontFamily: "Poppins",
+    color: "#333",
+    marginTop: 60,
   },
 });
 
