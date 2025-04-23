@@ -42,7 +42,9 @@ const DressingPage = () => {
     .then((data) => {
       console.log("Données récupérées :", data); // Ajoutez ce log
       setClothes(data.data);
+
     })
+    
     .catch((err) => console.error("Erreur fetch vêtements :", err));
       // Récupérer vêtements enfants
 
@@ -52,7 +54,7 @@ const DressingPage = () => {
         console.log("Données récupérées pour vêtements enfants :", data); // Ajoutez ce log
         setChildClothes(data.data);})
       .catch((err) => console.error("Erreur fetch vêtements enfants :", err));
-  }, [user]);
+  }, []);
 
   // Fonction pour regrouper les vêtements par catégorie
   const groupByCategory = (items) => {
@@ -78,6 +80,30 @@ const groupedChildClothesArray = Object.entries(groupedChildClothes); // [ ["hau
 
 // Ajouter un vêtement 
 
+const GetCloth = async () =>{
+
+  try {
+    const response = await fetch(`${config.API_BASE_URL}/api/dressing`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+    const data = await response.json();
+    console.log("Données récupérées get :", data);
+   
+  } catch (error) {
+    console.error("Erreur lors de la récupération des vêtements :", error);
+  }
+
+
+
+};
+
+useEffect(() => {
+  GetCloth();}, []);
+
   const handleAddClothes = () => {
     console.log("Données envoyées :", newClothing);
     if (!newClothing.label || !newClothing.category) {
@@ -98,6 +124,8 @@ const groupedChildClothesArray = Object.entries(groupedChildClothes); // [ ["hau
       if (data && data.message === "Vêtement ajouté avec succès") {
 
         setClothes((prev) => [...prev, data.item]);
+
+        
         setNewClothing({ label: "", category: "haut", forChild: false });
         setModalVisible(false);
         Alert.alert("Succès", "Vêtement ajouté avec succès !");
