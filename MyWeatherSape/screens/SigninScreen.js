@@ -97,6 +97,7 @@ const SigninPage = ({ navigation }) => {
             keyboardType="email-address"
             value={email}
             onChangeText={(text) => setEmail(text)}
+            autoCapitalize="none"
           />
           <View style={styles.passwordContainer}>
             <TextInput
