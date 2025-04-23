@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   StyleSheet,
   Text,
@@ -34,6 +34,7 @@ const HomePage = () => {
   const [selectedChild, setSelectedChild] = useState("");
   const [childName, setChildName] = useState("");
   const [children, setChildren] = useState([]);
+  const [fetchedChildren, setFetchedChildren] = useState([]);
 
   const [selectedDay, setSelectedDay] = useState(0);
   const [searchCity, setSearchCity] = useState("");
@@ -68,26 +69,35 @@ const HomePage = () => {
   const toggleFavorite = async (cityName) => {
     let updatedFavorites;
     if (favorites.includes(cityName)) {
-      updatedFavorites = favorites.filter(fav => fav !== cityName);
+      updatedFavorites = favorites.filter((fav) => fav !== cityName);
     } else {
-      updatedFavorites = [cityName, ...favorites.filter(fav => fav !== cityName)];
+      updatedFavorites = [
+        cityName,
+        ...favorites.filter((fav) => fav !== cityName),
+      ];
     }
     await saveFavorites(updatedFavorites);
   };
 
   const removeSearch = async (cityName) => {
-    const updatedSearches = recentSearches.filter(c => c !== cityName);
-    await AsyncStorage.setItem("searchHistory", JSON.stringify(updatedSearches));
+    const updatedSearches = recentSearches.filter((c) => c !== cityName);
+    await AsyncStorage.setItem(
+      "searchHistory",
+      JSON.stringify(updatedSearches)
+    );
     setRecentSearches(updatedSearches);
     // Optionally also remove from favorites
     if (favorites.includes(cityName)) {
-      const updatedFavorites = favorites.filter(fav => fav !== cityName);
+      const updatedFavorites = favorites.filter((fav) => fav !== cityName);
       await saveFavorites(updatedFavorites);
     }
   };
 
   const saveSearch = async (cityName) => {
-    const updatedHistory = [cityName, ...recentSearches.filter(c => c !== cityName)].slice(0, 5);
+    const updatedHistory = [
+      cityName,
+      ...recentSearches.filter((c) => c !== cityName),
+    ].slice(0, 5);
     await AsyncStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
     setRecentSearches(updatedHistory);
   };
@@ -206,7 +216,7 @@ const HomePage = () => {
   // Appeler la fonction pour récupérer les enfants au chargement du composant
   useEffect(() => {
     getChild();
-  }, [handleAddChild]);
+  }, []);
 
   const fetchUserLocation = async () => {
     try {
@@ -278,6 +288,62 @@ const HomePage = () => {
       setTips("Erreur réseau. Veuillez réessayer.");
     }
   };
+
+  const fetchChildRecommendations = async (childid) => {
+    if (fetchedChildren.includes(childid)) return; // Évite les doublons
+
+    try {
+      const response = await fetch(
+        `${config.API_BASE_URL}/api/weather/recommendation/child`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            include: "credentials",
+          },
+          body: JSON.stringify({
+            city,
+            dayOffset: selectedDay,
+            childId: childid,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok && data.advice) {
+        // Mettre à jour les recommandations pour l'enfant spécifique
+        setChildren((prevChildren) =>
+          prevChildren.map((child) =>
+            child._id === childid
+              ? { ...child, recommendation: data.advice }
+              : child
+          )
+        );
+
+        // Ajouter l'enfant à la liste des enfants déjà traités
+        setFetchedChildren((prev) => [...prev, childid]);
+      } else {
+        console.error(
+          "Erreur lors de la récupération des recommandations pour l'enfant :",
+          data.message
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Erreur réseau lors de la récupération des recommandations :",
+        error
+      );
+    }
+  };
+
+  useEffect(() => {
+    children.forEach((child) => {
+      if (!fetchedChildren.includes(child._id)) {
+        fetchChildRecommendations(child._id);
+      }
+    });
+  }, [city, selectedDay, children]);
 
   useEffect(() => {
     fetchUserLocation();
@@ -374,7 +440,9 @@ const HomePage = () => {
           />
         </View>
         {showDropdown && recentSearches.length > 0 && (
-          <View style={{ backgroundColor: "#fff", borderRadius: 10, marginTop: 5 }}>
+          <View
+            style={{ backgroundColor: "#fff", borderRadius: 10, marginTop: 5 }}
+          >
             {(() => {
               // Tri des recherches récentes : favoris d'abord
               const sortedSearches = [...recentSearches].sort((a, b) => {
@@ -392,7 +460,8 @@ const HomePage = () => {
                     alignItems: "center",
                     justifyContent: "space-between",
                     padding: 10,
-                    borderBottomWidth: index !== sortedSearches.length - 1 ? 1 : 0,
+                    borderBottomWidth:
+                      index !== sortedSearches.length - 1 ? 1 : 0,
                     borderColor: "#ccc",
                   }}
                 >
@@ -499,22 +568,29 @@ const HomePage = () => {
           </View>
 
           {/* Slides dynamiques : Un slide par enfant */}
-          {children.map((child, index) => (
-            <View key={child._id} style={styles.widgetTips}>
-              <Text style={styles.title}>Informations sur {child.name} :</Text>
-              <Text style={{ fontSize: 14 }}>Genre : {child.gender}</Text>
-              <Text style={{ fontSize: 14 }}>
-                Vêtements : {child.dressing.length} articles
+          {children.map((child) => (
+            <View style={styles.widgetTips} key={child._id}>
+              <Text style={styles.title}>
+                Voici nos recommandations pour {child.name} :
               </Text>
-              <FlatList
-                data={child.dressing}
-                keyExtractor={(item, idx) => `${child._id}-${idx}`}
-                renderItem={({ item }) => (
-                  <Text style={{ fontSize: 12, color: "#555" }}>
-                    - {item.label} ({item.category})
+              <View style={styles.tipsContent}>
+                <View style={styles.display}>
+                  <Image
+                    source={require("../assets/tshirt.png")}
+                    style={{ width: 50, height: 50 }}
+                  />
+                </View>
+
+                <ScrollView
+                  style={styles.tipsScroll}
+                  contentContainerStyle={styles.tipsScrollContent}
+                >
+                  <Text style={styles.tips}>
+                    {child.recommendation ||
+                      "Chargement des recommandations..."}
                   </Text>
-                )}
-              />
+                </ScrollView>
+              </View>
             </View>
           ))}
 
