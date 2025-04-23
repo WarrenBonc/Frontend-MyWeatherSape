@@ -247,8 +247,9 @@ useEffect(() => {
   };
 
   return (
-    <>
+    <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
       <FlatList
+      
         ListHeaderComponent={
           <View>
             
@@ -368,7 +369,7 @@ useEffect(() => {
           </View>
         </View>
       </Modal>
-    </>
+    </View>
   );
 };
 
@@ -378,7 +379,7 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingTop: 90,
     backgroundColor: "#FFFFFF",
-    width: "80%"
+    
   },
   sectionTitle: {
     fontSize: 28,
@@ -433,6 +434,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: "#ccc",
     marginBottom: 5,
+    
   },
   modalOverlay: {
     flex: 1,
