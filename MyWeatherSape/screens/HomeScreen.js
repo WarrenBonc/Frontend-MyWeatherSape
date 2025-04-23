@@ -178,6 +178,8 @@ const HomePage = () => {
         setChildName(""); // Réinitialiser le champ prénom
         setSelectedChild(""); // Réinitialiser le champ sexe
         setCreateChild(true); // Revenir à l'état initial
+
+        await getChild();
       } else {
         Alert.alert("Erreur", data.message || "Une erreur est survenue.");
       }
@@ -286,6 +288,36 @@ const HomePage = () => {
     } catch (error) {
       console.error("Erreur réseau :", error);
       setTips("Erreur réseau. Veuillez réessayer.");
+    }
+  };
+
+  const handleRemoveChild = async (childId) => {
+    try {
+      const response = await fetch(
+        `${config.API_BASE_URL}/api/users/remove-child`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            include: "credentials",
+          },
+          body: JSON.stringify({ childId }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Alert.alert("Succès", "Enfant supprimé avec succès !");
+        setChildren((prevChildren) =>
+          prevChildren.filter((child) => child._id !== childId)
+        );
+      } else {
+        Alert.alert("Erreur", data.message || "Une erreur est survenue.");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la suppression de l'enfant :", error);
+      Alert.alert("Erreur", "Impossible de supprimer l'enfant.");
     }
   };
 
@@ -597,16 +629,66 @@ const HomePage = () => {
           {/* Slide final : Création d'un enfant */}
           <View style={styles.widgetTips}>
             {createChild ? (
-              <View style={styles.crossContainer}>
-                <TouchableOpacity onPress={() => setCreateChild(false)}>
-                  <View style={styles.circleCross}>
-                    <Image
-                      style={{ width: 30, height: 30 }}
-                      source={require("../assets/cross.png")}
-                    />
-                  </View>
-                </TouchableOpacity>
-                <Text style={styles.crossText}>Ajouter un enfant</Text>
+              //rajoute la liste des enfant avec une croix sur le coté de chaque enfant
+              <View style={{ width: "100%", height: "100%" }}>
+                <View style={styles.crossContainer}>
+                  <TouchableOpacity onPress={() => setCreateChild(false)}>
+                    <View style={styles.circleCross}>
+                      <Image
+                        style={{ width: 30, height: 30 }}
+                        source={require("../assets/cross.png")}
+                      />
+                    </View>
+                  </TouchableOpacity>
+                  <Text style={styles.crossText}>Ajouter un enfant</Text>
+                </View>
+                <View
+                  style={{
+                    marginTop: 70,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <FlatList
+                    style={{
+                      width: "80%",
+                      height: "90%",
+                    }}
+                    data={children}
+                    keyExtractor={(item) => item._id}
+                    renderItem={({ item }) => (
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          padding: 10,
+                          backgroundColor: "#f9f9f9",
+                          borderRadius: 10,
+                          marginBottom: 10,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontSize: 16,
+                            fontWeight: "bold",
+                            color: "#333",
+                          }}
+                        >
+                          {item.name} ({item.gender})
+                        </Text>
+                        <TouchableOpacity
+                          onPress={() => handleRemoveChild(item._id)}
+                        >
+                          <Image
+                            source={require("../assets/cross2.png")}
+                            style={{ width: 24, height: 24 }}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                  />
+                </View>
               </View>
             ) : (
               <View
@@ -744,8 +826,18 @@ const HomePage = () => {
           </View>
         </PagerView>
         <View style={styles.pagination}>
-          <View style={[styles.dot, currentSlide2 === 0 && styles.dotActive]} />
-          <View style={[styles.dot, currentSlide2 === 1 && styles.dotActive]} />
+          {/* Générer un dot pour chaque slide */}
+          {[
+            ...Array(1 + children.length + 1), // 1 pour les recommandations générales, `children.length` pour les enfants, et 1 pour le slide d'ajout
+          ].map((_, index) => (
+            <View
+              key={index}
+              style={[
+                styles.dot,
+                currentSlide2 === index && styles.dotActive, // Activer le dot correspondant au slide actuel
+              ]}
+            />
+          ))}
         </View>
       </View>
     </ScrollView>
