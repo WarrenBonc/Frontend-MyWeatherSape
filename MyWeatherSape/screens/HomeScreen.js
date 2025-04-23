@@ -11,6 +11,8 @@ import {
   TouchableOpacity,
   Modal,
   FlatList,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import * as Location from "expo-location";
@@ -439,7 +441,13 @@ const HomePage = () => {
   const [createChild, setCreateChild] = useState(true);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()} accessible={false}>
+      <FlatList
+        data={[{}]}
+        keyExtractor={() => 'static'}
+        contentContainerStyle={styles.container}
+        renderItem={() => (
+          <>
       <View style={styles.header}>
         <Image
           source={require("../assets/Ellipse.png")}
@@ -468,13 +476,22 @@ const HomePage = () => {
             }}
             placeholderTextColor="#999"
             onFocus={() => setShowDropdown(true)}
-            onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
           />
+          {searchCity.trim() !== "" && (
+            <TouchableOpacity onPress={() => toggleFavorite(searchCity.trim())}>
+              <Image
+                source={
+                  favorites.includes(searchCity.trim())
+                    ? require("../assets/heart_filled.png")
+                    : require("../assets/heart_outline.png")
+                }
+                style={{ width: 24, height: 24, marginLeft: 10 }}
+              />
+            </TouchableOpacity>
+          )}
         </View>
         {showDropdown && recentSearches.length > 0 && (
-          <View
-            style={{ backgroundColor: "#fff", borderRadius: 10, marginTop: 5 }}
-          >
+          <View style={{ backgroundColor: "#fff", borderRadius: 10, marginTop: 5 }}>
             {(() => {
               // Tri des recherches récentes : favoris d'abord
               const sortedSearches = [...recentSearches].sort((a, b) => {
@@ -492,8 +509,7 @@ const HomePage = () => {
                     alignItems: "center",
                     justifyContent: "space-between",
                     padding: 10,
-                    borderBottomWidth:
-                      index !== sortedSearches.length - 1 ? 1 : 0,
+                    borderBottomWidth: index !== sortedSearches.length - 1 ? 1 : 0,
                     borderColor: "#ccc",
                   }}
                 >
@@ -586,7 +602,7 @@ const HomePage = () => {
               <View style={styles.display}>
                 <Image
                   source={require("../assets/tshirt.png")}
-                  style={{ width: 50, height: 50 }}
+                  style={{ width: 70, height: 70 }}
                 />
               </View>
 
@@ -840,7 +856,10 @@ const HomePage = () => {
           ))}
         </View>
       </View>
-    </ScrollView>
+          </>
+        )}
+      />
+    </TouchableWithoutFeedback>
   );
 };
 
