@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   StyleSheet,
   Text,
@@ -36,6 +37,65 @@ const HomePage = () => {
 
   const [selectedDay, setSelectedDay] = useState(0);
   const [searchCity, setSearchCity] = useState("");
+  const [recentSearches, setRecentSearches] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [favorites, setFavorites] = useState([]);
+
+  const loadSearchHistory = async () => {
+    const history = await AsyncStorage.getItem("searchHistory");
+    if (history) setRecentSearches(JSON.parse(history));
+    // else setRecentSearches([]); // optional
+  };
+
+  const loadFavorites = async () => {
+    try {
+      const favs = await AsyncStorage.getItem("favorites");
+      if (favs) {
+        setFavorites(JSON.parse(favs));
+      } else {
+        setFavorites([]);
+      }
+    } catch (e) {
+      setFavorites([]);
+    }
+  };
+
+  const saveFavorites = async (favArr) => {
+    setFavorites(favArr);
+    await AsyncStorage.setItem("favorites", JSON.stringify(favArr));
+  };
+
+  const toggleFavorite = async (cityName) => {
+    let updatedFavorites;
+    if (favorites.includes(cityName)) {
+      updatedFavorites = favorites.filter(fav => fav !== cityName);
+    } else {
+      updatedFavorites = [cityName, ...favorites.filter(fav => fav !== cityName)];
+    }
+    await saveFavorites(updatedFavorites);
+  };
+
+  const removeSearch = async (cityName) => {
+    const updatedSearches = recentSearches.filter(c => c !== cityName);
+    await AsyncStorage.setItem("searchHistory", JSON.stringify(updatedSearches));
+    setRecentSearches(updatedSearches);
+    // Optionally also remove from favorites
+    if (favorites.includes(cityName)) {
+      const updatedFavorites = favorites.filter(fav => fav !== cityName);
+      await saveFavorites(updatedFavorites);
+    }
+  };
+
+  const saveSearch = async (cityName) => {
+    const updatedHistory = [cityName, ...recentSearches.filter(c => c !== cityName)].slice(0, 5);
+    await AsyncStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
+    setRecentSearches(updatedHistory);
+  };
+
+  useEffect(() => {
+    loadSearchHistory();
+    loadFavorites();
+  }, []);
   const [tips, setTips] = useState("Chargement des recommandations...");
 
   const childrenOptions = [
@@ -300,15 +360,82 @@ const HomePage = () => {
             placeholder="Rechercher une ville"
             value={searchCity}
             onChangeText={setSearchCity}
-            onSubmitEditing={() => {
-              if (searchCity !== city) {
-                dispatch(setCity(searchCity));
-                fetchAllWeatherData();
+            onSubmitEditing={async () => {
+              if (searchCity.trim() !== "") {
+                await dispatch(setCity(searchCity.trim()));
+                await fetchAllWeatherData();
+                await saveSearch(searchCity.trim());
+                setShowDropdown(false);
               }
             }}
             placeholderTextColor="#999"
+            onFocus={() => setShowDropdown(true)}
+            onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
           />
         </View>
+        {showDropdown && recentSearches.length > 0 && (
+          <View style={{ backgroundColor: "#fff", borderRadius: 10, marginTop: 5 }}>
+            {(() => {
+              // Tri des recherches récentes : favoris d'abord
+              const sortedSearches = [...recentSearches].sort((a, b) => {
+                const aFav = favorites.includes(a) ? 0 : 1;
+                const bFav = favorites.includes(b) ? 0 : 1;
+                if (aFav !== bFav) return aFav - bFav;
+                // Optionally: keep original order for same favorite status
+                return recentSearches.indexOf(a) - recentSearches.indexOf(b);
+              });
+              return sortedSearches.map((item, index) => (
+                <View
+                  key={item}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: 10,
+                    borderBottomWidth: index !== sortedSearches.length - 1 ? 1 : 0,
+                    borderColor: "#ccc",
+                  }}
+                >
+                  <TouchableOpacity
+                    style={{ flex: 1 }}
+                    onPress={() => {
+                      setSearchCity(item);
+                      dispatch(setCity(item));
+                      fetchAllWeatherData();
+                      setShowDropdown(false);
+                    }}
+                  >
+                    <Text style={{ fontSize: 16 }}>{item}</Text>
+                  </TouchableOpacity>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <TouchableOpacity
+                      onPress={() => toggleFavorite(item)}
+                      style={{ marginHorizontal: 6 }}
+                    >
+                      <Image
+                        source={
+                          favorites.includes(item)
+                            ? require("../assets/heart_filled.png")
+                            : require("../assets/heart_outline.png")
+                        }
+                        style={{ width: 24, height: 24 }}
+                      />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => removeSearch(item)}
+                      style={{ marginHorizontal: 6 }}
+                    >
+                      <Image
+                        source={require("../assets/trash.png")}
+                        style={{ width: 24, height: 30 }}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ));
+            })()}
+          </View>
+        )}
       </View>
       <View style={styles.daySelector}>
         <Text

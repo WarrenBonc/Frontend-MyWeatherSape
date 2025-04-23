@@ -141,6 +141,8 @@ const SignupPage = ({ navigation }) => {
             placeholder="Email"
             placeholderTextColor="#aaa"
             keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
             value={email}
             onChangeText={setEmail}
           />
