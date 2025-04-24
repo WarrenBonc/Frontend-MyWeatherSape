@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   StyleSheet,
@@ -656,12 +657,17 @@ const HomePage = () => {
               <View style={{ width: "100%", height: "100%" }}>
                 <View style={styles.crossContainer}>
                   <TouchableOpacity onPress={() => setCreateChild(false)}>
-                    <View style={styles.circleCross}>
+                    <LinearGradient
+                      colors={['#34C8E8', '#4E4AF2']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.circleCross}
+                    >
                       <Image
                         style={{ width: 30, height: 30 }}
                         source={require("../assets/cross.png")}
                       />
-                    </View>
+                    </LinearGradient>
                   </TouchableOpacity>
                   <Text style={styles.crossText}>Ajouter un enfant</Text>
                 </View>
@@ -740,43 +746,54 @@ const HomePage = () => {
                   value={childName}
                   onChangeText={setChildName}
                 />
-                <TouchableOpacity
+                <LinearGradient
+                  colors={['#34C8E8', '#4E4AF2']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
                   style={{
-                    backgroundColor: "#007BFF",
-                    padding: 10,
                     borderRadius: 5,
                     marginTop: 20,
                     width: "80%",
                     alignItems: "center",
                   }}
-                  onPress={() => setIsModalVisible(true)}
                 >
-                  <Text style={{ color: "#fff", fontSize: 16 }}>
-                    {selectedChild
-                      ? `${selectedChild}`
-                      : "Sélectionner le sexe de l'enfant"}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={{
-                    backgroundColor: "#007BFF",
-                    padding: 10,
-                    borderRadius: 5,
-                    marginTop: 20,
-                    width: "80%",
-                    alignItems: "center",
-                  }}
-                  onPress={handleAddChild}
-                >
-                  <Text
+                  <TouchableOpacity
                     style={{
-                      color: "#fff",
-                      fontSize: 16,
+                      padding: 10,
+                      width: "100%",
+                      alignItems: "center",
                     }}
+                    onPress={() => setIsModalVisible(true)}
                   >
-                    Valider
-                  </Text>
-                </TouchableOpacity>
+                    <Text style={{ color: "#fff", fontSize: 16 }}>
+                      {selectedChild
+                        ? `${selectedChild}`
+                        : "Sélectionner le sexe de l'enfant"}
+                    </Text>
+                  </TouchableOpacity>
+                </LinearGradient>
+                <LinearGradient
+                  colors={['#34C8E8', '#4E4AF2']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={{
+                    borderRadius: 5,
+                    marginTop: 20,
+                    width: "80%",
+                    alignItems: "center",
+                  }}
+                >
+                  <TouchableOpacity
+                    style={{
+                      padding: 10,
+                      width: "100%",
+                      alignItems: "center",
+                    }}
+                    onPress={handleAddChild}
+                  >
+                    <Text style={{ color: "#fff", fontSize: 16 }}>Valider</Text>
+                  </TouchableOpacity>
+                </LinearGradient>
                 {/* Modal pour sélectionner le sexe */}
                 <Modal
                   visible={isModalVisible}
@@ -1126,7 +1143,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 25,
-    backgroundColor: "#7D62E0",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 10,
