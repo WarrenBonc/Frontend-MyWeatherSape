@@ -5,63 +5,35 @@ import {
   View,
   FlatList,
   TouchableOpacity,
-  Alert,
   TextInput,
   ScrollView,
   Modal,
+  Image,
 } from "react-native";
-import { useSelector } from "react-redux";
-import { useNavigation } from "@react-navigation/native";
-import { LinearGradient } from "expo-linear-gradient";
+import { Dropdown } from "react-native-element-dropdown";
 import Icon from "react-native-vector-icons/FontAwesome";
 import config from "../config";
 
 const DressingPage = () => {
-  const user = useSelector((state) => state.user.value);
-  const [clothes, setClothes] = useState([]);
-  const [childClothes, setChildClothes] = useState([]);
-  const [editingItemId, setEditingItemId] = useState(null);
-  const [editingLabel, setEditingLabel] = useState("");
-  const navigation = useNavigation();
+  const [clothingItems, setClothingItems] = useState([]);
+  const [children, setChildren] = useState([]);
+  const [activePerson, setActivePerson] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [newClothing, setNewClothing] = useState({
     label: "",
-    category: "haut",
+    category: "",
     forChild: false,
+    childId: null,
   });
+  const [value, setValue] = useState(null);
+  const [isFocus, setIsFocus] = useState(false);
 
-  const fetchClothes = async () => {
-    try {
-      // Récupérer vêtements adultes
-      const adultResponse = await fetch(`${config.API_BASE_URL}/api/dressing`, { credentials: "include" });
-      const adultData = await adultResponse.json();
-      if (adultResponse.ok) {
-        setClothes(adultData.data);
-        console.log("Vêtements adultes récupérés :", adultData.data);
-      } else {
-        console.error("Erreur lors de la récupération des vêtements adultes :", adultData.message);
-      }
-  
-      // Récupérer vêtements enfants
-      const childResponse = await fetch(`${config.API_BASE_URL}/api/dressing?child=true`, { credentials: "include" });
-      const childData = await childResponse.json();
-      if (childResponse.ok) {
-        setChildClothes(childData.data);
-        console.log("Vêtements enfants récupérés :", childData.data);
-      } else {
-        console.error("Erreur lors de la récupération des vêtements enfants :", childData.message);
-      }
-    } catch (error) {
-      console.error("Erreur lors de la récupération des vêtements :", error);
-    }
-  };
-  
-  useEffect(() => {
-    if (user && user._id) {
-      fetchClothes();
-    }
-  }, [user]);
+  const categories = [
+    { label: "Haut", value: "haut" },
+    { label: "Bas", value: "bas" },
+    { label: "Accessoire", value: "accessoire" },
+    { label: "Chaussure", value: "chaussure" },
+  ];
 
   // Fonction pour regrouper les vêtements par catégorie
   const groupByCategory = (items) => {
@@ -74,302 +46,234 @@ const DressingPage = () => {
     }, {});
   };
 
- 
-  // Regrouper les vêtements adultes par catégorie
-  const groupedClothes = groupByCategory(clothes);
+  const fetchDressing = async () => {
+    try {
+      const response = await fetch(`${config.API_BASE_URL}/api/dressing`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          include: "credentials",
+        },
+      });
 
-  // Transformer l'objet en tableau pour FlatList
-  const groupedClothesArray = Object.entries(groupedClothes); // [ ["haut", [...]], ["bas", [...]] ]
-
-  // Regrouper les vêtements des enfants par catégorie
-const groupedChildClothes = groupByCategory(childClothes);
-const groupedChildClothesArray = Object.entries(groupedChildClothes); // [ ["haut", [...]], ["bas", [...]] ]
-
-// Ajouter un vêtement 
-
-const GetCloth = async () =>{
-
-  try {
-    const response = await fetch(`${config.API_BASE_URL}/api/dressing`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    });
-    const data = await response.json();
-    console.log("Données récupérées get :", data);
-   
-    if (response.ok) {
-      console.log("Données récupérées get :", data);
-      setClothes(data.data); // Met à jour l'état local avec les vêtements récupérés
-    } else {
-      console.error("Erreur lors de la récupération des vêtements :", data.message);
+      const data = await response.json();
+      if (data) {
+        setClothingItems(data.data);
+        setChildren(data.children);
+      }
+    } catch (error) {
+      console.error("Error fetching dressing items:", error);
     }
-  } catch (error) {
-    console.error("Erreur lors de la récupération des vêtements :", error);
-  }
+  };
 
-};
-
-useEffect(() => {
-  GetCloth();}, []);
-
-  const handleAddClothes = () => {
-    console.log("Données envoyées :", newClothing);
-
-    // Validation : Vérifiez que le label et la catégorie sont renseignés
-    if (!newClothing.label || !newClothing.category) {
-      Alert.alert("Erreur", "Veuillez entrer un nom pour le vêtement et sélectionner une catégorie.");
+  const handleAddClothing = async (cloth) => {
+    if (!cloth.label.trim()) {
+      alert("Veuillez entrer un nom pour le vêtement.");
+      return;
+    }
+    if (!cloth.category) {
+      alert("Veuillez sélectionner une catégorie.");
       return;
     }
 
+    try {
+      const response = await fetch(`${config.API_BASE_URL}/api/dressing`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          include: "credentials",
+        },
+        body: JSON.stringify(cloth),
+      });
 
-    fetch(`${config.API_BASE_URL}/api/dressing`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(newClothing),
-    })
-    .then((res) => res.json())
-    .then((data) => {
-      console.log("Données récupérées :", data);
-      if (data && data.message === "Vêtement ajouté avec succès") {
-
-        setClothes((prev) => [...prev, data.item]);
-
-        
-        setNewClothing({ label: "", category: "haut", forChild: false });
-        setModalVisible(false);
-        Alert.alert("Succès", "Vêtement ajouté avec succès !");
-      } else {
-        Alert.alert("Erreur", "Impossible d'ajouter le vêtement.");
-      }
-    })
-    .catch(() => Alert.alert("Erreur", "Impossible d'ajouter le vêtement."));
-};
-// Fonction pour supprimer un vêtement
-
-  const handleDelete = (id, forChild = false, childId = null) => {
-     if (!id) {
-       console.error("ID invalide pour la suppression :", id);
-       Alert.alert("Erreur", "Impossible de supprimer le vêtement : ID invalide.");
-       return;
+      const data = await response.json();
+      fetchDressing();
+      closeModal();
+    } catch (error) {
+      console.error("Error adding clothing item:", error);
     }
+  };
 
-    const url = forChild
-      ? `${config.API_BASE_URL}/api/dressing/${id}?childId=${childId}`
-      : `${config.API_BASE_URL}/api/dressing/${id}`;
+  const handleDeleteClothing = async (
+    clothingId,
+    forChild = false,
+    childId = null
+  ) => {
+    try {
+      await fetch(`${config.API_BASE_URL}/api/dressing`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          include: "credentials",
+        },
+        body: JSON.stringify({ clothingId, childId, forChild }),
+      });
 
-      console.log("URL de suppression :", url);
+      fetchDressing();
+    } catch (error) {
+      console.error("Error deleting clothing item:", error);
+    }
+  };
 
-    fetch(url, {
-       method: "DELETE",
-       credentials: "include",
-       })
-      .then((res) => {
-      console.log("Statut de la réponse :", res.status);
-        if (!res.ok) {
-          throw new Error(`Erreur HTTP : ${res.status}`);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        console.log("Réponse de l'API :", data);
-
-        if (data.message === "Vêtement supprimé avec succès") {
-          setClothes((prev) => prev.filter((item) => item._id !== id));
-        Alert.alert("Succès", "Vêtement supprimé avec succès !");
-      } else {
-        Alert.alert("Erreur", data.message || "Impossible de supprimer le vêtement.");
-      }
-    })
-    .catch((err) => {
-      console.error("Erreur lors de la suppression :", err);
-      Alert.alert("Erreur", "Impossible de supprimer le vêtement. Veuillez réessayer.");
+  const closeModal = () => {
+    setModalVisible(false);
+    setActivePerson(null);
+    setNewClothing({
+      label: "",
+      category: "",
+      forChild: false,
+      childId: null,
     });
-};
-
-  const handleEditSubmit = (id, forChild = false, childId = null) => {
-    const url = forChild
-      ? `${config.API_BASE_URL}/api/dressing/${id}?childId=${childId}`
-      : `${config.API_BASE_URL}/api/dressing/${id}`;
-
-    fetch(url, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ label: editingLabel }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.message === "Vêtement mis à jour avec succès") {
-          const updater = (prev) =>
-            prev.map((item) =>
-              item._id === id ? { ...item, label: editingLabel } : item
-            );
-          if (forChild) {
-            setChildClothes(updater);
-          } else {
-            setClothes(updater);
-          }
-          setEditingItemId(null);
-          Alert.alert("Succès", "Vêtement mis à jour avec succès !");
-        } else {
-          Alert.alert("Erreur", "Impossible de mettre à jour le vêtement.");
-        }
-      })
-      .catch(() => Alert.alert("Erreur", "Impossible de mettre à jour le vêtement."));
   };
-  const renderItem = ({ item, forChild = false}) => {
-    const [category, items] = item;
-    const isChildClothing = forChild;
 
-
-    return (
-      <View>
-        <Text style={styles.categoryTitle}>
-  {category.charAt(0).toUpperCase() + category.slice(1)}
-</Text>
-        {items.map((clothingItem, index) => (
-          <View key={clothingItem._id || `${clothingItem.label}-${index}`} style={styles.card}>
-            <Text style={styles.label}>{clothingItem.label}</Text>
-            <TouchableOpacity
-              style={styles.deleteButton} 
-              onPress={() => handleDelete(clothingItem._id, isChildClothing, clothingItem.childId)}
-            >
-              <Icon name="times" size={20} color="#FF5C5C" /> {/* Icône croix */}
-            </TouchableOpacity>
-          </View>
-        ))}s
-      </View>
-    );
+  const openModal = (person, childId, forChild) => {
+    setModalVisible(true);
+    setActivePerson(person);
+    setNewClothing({
+      label: "",
+      category: "",
+      forChild: forChild,
+      childId: childId,
+    });
   };
+
+  useEffect(() => {
+    fetchDressing();
+  }, []);
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
-      <FlatList
-      
-        ListHeaderComponent={
-          <View>
-            
-            <Text style={styles.sectionTitle}>Ma garde robe :</Text>
-            <View style={{ width: "60%", alignSelf: "center" }}>
-              <LinearGradient
-                colors={["#34C8E8", "#4E4AF2"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.gradientButton}
-              >
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    setModalVisible(true);
-                  }}
-                >
-                  <Text style={styles.btnText}>+ Ajouter un vêtement</Text>
-                </TouchableOpacity>
-              </LinearGradient>
-            </View>
-          </View>
-        }
-        data={groupedClothesArray}
-        renderItem={({ item }) => renderItem({ item, forChild: false })}
-        keyExtractor={(item) => item[0]}
-        contentContainerStyle={styles.container}
-        
+    <ScrollView style={styles.container}>
+      <Image
+        source={require("../assets/Ellipse.png")}
+        style={[styles.ellipse, styles.bottomLeft]}
       />
-
-      <FlatList
-        ListHeaderComponent={
-          <View>
-            <Text style={styles.sectionTitle}>Sa garde robe :</Text>
-            <View style={{ width: "60%", alignSelf: "center" }}>
-              <LinearGradient
-                colors={["#34C8E8", "#4E4AF2"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.gradientButton}
-              >
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    setModalVisible(true);
-                    setNewClothing((prev) => ({ ...prev, forChild: true, childId: "ID_DE_L_ENFANT" }));
-                  }}
-                >
-                  <Text style={styles.btnText}>+ Ajouter un vêtement</Text>
-                </TouchableOpacity>
-              </LinearGradient>
-            </View>
-          </View>
-        }
-        data={groupedChildClothesArray}
-        renderItem={({ item }) => renderItem({ item, forChild: true })}
-        keyExtractor={(item) => item[0]}
-        contentContainerStyle={styles.container}
+      {/* Ellipse Top Right */}
+      <Image
+        source={require("../assets/Ellipse.png")}
+        style={[styles.ellipse, styles.topRight]}
       />
+      {/* Dressing principal */}
+      <View>
+        <Text style={styles.sectionTitle}>Ma Garde-robe</Text>
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => openModal("Utilisateur principal", null, false)}
+        >
+          <Text style={styles.addClothText}>Ajouter un vêtement</Text>
+        </TouchableOpacity>
+        {Object.entries(groupByCategory(clothingItems)).map(
+          ([category, items]) => (
+            <View key={category}>
+              <Text style={styles.categoryTitle}>{category}</Text>
+              {items.map((item) => (
+                <View style={styles.card} key={item._id}>
+                  <Text style={{ color: "black" }}>{item.label}</Text>
+                  <TouchableOpacity
+                    style={styles.deleteButton}
+                    onPress={() => handleDeleteClothing(item._id)}
+                  >
+                    <Icon
+                      name="times"
+                      size={20}
+                      color="#FF5C5C"
+                      style={{ marginLeft: 5 }}
+                    />
+                  </TouchableOpacity>
+                </View>
+              ))}
+              <View style={styles.separator} />
+            </View>
+          )
+        )}
+      </View>
 
-      {/* Modale pour ajouter un vêtement */}
+      {/* Dressing des enfants */}
+      {children.map((child) => (
+        <View key={child._id}>
+          <Text style={styles.sectionTitle}>Garde-robe de {child.name}</Text>
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => openModal(child.name, child._id, true)}
+          >
+            <Text style={styles.addClothText}>
+              Ajouter un vêtement pour {child.name}
+            </Text>
+          </TouchableOpacity>
+          {Object.entries(groupByCategory(child.dressing)).map(
+            ([category, items]) => (
+              <View key={category}>
+                <Text style={styles.categoryTitle}>{category}</Text>
+                {items.map((item) => (
+                  <View style={styles.card} key={item._id}>
+                    <Text style={{ color: "black" }}>{item.label}</Text>
+                    <TouchableOpacity
+                      style={styles.deleteButton}
+                      onPress={() =>
+                        handleDeleteClothing(item._id, true, child._id)
+                      }
+                    >
+                      <Icon name="times" size={20} color="#FF5C5C" />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
+            )
+          )}
+        </View>
+      ))}
+
+      {/* Modal pour ajouter un vêtement */}
       <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(false);
-          setNewClothing({ label: "", category: "haut", forChild: false });
-        }}
+        onRequestClose={closeModal}
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Ajouter un vêtement</Text>
+            <Text style={styles.modalTitle}>
+              Ajouter un vêtement pour {activePerson || "Utilisateur"}
+            </Text>
             <TextInput
-              placeholder="Type de vêtement (ex: jupe, pull)"
+              placeholder="Nom du vêtement"
+              placeholderTextColor={"#999"}
               value={newClothing.label}
-              onChangeText={(text) => setNewClothing({ ...newClothing, label: text })}
+              onChangeText={(text) =>
+                setNewClothing({ ...newClothing, label: text })
+              }
               style={styles.input}
             />
-
-<View style={styles.dropdownContainer}>
-  <Text style={styles.categoryLabel}>Catégorie :</Text>
-  <TouchableOpacity
-    onPress={() => setShowCategoryDropdown(!showCategoryDropdown)}
-    style={styles.dropdownButton}
-  >
-    <Text style={styles.dropdownText}>{newClothing.category}</Text>
-  </TouchableOpacity>
-
-  {showCategoryDropdown && (
-    <View style={styles.dropdownList}>
-      {["haut", "bas", "accessoire", "chaussure"].map((category) => (
-        <TouchableOpacity
-          key={category}
-          onPress={() => {
-            setNewClothing({ ...newClothing, category });
-            setShowCategoryDropdown(false);
-          }}
-          style={styles.dropdownItem}
-        >
-          <Text style={styles.dropdownItemText}>{category}</Text>
-        </TouchableOpacity>
-      ))}
-    </View>
-  )}
-</View>
-
-            <TouchableOpacity onPress={handleAddClothes} style={styles.submitButton}>
+            <View style={styles.dropdownContainer}>
+              <Dropdown
+                style={[styles.dropdown, isFocus && { borderColor: "blue" }]}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                data={categories}
+                labelField="label"
+                valueField="value"
+                placeholder="Sélectionnez une catégorie"
+                value={value}
+                onFocus={() => setIsFocus(true)}
+                onBlur={() => setIsFocus(false)}
+                onChange={(item) => {
+                  setValue(item.value);
+                  setNewClothing({ ...newClothing, category: item.value });
+                }}
+              />
+            </View>
+            <TouchableOpacity
+              onPress={() => handleAddClothing(newClothing)}
+              style={styles.submitButton}
+            >
               <Text style={styles.submitButtonText}>Ajouter</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setModalVisible(false)}
-              style={styles.closeButton}
-            >
+            <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
               <Text style={styles.closeButtonText}>Annuler</Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -379,190 +283,132 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingTop: 90,
     backgroundColor: "#FFFFFF",
-    
   },
   sectionTitle: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
-    fontFamily: "Poppins-SemiBold",
-    textAlign: "center",
-    
+    margin: 0,
   },
-
-  
-  card: {
-    width: "80%",
-    marginVertical: 8,
-    flex: 1,
-    margin: 5,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 10,
-    elevation: 2,
-    shadowColor: "#000",
-  },
-  label: {
-    fontSize: 16,
-    fontFamily: "Poppins-Medium",
-  },
-  badge: {
-    fontSize: 12,
-    color: "#555",
-    fontFamily: "Poppins-Regular",
-  },
-  gradientButton: {
-    borderRadius: 5,
-    overflow: "hidden",
-    alignSelf: "flex-start",
-    marginVertical: 5,
-    paddingHorizontal: 0,
-  },
-  button: {
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    alignItems: "center",
-  },
-  btnText: {
-    color: "#fff",
-    fontSize: 16,
-    fontFamily: "Poppins-SemiBold",
-  },
-  input: {
-    fontSize: 16,
-    fontFamily: "Poppins-Medium",
-    borderBottomWidth: 1,
-    borderColor: "#ccc",
-    marginBottom: 5,
-    
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    width: "90%",
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 20,
-    maxHeight: "80%",
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-  },
-  modalTitle: {
+  categoryTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    fontFamily: "Poppins-SemiBold",
-    marginBottom: 15,
-    width: "60%"
-  },
-  dropdownContainer: {
     marginVertical: 10,
   },
-  categoryLabel: {
-    fontSize: 16,
-    fontFamily: "Poppins-Medium",
-    marginBottom: 5,
-  },
-  dropdownButton: {
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-  },
-  dropdownButtonText: {
-    fontSize: 16,
-    fontFamily: "Poppins-Regular",
-  },
-  dropdownList: {
-    marginTop: 5,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
+  card: {
+    width: "70%",
+    alignContent: "center",
+    marginVertical: 8,
+    flex: 1,
     backgroundColor: "#fff",
-  },
-  dropdownItem: {
-    padding: 10,
-  },
-  dropdownItemText: {
-    fontSize: 16,
-  },
-  forChildToggle: {
-    marginVertical: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  toggleButton: {
-    padding: 10,
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-  },
-  toggleButtonActive: {
-    backgroundColor: "#4E4AF2",
-  },
-  toggleButtonText: {
-    color: "#000",
+    padding: 8,
+    borderRadius: 10,
+    marginBottom: 10,
+    marginHorizontal: 10,
+    flexDirection: "row",
+    gap: 10,
+    justifyContent: "space-between",
   },
   addButton: {
     backgroundColor: "#4E4AF2",
     padding: 12,
     borderRadius: 5,
-    marginTop: 10,
+    marginTop: 20,
+    width: "80%",
+    alignItems: "center",
   },
-  addButtonText: {
-    color: "#fff",
-    fontFamily: "Poppins-SemiBold",
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 15,
+    width: "60%",
     textAlign: "center",
   },
-  cancelButton: {
-    marginTop: 10,
+  dropdownContainer: {
+    marginVertical: 10,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: "80%",
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 10,
+    alignItems: "center",
+    gap: 10,
+    justifyContent: "center",
+  },
+  input: {
+    fontSize: 16,
+    borderWidth: 1,
+    borderRadius: 5,
+    borderColor: "#ccc",
+    marginBottom: 5,
+    backgroundColor: "#FFFBFB",
+    width: "80%",
+    textAlign: "center",
     padding: 10,
   },
-  cancelButtonText: {
-    textAlign: "center",
-    color: "#4E4AF2",
-    fontFamily: "Poppins-SemiBold",
+  dropdown: {
+    margin: 16,
+    height: 50,
+    width: 220,
+    borderBottomColor: "gray",
+    borderBottomWidth: 0.5,
   },
   submitButton: {
-    backgroundColor: "#4E4AF2", // Couleur de fond
-    paddingVertical: 12,
+    backgroundColor: "#4E4AF2",
+    padding: 12,
     borderRadius: 5,
-    marginTop: 20, // Espacement avec le champ de saisie
-    width: "100%",  // Pour faire occuper toute la largeur de la modale
+    marginTop: 20,
+    width: "80%",
+    alignItems: "center",
   },
   submitButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontFamily: "Poppins-SemiBold",
-    textAlign: "center",
+    color: "white",
+    fontWeight: "bold",
   },
   closeButton: {
-    marginTop: 15, // Espacement avec le bouton Ajouter
-    paddingVertical: 12,
-    borderWidth: 1,
-    borderColor: "#4E4AF2",
+    backgroundColor: "#FF5C5C",
+    padding: 12,
     borderRadius: 5,
-    width: "100%",  // Pour faire occuper toute la largeur de la modale
+    width: "80%",
+    alignItems: "center",
   },
   closeButtonText: {
-    color: "#4E4AF2",
-    fontSize: 16,
-    fontFamily: "Poppins-SemiBold",
-    textAlign: "center",
+    color: "white",
+    fontWeight: "bold",
   },
-  deleteButton: {
-    position: "absolute", // Positionner l'icône à l'extérieur du card
-    top: 8, // Espacement par rapport au haut du card
-    right: 8, // Espacement par rapport à la droite du card
-    width: 20,
-
+  ellipse: {
+    position: "absolute",
+    width: 700,
+    height: 700,
+    resizeMode: "contain",
+  },
+  bottomLeft: {
+    bottom: 40,
+    left: -70,
+  },
+  topRight: {
+    top: 280,
+    right: -100,
+  },
+  addClothText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    fontFamily: "Poppins",
+    color: "#fff",
+  },
+  separator: {
+    height: 1,
+    backgroundColor: "#000",
+    marginVertical: 10,
+    width: "90%",
+    alignSelf: "center",
   },
 });
 
