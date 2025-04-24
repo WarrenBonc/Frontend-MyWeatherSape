@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
+import { LinearGradient } from "expo-linear-gradient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   StyleSheet,
@@ -389,6 +392,13 @@ const HomePage = () => {
     fetchRecommendations();
   }, [city, selectedDay]);
 
+  // Réinitialiser l'affichage du dropdown lors du retour sur HomeScreen
+  useFocusEffect(
+    useCallback(() => {
+      setShowDropdown(false);
+    }, [])
+  );
+
   const fetchAllWeatherData = async () => {
     try {
       const fetchData = await fetch(
@@ -451,6 +461,7 @@ const HomePage = () => {
         data={[{}]}
         keyExtractor={() => "static"}
         contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
         renderItem={() => (
           <>
             <View style={styles.header}>
@@ -1147,7 +1158,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 25,
-    backgroundColor: "#7D62E0",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 10,
