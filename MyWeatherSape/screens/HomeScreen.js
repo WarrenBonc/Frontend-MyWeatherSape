@@ -390,14 +390,11 @@ const HomePage = () => {
     fetchRecommendations();
   }, [city, selectedDay]);
 
-  // Masquer la dropdown uniquement si aucun champ n'est en focus (en utilisant TextInput.State)
+  // Réinitialiser l'affichage du dropdown lors du retour sur HomeScreen
   useFocusEffect(
     useCallback(() => {
-      const focusedInput = TextInput.State.currentlyFocusedInput?.();
-      if (!focusedInput) {
-        setShowDropdown(false);
-      }
-    }, [searchCity])
+      setShowDropdown(false);
+    }, [])
   );
 
   const fetchAllWeatherData = async () => {
@@ -784,7 +781,7 @@ const HomePage = () => {
                     <Text style={{ color: "#fff", fontSize: 16 }}>
                       {selectedChild
                         ? `${selectedChild}`
-                        : "Sélectionner le sexe de l'enfant"}
+                        : "Sexe"}
                     </Text>
                   </TouchableOpacity>
                 </LinearGradient>
