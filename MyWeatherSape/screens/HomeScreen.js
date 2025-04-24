@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
@@ -388,6 +390,16 @@ const HomePage = () => {
     fetchRecommendations();
   }, [city, selectedDay]);
 
+  // Masquer la dropdown uniquement si aucun champ n'est en focus (en utilisant TextInput.State)
+  useFocusEffect(
+    useCallback(() => {
+      const focusedInput = TextInput.State.currentlyFocusedInput?.();
+      if (!focusedInput) {
+        setShowDropdown(false);
+      }
+    }, [searchCity])
+  );
+
   const fetchAllWeatherData = async () => {
     try {
       const fetchData = await fetch(
@@ -447,6 +459,7 @@ const HomePage = () => {
         data={[{}]}
         keyExtractor={() => 'static'}
         contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
         renderItem={() => (
           <>
       <View style={styles.header}>
@@ -473,6 +486,7 @@ const HomePage = () => {
                 await fetchAllWeatherData();
                 await saveSearch(searchCity.trim());
                 setShowDropdown(false);
+                Keyboard.dismiss(); // Fermer le clavier après la recherche
               }
             }}
             placeholderTextColor="#999"
@@ -499,6 +513,8 @@ const HomePage = () => {
               borderRadius: 10,
               marginTop: 5,
             }}
+            nestedScrollEnabled={true}
+            keyboardShouldPersistTaps="handled"
           >
             {(() => {
               // Tri des recherches récentes : favoris d'abord
