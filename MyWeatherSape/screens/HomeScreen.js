@@ -491,7 +491,14 @@ const HomePage = () => {
           )}
         </View>
         {showDropdown && recentSearches.length > 0 && (
-          <View style={{ backgroundColor: "#fff", borderRadius: 10, marginTop: 5 }}>
+          <ScrollView
+            style={{
+              maxHeight: 150,
+              backgroundColor: "#fff",
+              borderRadius: 10,
+              marginTop: 5,
+            }}
+          >
             {(() => {
               // Tri des recherches récentes : favoris d'abord
               const sortedSearches = [...recentSearches].sort((a, b) => {
@@ -551,7 +558,7 @@ const HomePage = () => {
                 </View>
               ));
             })()}
-          </View>
+          </ScrollView>
         )}
       </View>
       <View style={styles.daySelector}>
