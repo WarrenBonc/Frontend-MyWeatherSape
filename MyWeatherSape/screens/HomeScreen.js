@@ -102,7 +102,7 @@ const HomePage = () => {
     const updatedHistory = [
       cityName,
       ...recentSearches.filter((c) => c !== cityName),
-    ].slice(0, 5);
+    ].slice(0, 3);
     await AsyncStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
     setRecentSearches(updatedHistory);
   };
@@ -509,23 +509,20 @@ const HomePage = () => {
                 )}
               </View>
               {showDropdown && recentSearches.length > 0 && (
-                <View
+                <ScrollView
                   style={{
+                    maxHeight: 160,
                     backgroundColor: "#fff",
                     borderRadius: 10,
                     marginTop: 5,
                   }}
                 >
                   {(() => {
-                    // Tri des recherches récentes : favoris d'abord
                     const sortedSearches = [...recentSearches].sort((a, b) => {
                       const aFav = favorites.includes(a) ? 0 : 1;
                       const bFav = favorites.includes(b) ? 0 : 1;
                       if (aFav !== bFav) return aFav - bFav;
-                      // Optionally: keep original order for same favorite status
-                      return (
-                        recentSearches.indexOf(a) - recentSearches.indexOf(b)
-                      );
+                      return recentSearches.indexOf(a) - recentSearches.indexOf(b);
                     });
                     return sortedSearches.map((item, index) => (
                       <View
@@ -535,8 +532,7 @@ const HomePage = () => {
                           alignItems: "center",
                           justifyContent: "space-between",
                           padding: 10,
-                          borderBottomWidth:
-                            index !== sortedSearches.length - 1 ? 1 : 0,
+                          borderBottomWidth: index !== sortedSearches.length - 1 ? 1 : 0,
                           borderColor: "#ccc",
                         }}
                       >
@@ -551,9 +547,7 @@ const HomePage = () => {
                         >
                           <Text style={{ fontSize: 16 }}>{item}</Text>
                         </TouchableOpacity>
-                        <View
-                          style={{ flexDirection: "row", alignItems: "center" }}
-                        >
+                        <View style={{ flexDirection: "row", alignItems: "center" }}>
                           <TouchableOpacity
                             onPress={() => toggleFavorite(item)}
                             style={{ marginHorizontal: 6 }}
@@ -580,7 +574,7 @@ const HomePage = () => {
                       </View>
                     ));
                   })()}
-                </View>
+                </ScrollView>
               )}
             </View>
             <View style={styles.daySelector}>
@@ -688,12 +682,17 @@ const HomePage = () => {
                     <View style={{ width: "100%", height: "100%" }}>
                       <View style={styles.crossContainer}>
                         <TouchableOpacity onPress={() => setCreateChild(false)}>
-                          <View style={styles.circleCross}>
+                          <LinearGradient
+                            colors={["#34C8E8", "#4E4AF2"]}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
+                            style={styles.circleCross}
+                          >
                             <Image
                               style={{ width: 30, height: 30 }}
                               source={require("../assets/cross.png")}
                             />
-                          </View>
+                          </LinearGradient>
                         </TouchableOpacity>
                         <Text style={styles.crossText}>Ajouter un enfant</Text>
                       </View>
@@ -772,42 +771,43 @@ const HomePage = () => {
                         value={childName}
                         onChangeText={setChildName}
                       />
-                      <TouchableOpacity
-                        style={{
-                          backgroundColor: "#007BFF",
-                          padding: 10,
-                          borderRadius: 5,
-                          marginTop: 20,
-                          width: "80%",
-                          alignItems: "center",
-                        }}
-                        onPress={() => setIsModalVisible(true)}
-                      >
-                        <Text style={{ color: "#fff", fontSize: 16 }}>
-                          {selectedChild
-                            ? `${selectedChild}`
-                            : "Sélectionner le sexe de l'enfant"}
-                        </Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={{
-                          backgroundColor: "#007BFF",
-                          padding: 10,
-                          borderRadius: 5,
-                          marginTop: 20,
-                          width: "80%",
-                          alignItems: "center",
-                        }}
-                        onPress={handleAddChild}
-                      >
-                        <Text
+                      <TouchableOpacity onPress={() => setIsModalVisible(true)}>
+                        <LinearGradient
+                          colors={["#34C8E8", "#4E4AF2"]}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 1 }}
                           style={{
-                            color: "#fff",
-                            fontSize: 16,
+                            padding: 10,
+                            borderRadius: 5,
+                            marginTop: 20,
+                            width: 290,
+                            alignItems: "center",
                           }}
                         >
-                          Valider
-                        </Text>
+                          <Text style={{ color: "#fff", fontSize: 16 }}>
+                            {selectedChild
+                              ? `${selectedChild}`
+                              : "Sexe"}
+                          </Text>
+                        </LinearGradient>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={handleAddChild}>
+                        <LinearGradient
+                          colors={["#34C8E8", "#4E4AF2"]}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 1 }}
+                          style={{
+                            padding: 10,
+                            borderRadius: 5,
+                            marginTop: 20,
+                            width: 290,
+                            alignItems: "center",
+                          }}
+                        >
+                          <Text style={{ color: "#fff", fontSize: 16 }}>
+                            Valider
+                          </Text>
+                        </LinearGradient>
                       </TouchableOpacity>
                       {/* Modal pour sélectionner le sexe */}
                       <Modal

@@ -13,6 +13,7 @@ import {
 import { Dropdown } from "react-native-element-dropdown";
 import Icon from "react-native-vector-icons/FontAwesome";
 import config from "../config";
+import { LinearGradient } from 'expo-linear-gradient';
 
 const DressingPage = () => {
   const [clothingItems, setClothingItems] = useState([]);
@@ -29,10 +30,10 @@ const DressingPage = () => {
   const [isFocus, setIsFocus] = useState(false);
 
   const categories = [
-    { label: "Haut", value: "haut" },
-    { label: "Bas", value: "bas" },
-    { label: "Accessoire", value: "accessoire" },
-    { label: "Chaussure", value: "chaussure" },
+    { label: "Haut", value: "Haut" },
+    { label: "Bas", value: "Bas" },
+    { label: "Accessoire", value: "Accessoire" },
+    { label: "Chaussure", value: "Chaussure" },
   ];
 
   // Fonction pour regrouper les vêtements par catégorie
@@ -143,6 +144,7 @@ const DressingPage = () => {
 
   return (
     <ScrollView style={styles.container}>
+      <Text style={styles.pageTitle}>Dressing</Text>
       <Image
         source={require("../assets/Ellipse.png")}
         style={[styles.ellipse, styles.bottomLeft]}
@@ -155,11 +157,15 @@ const DressingPage = () => {
       {/* Dressing principal */}
       <View>
         <Text style={styles.sectionTitle}>Ma Garde-robe</Text>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => openModal("Utilisateur principal", null, false)}
-        >
-          <Text style={styles.addClothText}>Ajouter un vêtement</Text>
+        <TouchableOpacity onPress={() => openModal("Utilisateur principal", null, false)}>
+          <LinearGradient
+            colors={['#34C8E8', '#4E4AF2']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.gradientButton}
+          >
+            <Text style={styles.addClothText}>Ajouter un vêtement</Text>
+          </LinearGradient>
         </TouchableOpacity>
         {Object.entries(groupByCategory(clothingItems)).map(
           ([category, items]) => (
@@ -191,13 +197,17 @@ const DressingPage = () => {
       {children.map((child) => (
         <View key={child._id}>
           <Text style={styles.sectionTitle}>Garde-robe de {child.name}</Text>
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => openModal(child.name, child._id, true)}
-          >
-            <Text style={styles.addClothText}>
-              Ajouter un vêtement pour {child.name}
-            </Text>
+          <TouchableOpacity onPress={() => openModal(child.name, child._id, true)}>
+            <LinearGradient
+              colors={['#34C8E8', '#4E4AF2']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.gradientButton}
+            >
+              <Text style={styles.addClothText}>
+                Ajouter un vêtement pour {child.name}
+              </Text>
+            </LinearGradient>
           </TouchableOpacity>
           {Object.entries(groupByCategory(child.dressing)).map(
             ([category, items]) => (
@@ -261,11 +271,15 @@ const DressingPage = () => {
                 }}
               />
             </View>
-            <TouchableOpacity
-              onPress={() => handleAddClothing(newClothing)}
-              style={styles.submitButton}
-            >
-              <Text style={styles.submitButtonText}>Ajouter</Text>
+            <TouchableOpacity onPress={() => handleAddClothing(newClothing)}>
+              <LinearGradient
+                colors={['#34C8E8', '#4E4AF2']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.gradientButton}
+              >
+                <Text style={styles.submitButtonText}>Ajouter</Text>
+              </LinearGradient>
             </TouchableOpacity>
             <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
               <Text style={styles.closeButtonText}>Annuler</Text>
@@ -410,6 +424,21 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     width: "90%",
     alignSelf: "center",
+  },
+  gradientButton: {
+    padding: 12,
+    borderRadius: 5,
+    marginTop: 20,
+    width: 237,
+    alignItems: 'center',
+  },
+  pageTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    fontFamily: "Poppins",
+    color: "#222",
+    marginBottom: 20,
+    marginTop: -30,
   },
 });
 
