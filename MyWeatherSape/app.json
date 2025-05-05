@@ -7,7 +7,6 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-    
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.teamweather.myweathersape"
@@ -22,10 +21,13 @@
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION"
       ]
-
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-localization",
+      "expo-web-browser"
+    ]
   }
 }
