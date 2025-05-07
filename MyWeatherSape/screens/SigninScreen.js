@@ -30,7 +30,7 @@ const SigninPage = ({ navigation }) => {
       setError("Veuillez entrer votre email et mot de passe.");
       return;
     }
-
+    console.log("url", `${config.API_BASE_URL}/api/users/signin`);
     setLoading(true);
     setError(""); // Réinitialise l'erreur avant de commencer la requête
 
@@ -146,7 +146,6 @@ const SigninPage = ({ navigation }) => {
               <Text style={styles.buttonText}>Se connecter</Text>
             </TouchableOpacity>
           </LinearGradient>
-
         </View>
         {/* pas de compte ? créer un compte */}
         <TouchableOpacity

@@ -9,10 +9,10 @@ const getLocalIp = () => {
 
   // Si debuggerHost n'est pas défini, essaie l'IP locale (fallback sur 192.168.0.44)
   // Ou tu peux remplacer avec ton adresse IP locale
-  return "192.168.1.45"; // Remplacer par l'IP de ton réseau local
+  return "192.168.0.46"; // Remplacer par l'IP de ton réseau local
 };
 
 const localIp = getLocalIp();
-const API_BASE_URL = `http://${localIp}:3000`;
+const API_BASE_URL = `https://backend-my-weather-sape.vercel.app`;
 
 export default { API_BASE_URL };
