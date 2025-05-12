@@ -3,7 +3,6 @@ import {
   StyleSheet,
   Text,
   View,
-  FlatList,
   TouchableOpacity,
   TextInput,
   ScrollView,
@@ -13,7 +12,7 @@ import {
 import { Dropdown } from "react-native-element-dropdown";
 import Icon from "react-native-vector-icons/FontAwesome";
 import config from "../config";
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient } from "expo-linear-gradient";
 
 const DressingPage = () => {
   const [clothingItems, setClothingItems] = useState([]);
@@ -47,6 +46,7 @@ const DressingPage = () => {
     }, {});
   };
 
+  // Fonction pour récupérer les vêtements
   const fetchDressing = async () => {
     try {
       const response = await fetch(`${config.API_BASE_URL}/api/dressing`, {
@@ -67,6 +67,7 @@ const DressingPage = () => {
     }
   };
 
+  // Fonction pour ajouter un vêtement
   const handleAddClothing = async (cloth) => {
     if (!cloth.label.trim()) {
       alert("Veuillez entrer un nom pour le vêtement.");
@@ -88,6 +89,7 @@ const DressingPage = () => {
       });
 
       const data = await response.json();
+      console.log(data);
       fetchDressing();
       closeModal();
     } catch (error) {
@@ -95,6 +97,7 @@ const DressingPage = () => {
     }
   };
 
+  // Fonction pour supprimer un vêtement
   const handleDeleteClothing = async (
     clothingId,
     forChild = false,
@@ -116,6 +119,7 @@ const DressingPage = () => {
     }
   };
 
+  // Fonction pour fermer le modal
   const closeModal = () => {
     setModalVisible(false);
     setActivePerson(null);
@@ -127,6 +131,7 @@ const DressingPage = () => {
     });
   };
 
+  // Fonction pour ouvrir le modal
   const openModal = (person, childId, forChild) => {
     setModalVisible(true);
     setActivePerson(person);
@@ -138,6 +143,7 @@ const DressingPage = () => {
     });
   };
 
+  // Effect pour récupérer les vêtements au montage
   useEffect(() => {
     fetchDressing();
   }, []);
@@ -157,9 +163,11 @@ const DressingPage = () => {
       {/* Dressing principal */}
       <View>
         <Text style={styles.sectionTitle}>Ma Garde-robe</Text>
-        <TouchableOpacity onPress={() => openModal("Utilisateur principal", null, false)}>
+        <TouchableOpacity
+          onPress={() => openModal("Utilisateur principal", null, false)}
+        >
           <LinearGradient
-            colors={['#34C8E8', '#4E4AF2']}
+            colors={["#34C8E8", "#4E4AF2"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.gradientButton}
@@ -167,6 +175,7 @@ const DressingPage = () => {
             <Text style={styles.addClothText}>Ajouter un vêtement</Text>
           </LinearGradient>
         </TouchableOpacity>
+        {/* Liste des vêtements par catégorie de l'utilisateur principal */}
         {Object.entries(groupByCategory(clothingItems)).map(
           ([category, items]) => (
             <View key={category}>
@@ -197,9 +206,11 @@ const DressingPage = () => {
       {children.map((child) => (
         <View key={child._id}>
           <Text style={styles.sectionTitle}>Garde-robe de {child.name}</Text>
-          <TouchableOpacity onPress={() => openModal(child.name, child._id, true)}>
+          <TouchableOpacity
+            onPress={() => openModal(child.name, child._id, true)}
+          >
             <LinearGradient
-              colors={['#34C8E8', '#4E4AF2']}
+              colors={["#34C8E8", "#4E4AF2"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.gradientButton}
@@ -273,7 +284,7 @@ const DressingPage = () => {
             </View>
             <TouchableOpacity onPress={() => handleAddClothing(newClothing)}>
               <LinearGradient
-                colors={['#34C8E8', '#4E4AF2']}
+                colors={["#34C8E8", "#4E4AF2"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.gradientButton}
@@ -290,7 +301,6 @@ const DressingPage = () => {
     </ScrollView>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -323,14 +333,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 10,
     justifyContent: "space-between",
-  },
-  addButton: {
-    backgroundColor: "#4E4AF2",
-    padding: 12,
-    borderRadius: 5,
-    marginTop: 20,
-    width: "80%",
-    alignItems: "center",
   },
   modalTitle: {
     fontSize: 18,
@@ -430,7 +432,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginTop: 20,
     width: 237,
-    alignItems: 'center',
+    alignItems: "center",
   },
   pageTitle: {
     fontSize: 24,

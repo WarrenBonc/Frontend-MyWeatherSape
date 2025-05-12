@@ -31,11 +31,15 @@ const SignupPage = ({ navigation }) => {
     );
   };
 
+  // fonction pour gérer l'inscription
   const handleSignup = () => {
+    // Regex pour vérifier l'email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Regex pour vérifier la date de naissance
     const dateRegex =
       /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/(19|20)\d{2}$/;
 
+    // Verifications des champs
     if (
       !firstName.trim() ||
       !email.trim() ||
@@ -62,6 +66,7 @@ const SignupPage = ({ navigation }) => {
     }
     setLoading(true);
 
+    // Envoi de la requête à l'API
     fetch(`${config.API_BASE_URL}/api/users/signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

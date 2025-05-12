@@ -1,5 +1,5 @@
 import { useDispatch } from "react-redux";
-import { setToken, setUser, setLoading, setError } from "../reducers/user";
+import { setUser } from "../reducers/user";
 
 import React, { useState } from "react";
 import {
@@ -21,7 +21,6 @@ const SigninPage = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   // Fonction de soumission de formulaire
@@ -67,8 +66,6 @@ const SigninPage = ({ navigation }) => {
         setLoading(false); // Réinitialise l'état de chargement
       });
   };
-
-  // Fonction pour gérer l'oubli de mot de passe
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>

@@ -1,17 +1,19 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { LinearGradient } from 'expo-linear-gradient';
+import React from "react";
+import { Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function LegalScreen() {
   const navigation = useNavigation();
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+      <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        style={styles.backButton}
+      >
         <LinearGradient
-          colors={['#34C8E8', '#4E4AF2']}
+          colors={["#34C8E8", "#4E4AF2"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.backGradient}
@@ -34,12 +36,15 @@ export default function LegalScreen() {
 
       <Text style={styles.sectionTitle}>Collecte des données</Text>
       <Text style={styles.text}>
-        Aucune donnée personnelle n’est collectée sans votre consentement. Les informations recueillies servent uniquement au bon fonctionnement de l’application.
+        Aucune donnée personnelle n’est collectée sans votre consentement. Les
+        informations recueillies servent uniquement au bon fonctionnement de
+        l’application.
       </Text>
 
       <Text style={styles.sectionTitle}>Propriété intellectuelle</Text>
       <Text style={styles.text}>
-        Tous les contenus présents dans MyWeatherSape sont la propriété de leurs auteurs respectifs et ne peuvent être reproduits sans autorisation.
+        Tous les contenus présents dans MyWeatherSape sont la propriété de leurs
+        auteurs respectifs et ne peuvent être reproduits sans autorisation.
       </Text>
 
       <Text style={styles.sectionTitle}>Contact</Text>
@@ -53,7 +58,7 @@ export default function LegalScreen() {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     flexGrow: 1,
     paddingTop: 50,
   },
@@ -66,31 +71,31 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
   backButtonText: {
-    color: '#fff',
-    fontFamily: 'Poppins-SemiBold',
+    color: "#fff",
+    fontFamily: "Poppins-SemiBold",
     fontSize: 16,
   },
   title: {
     fontSize: 28,
-    fontFamily: 'Poppins-SemiBold',
+    fontFamily: "Poppins-SemiBold",
     marginBottom: 30,
-    color : '222',
-    textAlign: 'center',
-    fontWeight : 'bold'
+    color: "222",
+    textAlign: "center",
+    fontWeight: "bold",
   },
   sectionTitle: {
     fontSize: 18,
-    fontFamily: 'Poppins-SemiBold',
+    fontFamily: "Poppins-SemiBold",
     marginTop: 15,
     marginBottom: 5,
   },
   text: {
     fontSize: 14,
-    fontFamily: 'Poppins-Regular',
-    color: '#333',
+    fontFamily: "Poppins-Regular",
+    color: "#333",
     marginBottom: 10,
   },
 });

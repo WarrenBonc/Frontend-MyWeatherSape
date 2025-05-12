@@ -23,7 +23,6 @@ const store = configureStore({
 import WelcomeScreen from "./screens/WelcomeScreen";
 import SigninScreen from "./screens/SigninScreen";
 import SignupScreen from "./screens/SignupScreen";
-import PreferenceScreen from "./screens/PreferenceScreen";
 import HomeScreen from "./screens/HomeScreen";
 import DressingScreen from "./screens/DressingScreen";
 import SettingsScreen from "./screens/SettingsScreen";
@@ -129,7 +128,6 @@ export default function App() {
           <Stack.Screen name="Signup" component={SignupScreen} />
           <Stack.Screen name="ForgotPassword" component={ForgotPasswordPage} />
           <Stack.Screen name="ResetPassword" component={ResetPassword} />
-          <Stack.Screen name="Preference" component={PreferenceScreen} />
           <Stack.Screen name="MainTabs" component={BottomTabs} />
           <Stack.Screen name="Legal" component={LegalScreen} />
           <Stack.Screen

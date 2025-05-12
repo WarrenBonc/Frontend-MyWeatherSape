@@ -6,19 +6,14 @@ import {
   StyleSheet,
   Image,
   ScrollView,
-  Alert,
-} from "react-native"; // Import des composants de base React Native
-import { useNavigation } from "@react-navigation/native"; // Hook de navigation fourni par React Navigation
-import { useDispatch } from "react-redux"; // Hook Redux pour dispatcher des actions
-import { logout } from "../reducers/user"; // Action logout du reducer utilisateur
-import LegalScreen from "./LegalScreen"; // Composant d'écran légal (utilisé dans la navigation)
-import { LinearGradient } from "expo-linear-gradient"; // Composant pour créer un fond en dégradé
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { useDispatch } from "react-redux";
 import config from "../config";
 export default function SettingsScreen() {
   // Récupération de l'objet navigation pour naviguer entre les écrans
   const navigation = useNavigation();
   // Initialisation du dispatch pour envoyer des actions Redux
-  const dispatch = useDispatch();
 
   // Fonction appelée quand l'utilisateur appuie sur "Déconnexion"
   const handleLogout = async () => {
@@ -36,8 +31,9 @@ export default function SettingsScreen() {
       } else {
         console.error("Erreur lors de la déconnexion :", data.message);
       }
-    } catch (error) {} // Réinitialise les données utilisateur dans le store
-    // Redirige vers l'écran de connexion
+    } catch (error) {
+      console.error("Erreur lors de la déconnexion :", error);
+    }
   };
 
   return (

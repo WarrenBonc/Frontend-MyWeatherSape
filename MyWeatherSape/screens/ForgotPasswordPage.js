@@ -40,8 +40,8 @@ const ForgotPasswordPage = ({ navigation }) => {
       .catch(() => setError("Erreur réseau."))
       .finally(() => setLoading(false));
   };
-
-  const handleVerifyCode = async () => {
+  // fonction pour gérer l'envoi du code de réinitialisation
+  const SendCode = async () => {
     if (!code) {
       setError("Veuillez entrer le code de verification.");
 
@@ -75,7 +75,7 @@ const ForgotPasswordPage = ({ navigation }) => {
       <View style={styles.container}>
         <Text style={styles.title}>Mot de passe oublié</Text>
         <Text style={styles.text}>
-          Saisis ton adresse email pour recevoir un lien de réinitialisation.
+          Saisis ton adresse email pour recevoir un code de verification.
         </Text>
         <TextInput
           style={styles.input}
@@ -107,7 +107,7 @@ const ForgotPasswordPage = ({ navigation }) => {
           onChangeText={setCode}
         />
         {error ? <Text style={styles.error}>{error}</Text> : null}
-        <TouchableOpacity style={styles.button} onPress={handleVerifyCode}>
+        <TouchableOpacity style={styles.button} onPress={SendCode}>
           <Text style={styles.buttonText}>
             {loading ? "Envoi..." : "Envoyer le lien"}
           </Text>
@@ -115,28 +115,6 @@ const ForgotPasswordPage = ({ navigation }) => {
       </View>
     );
   }
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Mot de passe oublié</Text>
-      <Text style={styles.text}>
-        Entrez votre adresse email, afin de réinitialiser votre mot de passe
-      </Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
-      />
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-      <TouchableOpacity style={styles.button} onPress={handleSendResetLink}>
-        <Text style={styles.buttonText}>
-          {loading ? "Envoi..." : "RÉINITIALISER"}
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
 };
 
 const styles = StyleSheet.create({

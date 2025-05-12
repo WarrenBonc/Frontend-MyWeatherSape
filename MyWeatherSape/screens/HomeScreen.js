@@ -40,6 +40,7 @@ const HomePage = () => {
   const [childName, setChildName] = useState("");
   const [children, setChildren] = useState([]);
   const [fetchedChildren, setFetchedChildren] = useState([]);
+  const [createChild, setCreateChild] = useState(true);
 
   const [selectedDay, setSelectedDay] = useState(0);
   const [searchCity, setSearchCity] = useState("");
@@ -47,12 +48,19 @@ const HomePage = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [favorites, setFavorites] = useState([]);
 
+  const childrenOptions = [
+    { label: "Garçon", value: "child1" },
+    { label: "Fille", value: "child2" },
+  ];
+
   const loadSearchHistory = async () => {
     const history = await AsyncStorage.getItem("searchHistory");
     if (history) setRecentSearches(JSON.parse(history));
     // else setRecentSearches([]); // optional
   };
-
+  {
+    /* Fonction pour charger les favoris */
+  }
   const loadFavorites = async () => {
     try {
       const favs = await AsyncStorage.getItem("favorites");
@@ -65,12 +73,16 @@ const HomePage = () => {
       setFavorites([]);
     }
   };
-
+  {
+    /* Fonction pour sauvegarder les favoris */
+  }
   const saveFavorites = async (favArr) => {
     setFavorites(favArr);
     await AsyncStorage.setItem("favorites", JSON.stringify(favArr));
   };
-
+  {
+    /* Fonction pour ajouter/supprimer un favori */
+  }
   const toggleFavorite = async (cityName) => {
     let updatedFavorites;
     if (favorites.includes(cityName)) {
@@ -83,7 +95,9 @@ const HomePage = () => {
     }
     await saveFavorites(updatedFavorites);
   };
-
+  {
+    /* Fonction pour supprimer une recherche */
+  }
   const removeSearch = async (cityName) => {
     const updatedSearches = recentSearches.filter((c) => c !== cityName);
     await AsyncStorage.setItem(
@@ -97,7 +111,9 @@ const HomePage = () => {
       await saveFavorites(updatedFavorites);
     }
   };
-
+  {
+    /* Fonction pour ajouter une recherche */
+  }
   const saveSearch = async (cityName) => {
     const updatedHistory = [
       cityName,
@@ -106,18 +122,18 @@ const HomePage = () => {
     await AsyncStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
     setRecentSearches(updatedHistory);
   };
-
+  {
+    /* Chargement des favoris et recherches */
+  }
   useEffect(() => {
     loadSearchHistory();
     loadFavorites();
   }, []);
   const [tips, setTips] = useState("Chargement des recommandations...");
 
-  const childrenOptions = [
-    { label: "Garçon", value: "child1" },
-    { label: "Fille", value: "child2" },
-  ];
-
+  {
+    /* Fonction pour récupérer le libellé d'un jour */
+  }
   const getLabelForDay = (dayOffset) => {
     const daysOfWeek = [
       "Dimanche",
@@ -153,7 +169,9 @@ const HomePage = () => {
 
     return `${dayName} ${day} ${monthName}`;
   };
-
+  {
+    /* Fonction pour ajouter un enfant */
+  }
   const handleAddChild = async () => {
     if (!childName || !selectedChild) {
       Alert.alert("Erreur", "Veuillez remplir tous les champs.");
@@ -193,7 +211,9 @@ const HomePage = () => {
       Alert.alert("Erreur", "Impossible de communiquer avec le serveur.");
     }
   };
-
+  {
+    /* Fonction pour récupérer les enfants */
+  }
   const getChild = async () => {
     try {
       const response = await fetch(
@@ -226,7 +246,9 @@ const HomePage = () => {
   useEffect(() => {
     getChild();
   }, []);
-
+  {
+    /* Fonction pour récupérer la localisation */
+  }
   const fetchUserLocation = async () => {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -266,7 +288,9 @@ const HomePage = () => {
       dispatch(setCity("Paris"));
     }
   };
-
+  {
+    /* Fonction pour récupérer les recommandations pour l'utilisateur */
+  }
   const fetchRecommendations = async () => {
     try {
       const response = await fetch(
@@ -327,7 +351,9 @@ const HomePage = () => {
       Alert.alert("Erreur", "Impossible de supprimer l'enfant.");
     }
   };
-
+  {
+    /* Fonction pour récupérer les recommandations pour les enfants */
+  }
   const fetchChildRecommendations = async (childid) => {
     if (fetchedChildren.includes(childid)) return; // Évite les doublons
 
@@ -375,7 +401,7 @@ const HomePage = () => {
       );
     }
   };
-
+  // Effect pour récupérer les recommandations pour les enfants
   useEffect(() => {
     children.forEach((child) => {
       if (!fetchedChildren.includes(child._id)) {
@@ -383,11 +409,11 @@ const HomePage = () => {
       }
     });
   }, [city, selectedDay, children]);
-
+  // Effect pour récupérer la localisation
   useEffect(() => {
     fetchUserLocation();
   }, []);
-
+  // Effect pour récupérer les recommandations trigger quand on change de ville ou de jour
   useEffect(() => {
     fetchRecommendations();
   }, [city, selectedDay]);
@@ -398,7 +424,9 @@ const HomePage = () => {
       setShowDropdown(false);
     }, [])
   );
-
+  {
+    /* Fonction pour récupérer toutes les météo */
+  }
   const fetchAllWeatherData = async () => {
     try {
       const fetchData = await fetch(
@@ -445,12 +473,10 @@ const HomePage = () => {
       console.error("Erreur météo :", error.message);
     }
   };
-
+  // Effect pour charger toutes les météo
   useEffect(() => {
     fetchAllWeatherData();
   }, [city]);
-
-  const [createChild, setCreateChild] = useState(true);
 
   return (
     <TouchableWithoutFeedback
@@ -475,7 +501,7 @@ const HomePage = () => {
                 style={[styles.ellipse, styles.topRight]}
               />
               <Text style={styles.logoText}>MyWeatherSape</Text>
-
+              {/* Barre de recherche */}
               <View style={styles.searchContainer}>
                 <TextInput
                   style={styles.searchInput}
@@ -508,6 +534,7 @@ const HomePage = () => {
                   </TouchableOpacity>
                 )}
               </View>
+              {/* Liste de recherches récentes */}
               {showDropdown && recentSearches.length > 0 && (
                 <ScrollView
                   style={{
@@ -522,7 +549,9 @@ const HomePage = () => {
                       const aFav = favorites.includes(a) ? 0 : 1;
                       const bFav = favorites.includes(b) ? 0 : 1;
                       if (aFav !== bFav) return aFav - bFav;
-                      return recentSearches.indexOf(a) - recentSearches.indexOf(b);
+                      return (
+                        recentSearches.indexOf(a) - recentSearches.indexOf(b)
+                      );
                     });
                     return sortedSearches.map((item, index) => (
                       <View
@@ -532,7 +561,8 @@ const HomePage = () => {
                           alignItems: "center",
                           justifyContent: "space-between",
                           padding: 10,
-                          borderBottomWidth: index !== sortedSearches.length - 1 ? 1 : 0,
+                          borderBottomWidth:
+                            index !== sortedSearches.length - 1 ? 1 : 0,
                           borderColor: "#ccc",
                         }}
                       >
@@ -547,7 +577,9 @@ const HomePage = () => {
                         >
                           <Text style={{ fontSize: 16 }}>{item}</Text>
                         </TouchableOpacity>
-                        <View style={{ flexDirection: "row", alignItems: "center" }}>
+                        <View
+                          style={{ flexDirection: "row", alignItems: "center" }}
+                        >
                           <TouchableOpacity
                             onPress={() => toggleFavorite(item)}
                             style={{ marginHorizontal: 6 }}
@@ -577,6 +609,7 @@ const HomePage = () => {
                 </ScrollView>
               )}
             </View>
+            {/* Sélecteur de jours */}
             <View style={styles.daySelector}>
               <Text
                 style={styles.arrow}
@@ -597,6 +630,7 @@ const HomePage = () => {
               </Text>
             </View>
             <View style={styles.swipercontainer}>
+              {/* Premiers Widgets : metéo + chart */}
               <PagerView
                 style={styles.wrapper}
                 horizontal={false}
@@ -620,6 +654,7 @@ const HomePage = () => {
               </View>
             </View>
             <View style={styles.swipercontainer}>
+              {/* Seconds Widgets : recommandations + enfants */}
               <PagerView
                 style={styles.wrapper}
                 horizontal={false}
@@ -785,9 +820,7 @@ const HomePage = () => {
                           }}
                         >
                           <Text style={{ color: "#fff", fontSize: 16 }}>
-                            {selectedChild
-                              ? `${selectedChild}`
-                              : "Sexe"}
+                            {selectedChild ? `${selectedChild}` : "Sexe"}
                           </Text>
                         </LinearGradient>
                       </TouchableOpacity>
@@ -920,50 +953,6 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins",
     color: "#222",
   },
-  city: {
-    fontSize: 32,
-    marginTop: 10,
-    fontWeight: "300",
-    fontFamily: "Poppins",
-    textAlign: "center",
-    marginBottom: 4,
-  },
-  temp: {
-    fontSize: 72,
-    fontWeight: "bold",
-    fontFamily: "Poppins",
-    textAlign: "center",
-  },
-  feelsLike: {
-    fontSize: 16,
-    fontFamily: "Poppins",
-    textAlign: "center",
-    color: "#444",
-    marginBottom: 20,
-  },
-  condition: {
-    fontSize: 18,
-    textAlign: "center",
-    fontFamily: "Poppins",
-    color: "#666",
-    marginBottom: 20,
-  },
-  advice: {
-    fontSize: 18,
-    fontFamily: "Poppins",
-    backgroundColor: "#f9f9f9",
-    borderRadius: 12,
-    padding: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 3,
-    marginBottom: 20,
-  },
-  block: {
-    marginVertical: 15,
-  },
   title: {
     fontWeight: "bold",
     fontSize: 16,
@@ -984,40 +973,6 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 16,
-  },
-  hourCard: {
-    backgroundColor: "#f2f2f2",
-    borderRadius: 10,
-    padding: 10,
-    marginRight: 10,
-    alignItems: "center",
-    width: 80,
-  },
-  hour: {
-    fontSize: 16,
-    fontWeight: "600",
-    fontFamily: "Poppins",
-  },
-  tempHour: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginVertical: 5,
-    fontFamily: "Poppins",
-  },
-  conditionHour: {
-    fontSize: 12,
-    color: "#666",
-    textAlign: "center",
-  },
-  tag: {
-    fontSize: 14,
-    fontFamily: "Poppins",
-    color: "#555",
-    backgroundColor: "#e0e0e0",
-    borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    marginRight: 6,
   },
   daySelector: {
     flexDirection: "row",
@@ -1082,16 +1037,6 @@ const styles = StyleSheet.create({
   },
   wrapper: {
     height: "100%",
-    width: "205%",
-    display: "flex",
-    borderRadius: 20,
-    gap: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fff",
-  },
-  wrappers: {
-    height: "60%",
     width: "205%",
     display: "flex",
     borderRadius: 20,

@@ -14,6 +14,7 @@ const ResetPassword = ({ navigation }) => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // fonction pour réinitialiser le mot de passe
   const handleResetPassword = async () => {
     if (newPassword !== confirmPassword) {
       setError("Les mots de passe ne correspondent pas.");

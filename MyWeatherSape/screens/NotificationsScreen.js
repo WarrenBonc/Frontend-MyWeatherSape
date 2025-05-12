@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react'; // Import des hooks React
-import { View, Text, Switch, StyleSheet, TouchableOpacity, Alert } from 'react-native'; // Composants natifs
-import { LinearGradient } from 'expo-linear-gradient'; // Pour le dégradé du bouton retour
-import * as Notifications from 'expo-notifications'; // Pour gérer les notifications
-import { useSelector } from 'react-redux';
-import config from '../config';
-import { useIsFocused } from '@react-navigation/native'; // pour re-fetcher les données quand l'écran est actif
+import React, { useState, useEffect } from "react"; // Import des hooks React
+import { View, Text, Switch, StyleSheet, TouchableOpacity } from "react-native"; // Composants natifs
+import { LinearGradient } from "expo-linear-gradient"; // Pour le dégradé du bouton retour
+import * as Notifications from "expo-notifications"; // Pour gérer les notifications
+import config from "../config";
+import { useIsFocused } from "@react-navigation/native"; // pour re-fetcher les données quand l'écran est actif
 
 export default function NotificationsScreen({ navigation }) {
   // États pour gérer si les notifications sont activées
@@ -13,18 +12,23 @@ export default function NotificationsScreen({ navigation }) {
   const isFocused = useIsFocused();
 
   // Active/désactive les notifications
-  const toggleSwitch = () => setNotificationsEnabled(previousState => !previousState);
+  const toggleSwitch = () =>
+    setNotificationsEnabled((previousState) => !previousState);
 
   // Sauvegarde automatique des préférences à chaque changement
   useEffect(() => {
+    // Fonction pour sauvegarder les préférences
     const savePref = async () => {
       try {
-        await fetch(`${config.API_BASE_URL}/api/notifications/save-preferences`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ preferences: { notificationsEnabled } }),
-          credentials: 'include',
-        });
+        await fetch(
+          `${config.API_BASE_URL}/api/notifications/save-preferences`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ preferences: { notificationsEnabled } }),
+            credentials: "include",
+          }
+        );
       } catch (e) {
         console.error("❌ Erreur sauvegarde auto notif :", e);
       }
@@ -37,32 +41,40 @@ export default function NotificationsScreen({ navigation }) {
 
   // Demande la permission d'envoyer des notifications lors du premier rendu du composant
   useEffect(() => {
+    // Fonction pour demander la permission d'envoyer des notifications
     const requestPermissions = async () => {
       const { status } = await Notifications.requestPermissionsAsync();
-      if (status !== 'granted') {
-        alert('Les notifications ne sont pas autorisées');
+      if (status !== "granted") {
+        alert("Les notifications ne sont pas autorisées");
       }
     };
     requestPermissions();
   }, []);
 
+  // Effect pour récupérer les préférences lorsque l'écran est actif
   useEffect(() => {
     const fetchPreferences = async () => {
       try {
-        const response = await fetch(`${config.API_BASE_URL}/api/notifications/preferences`, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Cache-Control': 'no-cache',
-          },
-          credentials: 'include',
-        });
+        const response = await fetch(
+          `${config.API_BASE_URL}/api/notifications/preferences`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "Cache-Control": "no-cache",
+            },
+            credentials: "include",
+          }
+        );
         const data = await response.json();
-        if (data && typeof data.notificationsEnabled === 'boolean') {
+        if (data && typeof data.notificationsEnabled === "boolean") {
           setNotificationsEnabled(data.notificationsEnabled);
           setHasLoadedPreferences(true);
         }
       } catch (error) {
-        console.error("❌ Erreur lors de la récupération des préférences :", error);
+        console.error(
+          "❌ Erreur lors de la récupération des préférences :",
+          error
+        );
       }
     };
 
@@ -97,13 +109,12 @@ export default function NotificationsScreen({ navigation }) {
     scheduleNotifications();
   }, [notificationsEnabled]); // Re-déclenche à chaque changement
 
-
   return (
     <View style={styles.container}>
       {/* Bouton retour avec dégradé */}
       <TouchableOpacity onPress={() => navigation.goBack()}>
         <LinearGradient
-          colors={['#34C8E8', '#4E4AF2']}
+          colors={["#34C8E8", "#4E4AF2"]}
           style={styles.backButton}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
@@ -120,7 +131,6 @@ export default function NotificationsScreen({ navigation }) {
         <Text>Activer les notifications</Text>
         <Switch value={notificationsEnabled} onValueChange={toggleSwitch} />
       </View>
-
     </View>
   );
 }
@@ -130,45 +140,45 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 100,
     paddingHorizontal: 20,
-    backgroundColor: 'white',
+    backgroundColor: "white",
   },
   backButton: {
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
     marginBottom: 0,
     marginTop: -50,
     zIndex: 1,
   },
   backButtonText: {
-    color: '#fff',
-    fontFamily: 'Poppins-SemiBold',
+    color: "#fff",
+    fontFamily: "Poppins-SemiBold",
     fontSize: 16,
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 30,
-    textAlign: 'center',
+    textAlign: "center",
   },
   subtitle: {
     fontSize: 18,
-    fontWeight: '500',
+    fontWeight: "500",
     marginBottom: 10,
   },
   option: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 20,
   },
   saveButton: {
     marginTop: 30,
-    alignSelf: 'center',
-    width: '60%',
+    alignSelf: "center",
+    width: "60%",
     borderRadius: 10,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   saveButtonGradient: {
     paddingVertical: 12,
@@ -176,9 +186,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   saveButtonText: {
-    color: 'white',
-    textAlign: 'center',
+    color: "white",
+    textAlign: "center",
     fontSize: 16,
-    fontFamily: 'Poppins-SemiBold',
+    fontFamily: "Poppins-SemiBold",
   },
 });
