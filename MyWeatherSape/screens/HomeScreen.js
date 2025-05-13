@@ -494,13 +494,22 @@ const HomePage = () => {
               <Image
                 source={require("../assets/Ellipse.png")}
                 style={[styles.ellipse, styles.bottomLeft]}
+                accessibilityLabel="Ellipse en bas à gauche"
+                accessibilityRole="image"
               />
               {/* Ellipse Top Right */}
               <Image
                 source={require("../assets/Ellipse.png")}
                 style={[styles.ellipse, styles.topRight]}
+                accessibilityLabel="Ellipse en haut à droite"
+                accessibilityRole="image"
               />
-              <Text style={styles.logoText}>MyWeatherSape</Text>
+              <Text
+                style={styles.logoText}
+                accessibilityLabel="Logo MyWeatherSape"
+              >
+                MyWeatherSape
+              </Text>
               {/* Barre de recherche */}
               <View style={styles.searchContainer}>
                 <TextInput
@@ -518,10 +527,14 @@ const HomePage = () => {
                   }}
                   placeholderTextColor="#999"
                   onFocus={() => setShowDropdown(true)}
+                  accessibilityLabel="Champ de recherche"
+                  accessibilityRole="search"
                 />
                 {searchCity.trim() !== "" && (
                   <TouchableOpacity
                     onPress={() => toggleFavorite(searchCity.trim())}
+                    accessibilityLabel="Ajouter ou retirer des favoris"
+                    accessibilityRole="button"
                   >
                     <Image
                       source={
@@ -530,6 +543,8 @@ const HomePage = () => {
                           : require("../assets/heart_outline.png")
                       }
                       style={{ width: 24, height: 24, marginLeft: 10 }}
+                      accessibilityLabel="Icône de cœur favoris"
+                      accessibilityRole="image"
                     />
                   </TouchableOpacity>
                 )}
@@ -543,6 +558,8 @@ const HomePage = () => {
                     borderRadius: 10,
                     marginTop: 5,
                   }}
+                  accessibilityLabel="Liste des recherches récentes"
+                  accessibilityRole="list"
                 >
                   {(() => {
                     const sortedSearches = [...recentSearches].sort((a, b) => {
@@ -574,8 +591,15 @@ const HomePage = () => {
                             fetchAllWeatherData();
                             setShowDropdown(false);
                           }}
+                          accessibilityLabel={`Sélectionner la ville ${item}`}
+                          accessibilityRole="button"
                         >
-                          <Text style={{ fontSize: 16 }}>{item}</Text>
+                          <Text
+                            style={{ fontSize: 16 }}
+                            accessibilityLabel={item}
+                          >
+                            {item}
+                          </Text>
                         </TouchableOpacity>
                         <View
                           style={{ flexDirection: "row", alignItems: "center" }}
@@ -583,6 +607,8 @@ const HomePage = () => {
                           <TouchableOpacity
                             onPress={() => toggleFavorite(item)}
                             style={{ marginHorizontal: 6 }}
+                            accessibilityLabel={`Ajouter ou retirer ${item} des favoris`}
+                            accessibilityRole="button"
                           >
                             <Image
                               source={
@@ -591,15 +617,21 @@ const HomePage = () => {
                                   : require("../assets/heart_outline.png")
                               }
                               style={{ width: 24, height: 24 }}
+                              accessibilityLabel={`Icône de cœur favoris pour ${item}`}
+                              accessibilityRole="image"
                             />
                           </TouchableOpacity>
                           <TouchableOpacity
                             onPress={() => removeSearch(item)}
                             style={{ marginHorizontal: 6 }}
+                            accessibilityLabel={`Supprimer ${item} de la liste`}
+                            accessibilityRole="button"
                           >
                             <Image
                               source={require("../assets/trash.png")}
                               style={{ width: 24, height: 30 }}
+                              accessibilityLabel={`Icône de poubelle pour ${item}`}
+                              accessibilityRole="image"
                             />
                           </TouchableOpacity>
                         </View>
@@ -616,15 +648,21 @@ const HomePage = () => {
                 onPress={() =>
                   selectedDay > 0 && setSelectedDay(selectedDay - 1)
                 }
+                accessibilityLabel="Jour précédent"
+                accessibilityRole="button"
               >
                 ←
               </Text>
-              <Text style={styles.date}>{getLabelForDay(selectedDay)}</Text>
+              <Text style={styles.date} accessibilityLabel="Jour sélectionné">
+                {getLabelForDay(selectedDay)}
+              </Text>
               <Text
                 style={styles.arrow}
                 onPress={() =>
                   selectedDay < 5 && setSelectedDay(selectedDay + 1)
                 }
+                accessibilityLabel="Jour suivant"
+                accessibilityRole="button"
               >
                 →
               </Text>
@@ -636,6 +674,8 @@ const HomePage = () => {
                 horizontal={false}
                 pageMargin={10}
                 onPageSelected={(e) => setCurrentSlide(e.nativeEvent.position)}
+                accessibilityLabel="Swiper des widgets"
+                accessibilityRole="carousel"
               >
                 <View style={styles.widgetmeteo}>
                   <WeatherDisplay num={selectedDay} city={city} />
@@ -647,9 +687,13 @@ const HomePage = () => {
               <View style={styles.pagination}>
                 <View
                   style={[styles.dot, currentSlide === 0 && styles.dotActive]}
+                  accessibilityLabel="Point de pagination 1"
+                  accessibilityRole="dot"
                 />
                 <View
                   style={[styles.dot, currentSlide === 1 && styles.dotActive]}
+                  accessibilityLabel="Point de pagination 2"
+                  accessibilityRole="dot"
                 />
               </View>
             </View>
@@ -660,6 +704,8 @@ const HomePage = () => {
                 horizontal={false}
                 pageMargin={10}
                 onPageSelected={(e) => setCurrentSlide2(e.nativeEvent.position)}
+                accessibilityLabel="Swiper des widgets"
+                accessibilityRole="carousel"
               >
                 {/* Slide 1 : Recommandations */}
                 <View style={styles.widgetTips}>
@@ -671,12 +717,16 @@ const HomePage = () => {
                       <Image
                         source={require("../assets/tshirt.png")}
                         style={{ width: 70, height: 70 }}
+                        accessibilityLabel="Icône de t-shirt"
+                        accessibilityRole="image"
                       />
                     </View>
 
                     <ScrollView
                       style={styles.tipsScroll}
                       contentContainerStyle={styles.tipsScrollContent}
+                      accessibilityLabel="Liste des recommandations"
+                      accessibilityRole="list"
                     >
                       <Text style={styles.tips}>{tips}</Text>
                     </ScrollView>
@@ -694,12 +744,16 @@ const HomePage = () => {
                         <Image
                           source={require("../assets/tshirt.png")}
                           style={{ width: 50, height: 50 }}
+                          accessibilityLabel="Icône de t-shirt pour enfant"
+                          accessibilityRole="image"
                         />
                       </View>
 
                       <ScrollView
                         style={styles.tipsScroll}
                         contentContainerStyle={styles.tipsScrollContent}
+                        accessibilityLabel={`Recommandations pour ${child.name}`}
+                        accessibilityRole="list"
                       >
                         <Text style={styles.tips}>
                           {child.recommendation ||
@@ -722,6 +776,8 @@ const HomePage = () => {
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 1 }}
                             style={styles.circleCross}
+                            accessibilityLabel="Fermer la création d'enfant"
+                            accessibilityRole="button"
                           >
                             <Image
                               style={{ width: 30, height: 30 }}
@@ -791,6 +847,8 @@ const HomePage = () => {
                       <TouchableOpacity
                         style={{ position: "absolute", top: 20, right: 20 }}
                         onPress={() => setCreateChild(true)}
+                        accessibilityLabel="Ajouter un enfant"
+                        accessibilityRole="button"
                       >
                         <Image
                           style={{
@@ -805,6 +863,8 @@ const HomePage = () => {
                         style={styles.input}
                         value={childName}
                         onChangeText={setChildName}
+                        accessibilityLabel="Champ de texte : Prenom"
+                        accessibilityRole="text"
                       />
                       <TouchableOpacity onPress={() => setIsModalVisible(true)}>
                         <LinearGradient
@@ -818,6 +878,8 @@ const HomePage = () => {
                             width: 290,
                             alignItems: "center",
                           }}
+                          accessibilityLabel="Icône de sexe"
+                          accessibilityRole="image"
                         >
                           <Text style={{ color: "#fff", fontSize: 16 }}>
                             {selectedChild ? `${selectedChild}` : "Sexe"}
@@ -836,6 +898,8 @@ const HomePage = () => {
                             width: 290,
                             alignItems: "center",
                           }}
+                          accessibilityLabel="Bouton valider"
+                          accessibilityRole="button"
                         >
                           <Text style={{ color: "#fff", fontSize: 16 }}>
                             Valider
@@ -888,6 +952,8 @@ const HomePage = () => {
                                     setSelectedChild(item.label);
                                     setIsModalVisible(false);
                                   }}
+                                  accessibilityLabel={`Sélectionner ${item.label}`}
+                                  accessibilityRole="button"
                                 >
                                   <Text style={{ fontSize: 16, color: "#333" }}>
                                     {item.label}
@@ -901,6 +967,8 @@ const HomePage = () => {
                                 alignItems: "center",
                               }}
                               onPress={() => setIsModalVisible(false)}
+                              accessibilityLabel="Fermer"
+                              accessibilityRole="button"
                             >
                               <Text style={{ fontSize: 16, color: "#007BFF" }}>
                                 Fermer

@@ -154,17 +154,23 @@ const DressingPage = () => {
       <Image
         source={require("../assets/Ellipse.png")}
         style={[styles.ellipse, styles.bottomLeft]}
+        accessibilityLabel="Ellipse en bas à gauche"
+        accessibilityRole="image"
       />
       {/* Ellipse Top Right */}
       <Image
         source={require("../assets/Ellipse.png")}
         style={[styles.ellipse, styles.topRight]}
+        accessibilityLabel="Ellipse en haut à droite"
+        accessibilityRole="image"
       />
       {/* Dressing principal */}
       <View>
         <Text style={styles.sectionTitle}>Ma Garde-robe</Text>
         <TouchableOpacity
           onPress={() => openModal("Utilisateur principal", null, false)}
+          accessibilityLabel="Ajouter un vêtement"
+          accessibilityRole="button"
         >
           <LinearGradient
             colors={["#34C8E8", "#4E4AF2"]}
@@ -186,6 +192,8 @@ const DressingPage = () => {
                   <TouchableOpacity
                     style={styles.deleteButton}
                     onPress={() => handleDeleteClothing(item._id)}
+                    accessibilityLabel="Supprimer"
+                    accessibilityRole="button"
                   >
                     <Icon
                       name="times"
@@ -208,6 +216,8 @@ const DressingPage = () => {
           <Text style={styles.sectionTitle}>Garde-robe de {child.name}</Text>
           <TouchableOpacity
             onPress={() => openModal(child.name, child._id, true)}
+            accessibilityLabel="Ajouter un vêtement pour enfant"
+            accessibilityRole="button"
           >
             <LinearGradient
               colors={["#34C8E8", "#4E4AF2"]}
@@ -232,6 +242,8 @@ const DressingPage = () => {
                       onPress={() =>
                         handleDeleteClothing(item._id, true, child._id)
                       }
+                      accessibilityLabel="Supprimer"
+                      accessibilityRole="button"
                     >
                       <Icon name="times" size={20} color="#FF5C5C" />
                     </TouchableOpacity>
@@ -263,6 +275,8 @@ const DressingPage = () => {
                 setNewClothing({ ...newClothing, label: text })
               }
               style={styles.input}
+              accessibilityLabel="Nom du vêtement"
+              accessibilityRole="text"
             />
             <View style={styles.dropdownContainer}>
               <Dropdown
@@ -280,9 +294,15 @@ const DressingPage = () => {
                   setValue(item.value);
                   setNewClothing({ ...newClothing, category: item.value });
                 }}
+                accessibilityLabel="Catégorie"
+                accessibilityRole="button"
               />
             </View>
-            <TouchableOpacity onPress={() => handleAddClothing(newClothing)}>
+            <TouchableOpacity
+              onPress={() => handleAddClothing(newClothing)}
+              accessibilityLabel="Ajouter"
+              accessibilityRole="button"
+            >
               <LinearGradient
                 colors={["#34C8E8", "#4E4AF2"]}
                 start={{ x: 0, y: 0 }}

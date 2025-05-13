@@ -7,10 +7,18 @@ export default function LegalScreen() {
   const navigation = useNavigation();
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView
+      contentContainerStyle={styles.container}
+      accessible={true}
+      accessibilityLabel="Mentions légales de l'application"
+    >
+      {/* Bouton retour */}
       <TouchableOpacity
         onPress={() => navigation.goBack()}
         style={styles.backButton}
+        accessibilityLabel="Retour"
+        accessibilityRole="button"
+        accessibilityHint="Revenir à l'écran précédent"
       >
         <LinearGradient
           colors={["#34C8E8", "#4E4AF2"]}
@@ -22,32 +30,74 @@ export default function LegalScreen() {
         </LinearGradient>
       </TouchableOpacity>
 
-      <Text style={styles.title}>Mentions légales</Text>
+      {/* Titre principal */}
+      <Text
+        style={styles.title}
+        accessibilityRole="header"
+        accessibilityLabel="Mentions légales"
+      >
+        Mentions légales
+      </Text>
 
-      <Text style={styles.sectionTitle}>Éditeur de l’application</Text>
+      {/* Section : Éditeur */}
+      <Text
+        style={styles.sectionTitle}
+        accessibilityRole="header"
+        accessibilityLabel="Éditeur de l'application"
+      >
+        Éditeur de l’application
+      </Text>
       <Text style={styles.text}>
         MyWeatherSape est éditée par KWP, situé en France.
       </Text>
 
-      <Text style={styles.sectionTitle}>Hébergement</Text>
+      {/* Section : Hébergement */}
+      <Text
+        style={styles.sectionTitle}
+        accessibilityRole="header"
+        accessibilityLabel="Hébergement"
+      >
+        Hébergement
+      </Text>
       <Text style={styles.text}>
         L’application est hébergée par Chuck Norris, situé au Texas.
       </Text>
 
-      <Text style={styles.sectionTitle}>Collecte des données</Text>
+      {/* Section : Données */}
+      <Text
+        style={styles.sectionTitle}
+        accessibilityRole="header"
+        accessibilityLabel="Collecte des données"
+      >
+        Collecte des données
+      </Text>
       <Text style={styles.text}>
         Aucune donnée personnelle n’est collectée sans votre consentement. Les
         informations recueillies servent uniquement au bon fonctionnement de
         l’application.
       </Text>
 
-      <Text style={styles.sectionTitle}>Propriété intellectuelle</Text>
+      {/* Section : Propriété */}
+      <Text
+        style={styles.sectionTitle}
+        accessibilityRole="header"
+        accessibilityLabel="Propriété intellectuelle"
+      >
+        Propriété intellectuelle
+      </Text>
       <Text style={styles.text}>
         Tous les contenus présents dans MyWeatherSape sont la propriété de leurs
         auteurs respectifs et ne peuvent être reproduits sans autorisation.
       </Text>
 
-      <Text style={styles.sectionTitle}>Contact</Text>
+      {/* Section : Contact */}
+      <Text
+        style={styles.sectionTitle}
+        accessibilityRole="header"
+        accessibilityLabel="Contact"
+      >
+        Contact
+      </Text>
       <Text style={styles.text}>
         Pour toute question, veuillez nous contacter à : myweathersape@gmail.com
       </Text>

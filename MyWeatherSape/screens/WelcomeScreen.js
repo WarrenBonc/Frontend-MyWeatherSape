@@ -15,6 +15,7 @@ const Welcome = ({ navigation }) => {
       source={require("../assets/bg-cloud.png")}
       style={styles.bgImage}
       blurRadius={7}
+      accessible={false}
     >
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <View style={styles.container}>
@@ -25,8 +26,15 @@ const Welcome = ({ navigation }) => {
               justifyContent: "center",
               alignItems: "center",
             }}
+            accessible={true}
+            accessibilityRole="image"
+            accessibilityLabel="Logo de l'application MyWeatherSape"
           >
-            <Image source={require("../assets/Logo.png")} style={styles.logo} />
+            <Image
+              source={require("../assets/Logo.png")}
+              style={styles.logo}
+              accessibilityIgnoresInvertColors={false}
+            />
           </View>
 
           <View
@@ -37,6 +45,7 @@ const Welcome = ({ navigation }) => {
               alignItems: "center",
               marginBottom: 140,
             }}
+            importantForAccessibility="yes"
           >
             <Text
               style={{
@@ -45,9 +54,12 @@ const Welcome = ({ navigation }) => {
                 textAlign: "center",
                 marginBottom: 40,
               }}
+              accessibilityRole="header"
+              accessible={true}
             >
               Bienvenue dans MyWeatherSape !
             </Text>
+
             <Text
               style={{
                 fontSize: 18,
@@ -55,9 +67,11 @@ const Welcome = ({ navigation }) => {
                 textAlign: "center",
                 marginBottom: 20,
               }}
+              accessible={true}
             >
-              Ne vous posez plus la question de comment vous habiller !{" "}
+              Ne vous posez plus la question de comment vous habiller !
             </Text>
+
             <Text
               style={{
                 fontSize: 15,
@@ -65,15 +79,17 @@ const Welcome = ({ navigation }) => {
                 textAlign: "center",
                 padding: 10,
               }}
+              accessible={true}
             >
               MyWeatherSape est une application simple et ludique qui vous aide
               à trouver en un instant une tenue adaptée à la météo.
             </Text>
+
             <LinearGradient
               colors={["#34C8E8", "#4E4AF2"]}
               start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }} // Dégradé horizontal
-              locations={[0, 0.99]} // La couleur #4E4AF2 commence à 85% de la largeur
+              end={{ x: 1, y: 0 }}
+              locations={[0, 0.99]}
               style={{
                 borderRadius: 5,
                 marginTop: 20,
@@ -86,6 +102,9 @@ const Welcome = ({ navigation }) => {
             >
               <TouchableOpacity
                 onPress={() => navigation.navigate("SignIn")}
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel="Continuer vers la page de connexion"
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
@@ -108,7 +127,9 @@ const Welcome = ({ navigation }) => {
                 </Text>
                 <Image
                   source={require("../assets/fleche.png")}
-                  style={{ width: "20", height: 15, resizeMode: "contain" }}
+                  style={{ width: 20, height: 15, resizeMode: "contain" }}
+                  accessible={true}
+                  accessibilityLabel="Icône de flèche pointant vers la droite"
                 />
               </TouchableOpacity>
             </LinearGradient>

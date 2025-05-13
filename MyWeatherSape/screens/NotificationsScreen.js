@@ -110,9 +110,18 @@ export default function NotificationsScreen({ navigation }) {
   }, [notificationsEnabled]); // Re-déclenche à chaque changement
 
   return (
-    <View style={styles.container}>
+    <View
+      style={styles.container}
+      accessible={true}
+      accessibilityLabel="Écran des paramètres de notifications"
+    >
       {/* Bouton retour avec dégradé */}
-      <TouchableOpacity onPress={() => navigation.goBack()}>
+      <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        accessibilityLabel="Retour à l'écran précédent"
+        accessibilityRole="button"
+        accessibilityHint="Revenir à la page précédente"
+      >
         <LinearGradient
           colors={["#34C8E8", "#4E4AF2"]}
           style={styles.backButton}
@@ -124,12 +133,30 @@ export default function NotificationsScreen({ navigation }) {
       </TouchableOpacity>
 
       {/* Titre de la page */}
-      <Text style={styles.title}>Notifications</Text>
+      <Text style={styles.title} accessibilityRole="header">
+        Notifications
+      </Text>
 
       {/* Switch principal pour activer ou non les notifications */}
       <View style={styles.option}>
-        <Text>Activer les notifications</Text>
-        <Switch value={notificationsEnabled} onValueChange={toggleSwitch} />
+        <Text
+          accessible={true}
+          accessibilityRole="text"
+          accessibilityLabel="Activer les notifications"
+        >
+          Activer les notifications
+        </Text>
+        <Switch
+          value={notificationsEnabled}
+          onValueChange={toggleSwitch}
+          accessibilityLabel="Bouton d'activation des notifications"
+          accessibilityHint={
+            notificationsEnabled
+              ? "Désactiver les notifications"
+              : "Activer les notifications"
+          }
+          accessibilityRole="switch"
+        />
       </View>
     </View>
   );

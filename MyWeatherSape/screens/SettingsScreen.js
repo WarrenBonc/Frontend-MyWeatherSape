@@ -37,46 +37,73 @@ export default function SettingsScreen() {
   };
 
   return (
-    // Conteneur principal de l'écran
-    <View style={styles.container}>
+    <View
+      style={styles.container}
+      accessible={true}
+      accessibilityLabel="Écran des paramètres"
+    >
       {/* Image de fond bleue */}
       <Image
         source={require("../assets/Ellipse.png")}
         style={styles.background}
+        accessible={false}
+        accessibilityIgnoresInvertColors
       />
 
       {/* Conteneur scrollable pour le contenu */}
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.headerTitle}>Paramètres</Text>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        accessible={true}
+        accessibilityLabel="Contenu des paramètres"
+      >
+        <Text style={styles.headerTitle} accessibilityRole="header">
+          Paramètres
+        </Text>
 
-        {/* Bouton pour aller à la page Notifications */}
+        {/* Bouton Notifications */}
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate("NotificationSettings")}
+          accessibilityLabel="Notifications"
+          accessibilityRole="button"
+          accessibilityHint="Aller à la page de configuration des notifications"
         >
           <Text style={styles.buttonText}>Notifications</Text>
           <Text style={styles.arrow}>→</Text>
         </TouchableOpacity>
 
+        {/* Bouton Modifier mes préférences */}
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate("EditProfile")}
+          accessibilityLabel="Modifier mes préférences"
+          accessibilityRole="button"
+          accessibilityHint="Aller à la page de modification de vos préférences"
         >
           <Text style={styles.buttonText}>Modifier mes préférences</Text>
           <Text style={styles.arrow}>→</Text>
         </TouchableOpacity>
 
-        {/* Bouton pour aller à la page des mentions légales */}
+        {/* Bouton Mentions légales */}
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate("Legal")}
+          accessibilityLabel="Mentions légales"
+          accessibilityRole="button"
+          accessibilityHint="Aller à la page des mentions légales"
         >
           <Text style={styles.buttonText}>Mentions légales</Text>
           <Text style={styles.arrow}>→</Text>
         </TouchableOpacity>
 
-        {/* Bouton pour se déconnecter */}
-        <TouchableOpacity style={styles.button} onPress={handleLogout}>
+        {/* Bouton Déconnexion */}
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleLogout}
+          accessibilityLabel="Déconnexion"
+          accessibilityRole="button"
+          accessibilityHint="Se déconnecter de l'application"
+        >
           <Text style={styles.buttonText}>Déconnexion</Text>
           <Text style={styles.arrow}>→</Text>
         </TouchableOpacity>

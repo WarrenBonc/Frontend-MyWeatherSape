@@ -83,6 +83,9 @@ const ForgotPasswordPage = ({ navigation }) => {
           keyboardType="email-address"
           value={email}
           onChangeText={setEmail}
+          accessibilityLabel="Champ email"
+          accessibilityHint="Entrez votre adresse email"
+          accessibilityRole="champ email"
         />
         {error ? <Text style={styles.error}>{error}</Text> : null}
         <TouchableOpacity style={styles.button} onPress={handleSendResetLink}>
@@ -105,6 +108,9 @@ const ForgotPasswordPage = ({ navigation }) => {
           keyboardType="number-pad"
           value={code}
           onChangeText={setCode}
+          accessibilityLabel="Champ code de verification"
+          accessibilityHint="Entrez le code de verification"
+          accessibilityRole="champ code de verification"
         />
         {error ? <Text style={styles.error}>{error}</Text> : null}
         <TouchableOpacity style={styles.button} onPress={SendCode}>

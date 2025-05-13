@@ -55,27 +55,50 @@ const ResetPassword = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Réinitialiser votre mot de passe</Text>
+    <View
+      style={styles.container}
+      accessible={true}
+      accessibilityLabel="Écran de réinitialisation du mot de passe"
+    >
+      <Text style={styles.title} accessibilityRole="header">
+        Réinitialiser votre mot de passe
+      </Text>
+
       <TextInput
         style={styles.input}
         placeholder="Nouveau mot de passe"
         secureTextEntry
         value={newPassword}
         onChangeText={(text) => setNewPassword(text)}
+        accessibilityLabel="Nouveau mot de passe"
+        accessibilityHint="Entrez votre nouveau mot de passe"
+        accessibilityRole="keyboardkey"
       />
+
       <TextInput
         style={styles.input}
-        placeholder="confirmer le mot de passe"
+        placeholder="Confirmer le mot de passe"
         secureTextEntry
         value={confirmPassword}
         onChangeText={(text) => setConfirmPassword(text)}
+        accessibilityLabel="Confirmer le mot de passe"
+        accessibilityHint="Entrez à nouveau votre mot de passe pour confirmation"
+        accessibilityRole="keyboardkey"
       />
-      {error && <Text style={styles.errorText}>{error}</Text>}
+
+      {error && (
+        <Text style={styles.errorText} accessibilityLiveRegion="polite">
+          {error}
+        </Text>
+      )}
+
       <TouchableOpacity
         style={styles.button}
         onPress={handleResetPassword}
         disabled={loading}
+        accessibilityLabel="Réinitialiser le mot de passe"
+        accessibilityRole="button"
+        accessibilityHint="Valider et réinitialiser votre mot de passe"
       >
         <Text style={styles.buttonText}>
           {loading ? "Chargement..." : "Réinitialiser le mot de passe"}

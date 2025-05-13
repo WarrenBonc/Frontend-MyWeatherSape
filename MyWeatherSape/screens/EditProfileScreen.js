@@ -73,6 +73,8 @@ const EditProfileScreen = ({ navigation }) => {
       <TouchableOpacity
         onPress={() => navigation.goBack()}
         style={styles.backButton}
+        accessibilityLabel="Retour"
+        accessibilityRole="button"
       >
         <LinearGradient
           colors={["#34C8E8", "#4E4AF2"]}
@@ -97,6 +99,8 @@ const EditProfileScreen = ({ navigation }) => {
                   justifyContent: "space-between",
                   alignItems: "center",
                 }}
+                accessibilityLabel="Genre"
+                accessibilityRole="button"
               >
                 <Text style={styles.preferenceText}>
                   {gender === "aucune"
@@ -152,6 +156,8 @@ const EditProfileScreen = ({ navigation }) => {
                       setGenderModalVisible(false);
                     }}
                     style={{ paddingVertical: 10 }}
+                    accessibilityLabel={`Sexe : ${item}`}
+                    accessibilityRole="button"
                   >
                     <Text style={{ fontSize: 16 }}>
                       {item === "aucune"
@@ -163,6 +169,8 @@ const EditProfileScreen = ({ navigation }) => {
                 <TouchableOpacity
                   onPress={() => setGenderModalVisible(false)}
                   style={styles.cancelButton}
+                  accessibilityLabel="Annuler"
+                  accessibilityRole="button"
                 >
                   <Text style={styles.cancelButtonText}>Annuler</Text>
                 </TouchableOpacity>
@@ -172,7 +180,11 @@ const EditProfileScreen = ({ navigation }) => {
 
           <View style={styles.pickerContainer}>
             <Text style={styles.preferenceText}>Sensibilité au froid :</Text>
-            <TouchableOpacity onPress={() => setSensitivityModalVisible(true)}>
+            <TouchableOpacity
+              onPress={() => setSensitivityModalVisible(true)}
+              accessibilityLabel="Sensibilité au froid"
+              accessibilityRole="button"
+            >
               <View
                 style={{
                   flexDirection: "row",
@@ -257,7 +269,11 @@ const EditProfileScreen = ({ navigation }) => {
 
           <View style={styles.pickerContainer}>
             <Text style={styles.preferenceText}>Accessoires préférés :</Text>
-            <TouchableOpacity onPress={() => setAccessoryModalVisible(true)}>
+            <TouchableOpacity
+              onPress={() => setAccessoryModalVisible(true)}
+              accessibilityLabel="Accessoires préférés"
+              accessibilityRole="button"
+            >
               <View
                 style={{
                   flexDirection: "row",

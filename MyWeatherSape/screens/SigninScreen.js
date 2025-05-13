@@ -69,24 +69,39 @@ const SigninPage = ({ navigation }) => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles.container}>
-        {/* Ellipse Bottom Left */}
+      <View
+        style={styles.container}
+        accessible={true}
+        accessibilityLabel="Écran de connexion"
+      >
+        {/* Décorations */}
         <Image
           source={require("../assets/Ellipse.png")}
           style={[styles.ellipse, styles.bottomLeft]}
+          accessibilityIgnoresInvertColors
+          accessible={false}
         />
-        {/* Ellipse Top Right */}
         <Image
           source={require("../assets/Ellipse.png")}
           style={[styles.ellipse, styles.topRight]}
+          accessibilityIgnoresInvertColors
+          accessible={false}
         />
 
-        {/* Sign-in Form */}
-        <View style={styles.formContainer}>
-          <Text style={styles.title}>Connectez-vous à votre compte</Text>
+        {/* Formulaire */}
+        <View
+          style={styles.formContainer}
+          accessible={true}
+          accessibilityLabel="Formulaire de connexion"
+        >
+          <Text style={styles.title} accessibilityRole="header">
+            Connectez-vous à votre compte
+          </Text>
+
           <Text style={styles.text}>
             Entrez votre mot de passe et votre email pour vous connecter
           </Text>
+
           <TextInput
             style={styles.input}
             placeholder="Email"
@@ -95,8 +110,15 @@ const SigninPage = ({ navigation }) => {
             value={email}
             onChangeText={(text) => setEmail(text)}
             autoCapitalize="none"
+            accessibilityLabel="Champ email"
+            accessibilityHint="Entrez votre adresse e-mail"
           />
-          <View style={styles.passwordContainer}>
+
+          <View
+            style={styles.passwordContainer}
+            accessible={true}
+            accessibilityLabel="Champ mot de passe"
+          >
             <TextInput
               style={[styles.input, styles.passwordInput]}
               placeholder="Mot de passe"
@@ -104,31 +126,48 @@ const SigninPage = ({ navigation }) => {
               secureTextEntry={!passwordVisible}
               value={password}
               onChangeText={(text) => setPassword(text)}
+              accessibilityLabel="Champ mot de passe"
+              accessibilityHint="Entrez votre mot de passe"
             />
-
             <TouchableOpacity
               onPress={() => setPasswordVisible(!passwordVisible)}
               style={styles.iconContainer}
+              accessibilityLabel={
+                passwordVisible
+                  ? "Masquer le mot de passe"
+                  : "Afficher le mot de passe"
+              }
+              accessibilityRole="button"
             >
               <Image
                 source={
                   passwordVisible
-                    ? require("../assets/eye-open.png") // Replace with your "eye open" icon
-                    : require("../assets/eye-closed.png") // Replace with your "eye closed" icon
+                    ? require("../assets/eye-open.png")
+                    : require("../assets/eye-closed.png")
                 }
                 style={styles.icon}
+                accessibilityIgnoresInvertColors
               />
             </TouchableOpacity>
           </View>
-          {error && <Text style={{ color: "red" }}>{error}</Text>}
-          {/* Forgot Password */}
+
+          {error && (
+            <Text style={{ color: "red" }} accessibilityLiveRegion="polite">
+              {error}
+            </Text>
+          )}
+
+          {/* Mot de passe oublié */}
           <TouchableOpacity
             style={styles.forgotPasswordButton}
             onPress={() => navigation.navigate("ForgotPassword")}
+            accessibilityLabel="Mot de passe oublié"
+            accessibilityRole="button"
           >
             <Text style={styles.forgotPasswordText}>Mot de passe oublié ?</Text>
           </TouchableOpacity>
 
+          {/* Bouton connexion */}
           <LinearGradient
             colors={["#34C8E8", "#4E4AF2"]}
             start={{ x: 0, y: 0 }}
@@ -139,15 +178,20 @@ const SigninPage = ({ navigation }) => {
             <TouchableOpacity
               style={styles.buttonContent}
               onPress={() => handleSignin()}
+              accessibilityRole="button"
+              accessibilityLabel="Se connecter"
             >
               <Text style={styles.buttonText}>Se connecter</Text>
             </TouchableOpacity>
           </LinearGradient>
         </View>
-        {/* pas de compte ? créer un compte */}
+
+        {/* Créer un compte */}
         <TouchableOpacity
           style={styles.createAccountButton}
           onPress={() => navigation.navigate("Signup")}
+          accessibilityLabel="Créer un compte"
+          accessibilityRole="button"
         >
           <Text style={styles.createAccountText}>Pas de compte ?</Text>
           <Text style={styles.blueText}>Créer un compte</Text>

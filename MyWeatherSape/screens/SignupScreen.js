@@ -118,29 +118,46 @@ const SignupPage = ({ navigation }) => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
         <Image
           source={require("../assets/Ellipse.png")}
           style={[styles.ellipse, styles.bottomLeft]}
+          accessible={false}
         />
         <Image
           source={require("../assets/Ellipse.png")}
           style={[styles.ellipse, styles.topRight]}
+          accessible={false}
         />
 
         <View style={styles.formContainer}>
-          <Text style={styles.title}>Créer un compte</Text>
-          <Text style={styles.text}>
+          <Text
+            style={styles.title}
+            accessibilityRole="header"
+            accessible={true}
+          >
+            Créer un compte
+          </Text>
+
+          <Text
+            style={styles.text}
+            accessible={true}
+            accessibilityLabel="Remplissez les informations ci-dessous pour créer un compte"
+          >
             Remplissez les informations ci-dessous pour créer un compte
           </Text>
+
           <TextInput
             style={styles.input}
             placeholder="Prénom"
             placeholderTextColor="#aaa"
             value={firstName}
             onChangeText={setFirstName}
+            accessible={true}
+            accessibilityLabel="Champ de texte : Prénom"
           />
+
           <TextInput
             style={styles.input}
             placeholder="Email"
@@ -150,8 +167,15 @@ const SignupPage = ({ navigation }) => {
             autoCorrect={false}
             value={email}
             onChangeText={setEmail}
+            accessible={true}
+            accessibilityLabel="Champ de texte : Email"
           />
-          <View style={styles.passwordContainer}>
+
+          <View
+            style={styles.passwordContainer}
+            accessible={true}
+            accessibilityLabel="Champ de texte : Mot de passe avec bouton d’affichage"
+          >
             <TextInput
               style={[styles.input, styles.passwordInput]}
               placeholder="Mot de passe"
@@ -159,10 +183,19 @@ const SignupPage = ({ navigation }) => {
               secureTextEntry={!passwordVisible}
               value={password}
               onChangeText={setPassword}
+              accessible={true}
+              accessibilityLabel="Champ de texte : Mot de passe"
             />
             <TouchableOpacity
               onPress={() => setPasswordVisible(!passwordVisible)}
               style={styles.iconContainer}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel={
+                passwordVisible
+                  ? "Masquer le mot de passe"
+                  : "Afficher le mot de passe"
+              }
             >
               <Image
                 source={
@@ -175,7 +208,6 @@ const SignupPage = ({ navigation }) => {
             </TouchableOpacity>
           </View>
 
-          {/* Date of Birth Input */}
           <TextInput
             style={styles.input}
             placeholder="Date de naissance (jj/mm/aaaa)"
@@ -183,7 +215,9 @@ const SignupPage = ({ navigation }) => {
             value={dateOfBirth}
             onChangeText={handleDateInput}
             keyboardType="numeric"
-            maxLength={10} // Limite la saisie à 10 caractères
+            maxLength={10}
+            accessible={true}
+            accessibilityLabel="Champ de texte : Date de naissance, au format jour mois année"
           />
 
           <LinearGradient
@@ -195,8 +229,11 @@ const SignupPage = ({ navigation }) => {
           >
             <TouchableOpacity
               style={styles.buttonContent}
-              onPress={() => handleSignup()}
+              onPress={handleSignup}
               disabled={loading}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Créer un compte"
             >
               <Text style={styles.buttonText}>Créer un compte</Text>
             </TouchableOpacity>
@@ -205,6 +242,9 @@ const SignupPage = ({ navigation }) => {
           <TouchableOpacity
             style={styles.haveAccountButton}
             onPress={() => navigation.navigate("SignIn")}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Vous avez déjà un compte ? Connectez-vous"
           >
             <Text style={styles.haveAccountText}>
               Vous avez déjà un compte ?
