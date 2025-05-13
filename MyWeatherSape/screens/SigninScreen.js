@@ -20,6 +20,7 @@ const SigninPage = ({ navigation }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const dispatch = useDispatch();
   const [error, setError] = useState("");
 
@@ -30,7 +31,7 @@ const SigninPage = ({ navigation }) => {
       return;
     }
     console.log("url", `${config.API_BASE_URL}/api/users/signin`);
-    setLoading(true);
+
     setError(""); // Réinitialise l'erreur avant de commencer la requête
 
     fetch(`${config.API_BASE_URL}/api/users/signin`, {
@@ -61,9 +62,6 @@ const SigninPage = ({ navigation }) => {
       .catch((err) => {
         console.error(err);
         setError("Une erreur est survenue, veuillez réessayer.");
-      })
-      .finally(() => {
-        setLoading(false); // Réinitialise l'état de chargement
       });
   };
 
